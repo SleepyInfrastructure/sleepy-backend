@@ -1,11 +1,10 @@
 /* Types */
-import { DatabaseType, Status } from "../../../../ts/base";
-import { RoutePushUnsubscribeOptions } from "../types";
+import { DatabaseType, Status } from "../../../../../ts/base";
+import { RoutePushUnsubscribeOptions } from "./index";
 
 /* Local Imports */
 import APIRoute from "..";
-import FeatureAPI from "../../api";
-import Database from "../../../../database";
+import FeatureAPI from "../..";
 
 class RoutePushUnsubscribe extends APIRoute {
     options: RoutePushUnsubscribeOptions;
@@ -19,25 +18,19 @@ class RoutePushUnsubscribe extends APIRoute {
         if (feature.instance === null) {
             return;
         }
-        if (
-            Array.from(feature.parent.databaseContainer.values()).filter((e) => {
-                return e.type === DatabaseType.MYSQL;
-            }).length === 0
-        ) {
+        const database = feature.parent.getDatabase(DatabaseType.MYSQL);
+        if (database === undefined) {
             this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
             return;
         }
 
-        const database: Database = Array.from(feature.parent.databaseContainer.values()).filter((e) => {
-            return e.type === DatabaseType.MYSQL;
-        })[0];
         feature.instance.post(this.path,
             { config: { rateLimit: { timeWindow: 1000, max: 4 } } },
             async (req, rep) => {
                 /* Validate schema */
                 if(req.cookies.Token === undefined) { rep.code(403); rep.send(); return; }
 
-                /* Check if user is logged in */
+                /* Get session */
                 const session = await database.fetch({ source: "sessions", selectors: { "id": req.cookies.Token } });
                 if(session === undefined) { rep.code(403); rep.send(); return; }
 

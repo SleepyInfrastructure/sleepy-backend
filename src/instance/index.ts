@@ -8,8 +8,10 @@ import { readFileSync } from "fs";
 
 /* Local Imports */
 import Feature from "../feature";
-import FeatureStatic from "../feature/addons/static";
-import FeatureAPI from "../feature/addons/api";
+import FeatureStatic from "../feature/built-in/static";
+import FeatureAPI from "../feature/built-in/api";
+import FeatureDaemon from "../feature/custom/daemon";
+import FeatureDaemonCron from "../feature/custom/daemon-cron";
 import Database from "../database";
 import DatabaseMySQL from "../database/addons/mysql";
 
@@ -57,6 +59,14 @@ class Instance {
                 case FeatureType.API:
                     feature = new FeatureAPI(this, options);
                     break;
+
+                case FeatureType.DAEMON:
+                    feature = new FeatureDaemon(this, options);
+                    break;
+
+                case FeatureType.DAEMON_CRON:
+                    feature = new FeatureDaemonCron(this, options);
+                    break;
             }
 
             if (feature === undefined) {
@@ -102,6 +112,10 @@ class Instance {
     fail(errorStatus: StateDescriptor): void {
         this.state = { status: Status.ERROR, message: errorStatus.message };
         console.log(`[  ${red("ERROR")}  ] Instance ${bold(yellow(this.options.name))} failed to start!`);
+    }
+
+    getDatabase(type: DatabaseType): Database | undefined {
+        return Array.from(this.databaseContainer.values()).find((e) => e.type === type);
     }
 }
 

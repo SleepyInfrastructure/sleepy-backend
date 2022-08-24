@@ -1,6 +1,6 @@
 /* Types */
-import { DatabaseType, DatabaseFetchOptions, Status } from "../../../../ts/base";
-import { RoutePushSendOptions } from "../types";
+import { DatabaseType, DatabaseFetchOptions, Status } from "../../../../../ts/base";
+import { RoutePushSendOptions } from "./index";
 
 /* Node Imports */
 import { FastifyRequest } from "fastify";
@@ -8,8 +8,7 @@ import * as webPush from "web-push";
 
 /* Local Imports */
 import APIRoute from "..";
-import FeatureAPI from "../../api";
-import Database from "../../../../database";
+import FeatureAPI from "../..";
 
 type Request = FastifyRequest<{
     Querystring: { message: string, adminKey: string };
@@ -27,18 +26,12 @@ class RoutePushSend extends APIRoute {
         if (feature.instance === null) {
             return;
         }
-        if (
-            Array.from(feature.parent.databaseContainer.values()).filter((e) => {
-                return e.type === DatabaseType.MYSQL;
-            }).length === 0
-        ) {
+        const database = feature.parent.getDatabase(DatabaseType.MYSQL);
+        if (database === undefined) {
             this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
             return;
         }
 
-        const database: Database = Array.from(feature.parent.databaseContainer.values()).filter((e) => {
-            return e.type === DatabaseType.MYSQL;
-        })[0];
         feature.instance.post(this.path,
             { config: { rateLimit: { timeWindow: 1000, max: 4 } } },
             async (req: Request, rep) => {
@@ -64,8 +57,8 @@ class RoutePushSend extends APIRoute {
                         privateKey: privateKey
                     }
                 };
-                
-                users.forEach(user => {
+
+                for(const user of users) {
                     const subscription = {
                         endpoint: user.pushUrl,
                         keys: {
@@ -74,7 +67,7 @@ class RoutePushSend extends APIRoute {
                         }
                     };
                     webPush.sendNotification(subscription, notificationPayload, notificationOptions);
-                });
+                }
             }
         );
     }

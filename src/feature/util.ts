@@ -1,14 +1,17 @@
 /* Types */
-import { FeatureOptions } from "../ts/base";
+import { FeatureOptions, FeatureServerOptions } from "../ts/base";
 
 /* Node Imports */
 import * as fastify from "fastify";
-import fastifyCors from "fastify-cors";
-import fastifyCookie from "fastify-cookie";
-import fastifyRateLimit from "fastify-rate-limit";
+import fastifyCors from "@fastify/cors";
+import fastifyCookie from "@fastify/cookie";
+import fastifyRateLimit from "@fastify/rate-limit";
+import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import { readFileSync } from "fs";
+import fastifyWebsocket from "@fastify/websocket";
+import fastifyMultipart from "@fastify/multipart";
 
-export function createFastifyInstance(options: FeatureOptions): fastify.FastifyInstance | Error {
+export function createFastifyInstance(options: FeatureServerOptions, websocket: boolean): fastify.FastifyInstance | Error {
     let instance: fastify.FastifyInstance;
     if (options.https) {
         instance = fastify.fastify({
@@ -16,7 +19,7 @@ export function createFastifyInstance(options: FeatureOptions): fastify.FastifyI
                 cert: readFileSync(`configs/features/${options.id}/cert.crt`),
                 key: readFileSync(`configs/features/${options.id}/key.key`),
             },
-        });
+        }).withTypeProvider<TypeBoxTypeProvider>();
     } else {
         instance = fastify.fastify();
     }
@@ -29,29 +32,44 @@ export function createFastifyInstance(options: FeatureOptions): fastify.FastifyI
             credentials: true,
         });
     }
-    if(options.rateLimit === true) {
-        instance.register(fastifyRateLimit, {
-            global : false
-        });
-    }
+    instance.register(fastifyRateLimit, {
+        global : false
+    });
     instance.register(fastifyCookie, {});
+    instance.addContentTypeParser('application/json', { parseAs: 'string' }, function (req, body, done) {
+        try {
+            const json = JSON.parse(body.toString());
+            done(null, json);
+        } catch (e: any) {
+            e.statusCode = 400;
+            done(e, undefined);
+        }
+    });
+    if(websocket) {
+        instance.register(fastifyWebsocket);
+    }
+    instance.register(fastifyMultipart, {});
 
     return instance;
 };
 
 
-export async function startFastifyInstance(instance: fastify.FastifyInstance, options: FeatureOptions): Promise<Error | null> {
-    return await new Promise((resolve) => {
+export async function startFastifyInstance(instance: fastify.FastifyInstance, options: FeatureServerOptions): Promise<null> {
+    return await new Promise((resolve, reject) => {
         if (instance === undefined) {
-            resolve(new Error("Instance failed to start!"));
+            reject(new Error("Instance failed to start!"));
             return;
         }
-        instance.listen(options.port, "0.0.0.0", (e) => {
+        instance.listen({ host: "0.0.0.0", port: options.port }, (e) => {
             if (e) {
-                resolve(e);
+                reject(e);
                 return;
             }
             resolve(null);
         });
     });
 };
+
+export function pad(n: number) {
+    return n < 10 ? `0${n}` : n.toString();
+}

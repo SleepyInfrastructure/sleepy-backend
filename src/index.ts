@@ -18,22 +18,22 @@ class Server {
 
     load() {
         const args = process.argv.slice(2);
-        args.forEach((arg, i) => {
+        for(const arg of args) {
             switch (arg) {
                 default:
                     break;
             }
-        });
+        }
     }
 
     start() {
-        this.rootOptions.instances.forEach((instanceID: string) => {
+        for(const instanceID of this.rootOptions.instances) {
             const worker: Worker = new Worker("./build/instance/index.js", {
                 workerData: {
                     id: instanceID,
                 },
             });
-        });
+        }
     }
 }
 

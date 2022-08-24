@@ -1,14 +1,13 @@
 /* Types */
-import { DatabaseType, Status } from "../../../../ts/base";
-import { RoutePushSubscribeOptions } from "../types";
+import { DatabaseType, Status } from "../../../../../ts/base";
+import { RoutePushSubscribeOptions } from "./index";
 
 /* Node Imports */
 import { FastifyRequest } from "fastify";
 
 /* Local Imports */
 import APIRoute from "..";
-import FeatureAPI from "../../api";
-import Database from "../../../../database";
+import FeatureAPI from "../..";
 
 type Request = FastifyRequest<{
     Querystring: { url: string, key: string, auth: string };
@@ -26,18 +25,12 @@ class RoutePushSubscribe extends APIRoute {
         if (feature.instance === null) {
             return;
         }
-        if (
-            Array.from(feature.parent.databaseContainer.values()).filter((e) => {
-                return e.type === DatabaseType.MYSQL;
-            }).length === 0
-        ) {
+        const database = feature.parent.getDatabase(DatabaseType.MYSQL);
+        if (database === undefined) {
             this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
             return;
         }
 
-        const database: Database = Array.from(feature.parent.databaseContainer.values()).filter((e) => {
-            return e.type === DatabaseType.MYSQL;
-        })[0];
         feature.instance.post(this.path,
             { config: { rateLimit: { timeWindow: 1000, max: 4 } } },
             async (req: Request, rep) => {

@@ -1,50 +1,57 @@
 services:
-  foxxy-mysql:
-    container_name: foxxy-mysql
+  sleepy-mysql:
+    container_name: sleepy-mysql
     image: mariadb:latest
     restart: "always"
-    expose:
-      - "3306"
+    ports:
+      - "3306:3306"
     networks:
-      - foxxy-backend
+      - sleepy-backend
     volumes:
-      - foxxy-mysql:/var/lib/mysql
+      - sleepy-mysql:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: "${FOXXY_mysql_PASSWORD}"
-      MYSQL_DATABASE: "foxxy-db"
+      MYSQL_ROOT_PASSWORD: "${SLEEPY_MYSQL_PASSWORD}"
+      MYSQL_DATABASE: "sleepy-db"
       MYSQL_ROOT_HOST: "%"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "--silent"]
-      timeout: 5s
-      retries: 10
+      timeout: 2s
+      retries: 30
     command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
-  foxxy-backend:
-    container_name: foxxy-backend
-    image: foxxy-backend:latest
+  sleepy-ssh:
+    container_name: sleepy-ssh
+    image: sleepy-ssh:latest
+    restart: "always"
+    ports:
+      - "8888:8888"
+    build:
+      context: .docker/images/sleepy-ssh
+      dockerfile: Dockerfile
+  sleepy-backend:
+    container_name: sleepy-backend
+    image: sleepy-backend:latest
     restart: "always"
     ports:
       - "8081:8081"
       - "8082:8082"
+      - "23365:23365"
     networks:
-      - foxxy-backend
+      - sleepy-backend
     volumes:
       - ./configs:/usr/src/app/configs
+      - C:\Users\LamkasDev\Desktop\sleepy:/usr/src/sleepy
     environment:
-      FOXXY_mysql_PASSWORD: "${FOXXY_mysql_PASSWORD}"
+      SLEEPY_MYSQL_PASSWORD: "${SLEEPY_MYSQL_PASSWORD}"
     depends_on:
-      foxxy-mysql:
-        condition: service_healthy
-      foxxy-redis:
+      sleepy-mysql:
         condition: service_healthy
     build: 
       context: ./
-      dockerfile: .docker/images/foxxy-backend/Dockerfile
+      dockerfile: .docker/images/sleepy-backend/Dockerfile
     tty: yes
 volumes:
-  foxxy-mysql:
-    external: true
-  foxxy-redis:
+  sleepy-mysql:
     external: true
 networks:
-  foxxy-backend:
-    name: foxxy-backend
+  sleepy-backend:
+    name: sleepy-backend

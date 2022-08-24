@@ -15,13 +15,17 @@ export type InstanceOptions = {
 export enum FeatureType {
     STATIC = "STATIC",
     API = "API",
+    DAEMON = "DAEMON",
+    DAEMON_CRON = "DAEMON_CRON",
 }
 
 export type FeatureOptions = {
     id: string;
     name: string;
     type: FeatureType;
+};
 
+export type FeatureServerOptions = FeatureOptions & {
     port: number;
     https: boolean;
     cors?: {
@@ -42,21 +46,45 @@ export type DatabaseOptions = {
     type: DatabaseType;
 };
 
+export type DatabaseSelectorValue = string | number | DatabaseFetchSelector;
+export type DatabaseItemValue = string | number | null;
+
 export type DatabaseFetchOptions = {
     source: string;
-    selectors: Record<string, string>;
+    selectors: Record<string, string | number | DatabaseFetchSelector>;
     ignoreSensitive?: boolean;
+    sort?: DatabaseSort;
+};
+
+export type DatabaseFetchSelector = {
+    value: string | number;
+    comparison: ">" | ">=" | "<" | "<>" | "!=" | "<=" | "<=>" | "=";
+};
+
+export type DatabaseFetchMultipleOptions = DatabaseFetchOptions & {
+    offset?: number;
+    limit?: number;
+};
+
+export type DatabaseSort = {
+    order?: "ASC" | "DESC";
+    field: string;
 };
 
 export type DatabaseAddOptions = {
     destination: string;
-    item: Record<string, string | number>;
+    item: Record<string, DatabaseItemValue>;
 };
 
 export type DatabaseEditOptions = {
     destination: string;
-    selectors: Record<string, string>;
-    item: Record<string, string | number>;
+    selectors: Record<string, DatabaseSelectorValue>;
+    item: Record<string, DatabaseItemValue>;
+};
+
+export type DatabaseDeleteOptions = {
+    source: string;
+    selectors: Record<string, DatabaseSelectorValue>;
 };
 
 /* Statuses */

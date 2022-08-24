@@ -1,20 +1,31 @@
 /* Types */
-import { DatabaseType, DatabaseFetchOptions, Status } from "../../../../ts/base";
-import { RouteSessionCreateOptions } from "../types";
+import { DatabaseType, DatabaseFetchOptions, Status } from "../../../../../ts/base";
+import { RouteSessionCreateOptions } from "./index";
 
 /* Node Imports */
 import { compare } from "bcrypt";
 import { randomBytes } from "crypto";
-import { FastifyRequest } from "fastify";
+import { FastifyRequest, FastifySchema } from "fastify";
 
 /* Local Imports */
 import APIRoute from "..";
-import FeatureAPI from "../../api";
-import Database from "../../../../database";
+import FeatureAPI from "../..";
 
 type Request = FastifyRequest<{
-    Querystring: { type: string, username?: string; password?: string };
+    Body: { type: string, username?: string; password?: string };
 }>;
+
+const schema: FastifySchema = {
+    body: {
+        type: "object",
+        required: ["type"],
+        properties: {
+            type: { type: "string", pattern: "token|classic" },
+            username: { type: "string", minLength: 3, maxLength: 64 },
+            password: { type: "string", minLength: 8, maxLength: 64 }
+        }
+    }
+};
 
 class RouteSessionCreate extends APIRoute {
     options: RouteSessionCreateOptions;
@@ -28,56 +39,47 @@ class RouteSessionCreate extends APIRoute {
         if (feature.instance === null) {
             return;
         }
-        if (
-            Array.from(feature.parent.databaseContainer.values()).filter((e) => {
-                return e.type === DatabaseType.MYSQL;
-            }).length === 0
-        ) {
+        const database = feature.parent.getDatabase(DatabaseType.MYSQL);
+        if (database === undefined) {
             this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
             return;
         }
 
-        const database: Database = Array.from(feature.parent.databaseContainer.values()).filter((e) => {
-            return e.type === DatabaseType.MYSQL;
-        })[0];
         feature.instance.post(this.path,
-            { config: { rateLimit: { timeWindow: 1000, max: 4 } } },
+            { schema: schema, config: { rateLimit: { timeWindow: 1000, max: 4 } } },
             async (req: Request, rep) => {
-                switch(req.query.type) {
+                switch(req.body.type) {
                     case "token": {
                         /* Validate schema */
                         if(req.cookies.Token === undefined) { rep.code(403); rep.send(); return; }
 
-                        /* Check if session exists */
-                        const options: DatabaseFetchOptions = { source: "sessions", selectors: { id: req.cookies.Token }, ignoreSensitive: true };
+                        /* Get session */
+                        const options: DatabaseFetchOptions = { source: "sessions", selectors: { id: req.cookies.Token } };
                         const session = await database.fetch(options);
                         if (session === undefined) {
-                            rep.code(404);
-                            rep.send();
+                            rep.code(404); rep.send();
                             return;
                         }
 
                         /* Return session */
-                        rep.cookie("Token", session.id);
                         rep.send(session);
                         break;
                     }
 
                     case "classic": {
                         /* Validate schema */
-                        if(req.query.username === undefined || req.query.password === undefined) { rep.code(400); rep.send(); return; }
+                        if(req.body.username === undefined || req.body.password === undefined) { rep.code(400); rep.send(); return; }
                         
-                        /* Check if user exists */
-                        const options: DatabaseFetchOptions = { source: "users", selectors: { username: req.query.username }, ignoreSensitive: true };
+                        /* Get user */
+                        const options: DatabaseFetchOptions = { source: "users", selectors: { username: req.body.username }, ignoreSensitive: true };
                         const user = await database.fetch(options);
                         if (user === undefined) {
-                            rep.code(404);
-                            rep.send();
+                            rep.code(404); rep.send();
                             return;
                         }
 
                         /* Compare passwords */
-                        if ((await compare(req.query.password, user.password)) === false) {
+                        if ((await compare(req.body.password, user.password.toString())) === false) {
                             rep.code(401);
                             rep.send();
                             return;
@@ -89,7 +91,7 @@ class RouteSessionCreate extends APIRoute {
                             user: user.id
                         };
                         database.add({ destination: "sessions", item: session });
-                        rep.cookie("Token", session.id);
+                        rep.cookie("Token", session.id, { path: "/", httpOnly: true, maxAge: 604800000 });
                         rep.send(session);
                         break;
                     }

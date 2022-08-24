@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 RUN apk update
 RUN apk add bash jq
 
-COPY package*.json ./
+COPY package*.json yarn.lock ./
 RUN yarn --no-cache
 
 COPY . .

@@ -4,7 +4,7 @@ import { FeatureStaticOptions } from "./types";
 
 /* Node Imports */
 import * as fastify from "fastify";
-import fastifyStatic from "fastify-static";
+import fastifyStatic from "@fastify/static";
 import { existsSync, createReadStream } from "fs";
 import { join } from "path";
 
@@ -29,7 +29,7 @@ class FeatureStatic extends Feature {
             return;
         }
 
-        const result = await createFastifyInstance(this.options);
+        const result = await createFastifyInstance(this.options, false);
         if (result instanceof Error) {
             this.state = { status: Status.ERROR, message: result.message };
             return;
@@ -40,13 +40,12 @@ class FeatureStatic extends Feature {
             root: this.options.root,
         });
         if(this.options.roots !== undefined) {
-            this.options.roots.forEach(root => {
-                if(this.instance === null) { return; }
+            for(const root of this.options.roots) {
                 this.instance.get(root, (req: any, rep: any) => {
                     const stream = createReadStream(join(this.options.root, "index.html"));
                     rep.type("text/html").send(stream);
                 });
-            });
+            }
         }
 
         startFastifyInstance(this.instance, this.options);
