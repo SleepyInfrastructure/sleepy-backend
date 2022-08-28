@@ -1,5 +1,6 @@
 /* Types */
-import { DatabaseType, Status } from "../../../../../ts/base";
+import { Status } from "../../../../../ts/base";
+import { DatabaseType } from "../../../../../database/types";
 import { RouteFetchMultipleOptions } from "./index";
 
 /* Node Imports */
@@ -28,8 +29,8 @@ const schema: FastifySchema = {
 class RouteFetchMultiple extends APIRoute {
     options: RouteFetchMultipleOptions;
 
-    constructor(options: RouteFetchMultipleOptions) {
-        super(options);
+    constructor(feature: FeatureAPI, options: RouteFetchMultipleOptions) {
+        super(feature, options);
         this.options = options;
     }
 

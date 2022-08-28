@@ -1,13 +1,13 @@
 /* Types */
-import { FeatureOptions, FeatureServerOptions } from "../ts/base";
+import { FeatureServerOptions } from "../ts/base";
 
 /* Node Imports */
+import { readFileSync } from "fs";
 import * as fastify from "fastify";
 import fastifyCors from "@fastify/cors";
 import fastifyCookie from "@fastify/cookie";
 import fastifyRateLimit from "@fastify/rate-limit";
-import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
-import { readFileSync } from "fs";
+import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import fastifyWebsocket from "@fastify/websocket";
 import fastifyMultipart from "@fastify/multipart";
 
@@ -21,7 +21,7 @@ export function createFastifyInstance(options: FeatureServerOptions, websocket: 
             },
         }).withTypeProvider<TypeBoxTypeProvider>();
     } else {
-        instance = fastify.fastify();
+        instance = fastify.fastify({}).withTypeProvider<TypeBoxTypeProvider>();
     }
     if (instance === undefined) {
         return new Error("Instance failed to start!");
@@ -32,9 +32,7 @@ export function createFastifyInstance(options: FeatureServerOptions, websocket: 
             credentials: true,
         });
     }
-    instance.register(fastifyRateLimit, {
-        global : false
-    });
+    instance.register(fastifyRateLimit, { global : false });
     instance.register(fastifyCookie, {});
     instance.addContentTypeParser('application/json', { parseAs: 'string' }, function (req, body, done) {
         try {

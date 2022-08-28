@@ -1,7 +1,7 @@
 /* Types */
 import { Status } from "../../../../../ts/base";
-import { RouteDaemonTokenCreateOptions } from "./index";
 import { DatabaseType } from "../../../../../database/types";
+import { RouteUptimeEndpointCreateOptions } from "./index";
 
 /* Node Imports */
 import { randomBytes } from "crypto";
@@ -12,23 +12,25 @@ import APIRoute from "..";
 import FeatureAPI from "../..";
 
 type Request = FastifyRequest<{
-    Body: { id: string };
+    Body: { name: string, host?: string, requestEndpoint?: string };
 }>;
 
 const schema: FastifySchema = {
     body: {
         type: "object",
-        required: ["id"],
+        required: ["name"],
         properties: {
-            id: { type: "string", minLength: 32, maxLength: 32 }
+            name: { type: "string", minLength: 3, maxLength: 64 },
+            host: { type: "string", minLength: 3, maxLength: 256 },
+            requestEndpoint: { type: "string", pattern: "(http:\/\/|https:\/\/).*", maxLength: 256 }
         }
     }
 };
 
-class RouteDaemonTokenCreate extends APIRoute {
-    options: RouteDaemonTokenCreateOptions;
+class RouteUptimeEndpointCreate extends APIRoute {
+    options: RouteUptimeEndpointCreateOptions;
 
-    constructor(feature: FeatureAPI, options: RouteDaemonTokenCreateOptions) {
+    constructor(feature: FeatureAPI, options: RouteUptimeEndpointCreateOptions) {
         super(feature, options);
         this.options = options;
     }
@@ -47,36 +49,28 @@ class RouteDaemonTokenCreate extends APIRoute {
             { schema: schema, config: { rateLimit: { timeWindow: 10000, max: 1 } } },
             async (req: Request, rep) => {
                 /* Validate schema */
-                if(req.body.id === undefined) { rep.code(400); rep.send(); return; }
+                if(req.body.host === undefined && req.body.requestEndpoint === undefined) { rep.code(400); rep.send(); return; }
                 if(req.cookies.Token === undefined) { rep.code(403); rep.send(); return; }
 
                 /* Get session */
                 const session = await database.fetch({ source: "sessions", selectors: { "id": req.cookies.Token } });
                 if(session === undefined) { rep.code(403); rep.send(); return; }
 
-                /* Get server */
-                const server = await database.fetch({ source: "servers", selectors: { "id": req.body.id } });
-                if(server === undefined) { rep.code(404); rep.send(); return; }
-
-                /* Check if server belongs to logged in user */
-                if(server.author !== session.user) {
-                    rep.code(403); rep.send();
-                    return;
-                }
-
-                /* Create a new token */
-                const token = {
+                /* Create endpoint */
+                const endpoint = {
                     id: randomBytes(16).toString("hex"),
                     author: session.user,
-                    server: req.body.id,
-                    timestamp: Math.round(Date.now() / 1000),
-                    used: Math.round(Date.now() / 1000)
+                    name: req.body.name,
+                    host: req.body.host ?? null,
+                    requestEndpoint: req.body.requestEndpoint ?? null
                 };
-                database.add({ destination: "daemontokens", item: token });
-                rep.send(token);
+                database.add({ destination: "uptimeendpoints", item: endpoint });
+
+                /* Send structured */
+                rep.send(endpoint);
             }
         );
     }
 }
 
-export default RouteDaemonTokenCreate;
+export default RouteUptimeEndpointCreate;

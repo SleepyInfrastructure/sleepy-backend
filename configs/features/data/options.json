@@ -1,0 +1,12 @@
+{
+	"id": "data",
+	"name": "data",
+	"type": "STATIC",
+
+	"port": 455,
+	"https": false,
+	"cors": {
+        "origins": ["https://sleepy.lamkas.dev", "https://daemon.sleepy.lamkas.dev", "http://localhost:8080"]
+    },
+	"root": "/usr/src/sleepy/data"
+}

@@ -1,3 +1,5 @@
+import { RouteFetchStructuredItemOptions } from "../feature/built-in/api/routes/built-in";
+
 /* Root Options */
 export type RootOptions = {
     instances: string[];
@@ -16,7 +18,7 @@ export enum FeatureType {
     STATIC = "STATIC",
     API = "API",
     DAEMON = "DAEMON",
-    DAEMON_CRON = "DAEMON_CRON",
+    CRON = "CRON",
 }
 
 export type FeatureOptions = {
@@ -34,58 +36,14 @@ export type FeatureServerOptions = FeatureOptions & {
     rateLimit?: boolean;
 };
 
-/* Databases */
-export enum DatabaseType {
-    MYSQL = "MYSQL",
-    REDIS = "REDIS",
-}
+/* API Structures */
+export type APIStructure = Record<string, RouteFetchStructuredItemOptions & { type: "SINGLE" | "ARRAY" }>;
 
-export type DatabaseOptions = {
+export type APIStructureOptions = {
     id: string;
-    name: string;
-    type: DatabaseType;
+    structure: APIStructure;
 };
 
-export type DatabaseSelectorValue = string | number | DatabaseFetchSelector;
-export type DatabaseItemValue = string | number | null;
-
-export type DatabaseFetchOptions = {
-    source: string;
-    selectors: Record<string, string | number | DatabaseFetchSelector>;
-    ignoreSensitive?: boolean;
-    sort?: DatabaseSort;
-};
-
-export type DatabaseFetchSelector = {
-    value: string | number;
-    comparison: ">" | ">=" | "<" | "<>" | "!=" | "<=" | "<=>" | "=";
-};
-
-export type DatabaseFetchMultipleOptions = DatabaseFetchOptions & {
-    offset?: number;
-    limit?: number;
-};
-
-export type DatabaseSort = {
-    order?: "ASC" | "DESC";
-    field: string;
-};
-
-export type DatabaseAddOptions = {
-    destination: string;
-    item: Record<string, DatabaseItemValue>;
-};
-
-export type DatabaseEditOptions = {
-    destination: string;
-    selectors: Record<string, DatabaseSelectorValue>;
-    item: Record<string, DatabaseItemValue>;
-};
-
-export type DatabaseDeleteOptions = {
-    source: string;
-    selectors: Record<string, DatabaseSelectorValue>;
-};
 
 /* Statuses */
 export type StateDescriptor = {

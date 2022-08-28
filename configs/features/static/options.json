@@ -1,0 +1,10 @@
+{
+	"id": "static",
+	"name": "static",
+	"type": "STATIC",
+
+	"port": 454,
+	"https": false,
+	"root": "/usr/src/sleepy/static",
+	"roots": ["/", "/login", "/register", "/tokens", "/settings", "/create-server", "/server/:id", "/installing-daemon/:id"]
+}

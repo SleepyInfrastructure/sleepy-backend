@@ -1,5 +1,6 @@
 /* Types */
-import { DatabaseType, Status } from "../../../../../ts/base";
+import { Status } from "../../../../../ts/base";
+import { DatabaseType } from "../../../../../database/types";
 import { RoutePushSubscribeOptions } from "./index";
 
 /* Node Imports */
@@ -16,8 +17,8 @@ type Request = FastifyRequest<{
 class RoutePushSubscribe extends APIRoute {
     options: RoutePushSubscribeOptions;
 
-    constructor(options: RoutePushSubscribeOptions) {
-        super(options);
+    constructor(feature: FeatureAPI, options: RoutePushSubscribeOptions) {
+        super(feature, options);
         this.options = options;
     }
 

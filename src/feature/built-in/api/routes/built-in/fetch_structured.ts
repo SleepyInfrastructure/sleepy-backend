@@ -1,5 +1,6 @@
 /* Types */
-import { DatabaseType, Status } from "../../../../../ts/base";
+import { APIStructure, Status } from "../../../../../ts/base";
+import { DatabaseType } from "../../../../../database/types";
 import { RouteFetchStructuredOptions } from "./index";
 
 /* Node Imports */
@@ -26,10 +27,23 @@ const schema: FastifySchema = {
 
 class RouteFetchStructured extends APIRoute {
     options: RouteFetchStructuredOptions;
+    structure: APIStructure;
 
-    constructor(options: RouteFetchStructuredOptions) {
-        super(options);
+    constructor(feature: FeatureAPI, options: RouteFetchStructuredOptions) {
+        super(feature, options);
         this.options = options;
+
+        if(typeof(this.options.structure) === "object") {
+            this.structure = this.options.structure;
+        } else {
+            const structureTemp = feature.parent.structureContainer.get(this.options.structure);
+            if(structureTemp === undefined) {
+                this.structure = {};
+                this.state = { status: Status.ERROR, message: "NO_STRUCTURE_FOUND" };
+                return;
+            }
+            this.structure = structureTemp.structure;
+        }
     }
 
     async hook(feature: FeatureAPI): Promise<void> {
@@ -48,7 +62,7 @@ class RouteFetchStructured extends APIRoute {
                 /* Predetermine if a session is needed, then fetch it once */
                 let session: any;
                 if((this.options.base !== undefined && this.options.base.authorField !== undefined) ||
-                    Array.from(Object.values(this.options.structure)).some(e => e.authorField !== undefined)) {
+                    Array.from(Object.values(this.structure)).some(e => e.authorField !== undefined)) {
                     if(req.cookies.Token === undefined) { rep.code(403); rep.send(); return; }
                     session = await database.fetch({ source: "sessions", selectors: { "id": req.cookies.Token } });
                     if(session === undefined) {
@@ -104,7 +118,7 @@ class RouteFetchStructured extends APIRoute {
 
     async decorateBase(database: Database, req: Request, session: any, base: any): Promise<any> {
         const decoratorPromises: Promise<{ key: string, value: any }>[] = [];
-        for (const [key, value] of Object.entries(this.options.structure)) {
+        for (const [key, value] of Object.entries(this.structure)) {
             decoratorPromises.push(new Promise(async(resolve, reject) => {
                 /* Construct selectors */
                 const selectors = value.disableIdField ? {} : { [value.idField === undefined ? "id": value.idField]: value.baseIdField === undefined ? req.query.id : base[value.baseIdField] };

@@ -1,0 +1,17 @@
+{
+	"id": "cron",
+	"name": "cron",
+	"type": "CRON",
+	"intervals": [
+		{
+			"time": "*/1 * * * *",
+			"updates": ["STATISTICS"],
+			"cleans": [{ "type": "STATISTICS", "time": 600 }]
+		},
+		{
+			"time": "*/1 * * * *",
+			"updates": ["UPTIME_ENDPOINTS"],
+			"cleans": [{ "type": "UPTIME_STATISTICS", "time": 600 }]
+		}
+	]
+}

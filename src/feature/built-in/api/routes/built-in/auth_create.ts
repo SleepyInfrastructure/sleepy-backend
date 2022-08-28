@@ -1,6 +1,7 @@
 /* Types */
-import { DatabaseType, DatabaseFetchOptions, Status } from "../../../../../ts/base";
+import { Status } from "../../../../../ts/base";
 import { RouteAuthCreateOptions } from "./index";
+import { DatabaseFetchOptions, DatabaseType } from "../../../../../database/types";
 
 /* Node Imports */
 import { hashSync } from "bcrypt";
@@ -29,8 +30,8 @@ const schema: FastifySchema = {
 class RouteAuthCreate extends APIRoute {
     options: RouteAuthCreateOptions;
 
-    constructor(options: RouteAuthCreateOptions) {
-        super(options);
+    constructor(feature: FeatureAPI, options: RouteAuthCreateOptions) {
+        super(feature, options);
         this.options = options;
     }
 

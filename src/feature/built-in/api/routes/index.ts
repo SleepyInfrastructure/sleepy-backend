@@ -9,7 +9,7 @@ abstract class APIRoute {
     path: string;
     state: StateDescriptor;
 
-    constructor(options: RouteOptions) {
+    constructor(feature: FeatureAPI, options: RouteOptions) {
         this.path = options.path;
         this.state = { status: Status.WAITING, message: "WAITING" };
     }

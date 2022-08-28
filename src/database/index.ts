@@ -1,5 +1,6 @@
 /* Types */
-import { DatabaseOptions, StateDescriptor, Status, DatabaseFetchOptions, DatabaseAddOptions, DatabaseEditOptions, DatabaseDeleteOptions, DatabaseFetchMultipleOptions } from "../ts/base";
+import { StateDescriptor, Status } from "../ts/base";
+import { DatabaseAddOptions, DatabaseDeleteOptions, DatabaseEditOptions, DatabaseFetchMultipleOptions, DatabaseFetchOptions, DatabaseOptions } from "./types";
 
 /* Local Imports */
 import Instance from "../instance";

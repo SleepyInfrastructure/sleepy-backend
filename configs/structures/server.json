@@ -1,0 +1,54 @@
+{
+    "id": "server",
+    "structure": {
+        "config": {
+            "type": "SINGLE",
+            "table": "serverconfigs",
+            "baseIdField": "config",
+            "authorField": "author"
+        },
+        "network": {
+            "type": "SINGLE",
+            "table": "networks",
+            "baseIdField": "network",
+            "authorField": "author"
+        },
+        "disks": {
+            "type": "ARRAY",
+            "table": "disks",
+            "idField": "parent",
+            "baseIdField": "id",
+            "authorField": "author"
+        },
+        "partitions": {
+            "type": "ARRAY",
+            "table": "partitions",
+            "idField": "server",
+            "baseIdField": "id",
+            "authorField": "author"
+        },
+        "containers": {
+            "type": "ARRAY",
+            "table": "containers",
+            "idField": "parent",
+            "baseIdField": "id",
+            "authorField": "author"
+        },
+        "databases": {
+            "type": "ARRAY",
+            "table": "databases",
+            "idField": "parent",
+            "baseIdField": "id",
+            "authorField": "author"
+        },
+        "statistics": {
+            "type": "ARRAY",
+            "table": "statistics",
+            "idField": "parent",
+            "baseIdField": "id",
+            "authorField": "author",
+            "sort": { "field": "timestamp", "order": "DESC" },
+            "limit": 10
+        }
+    }
+}

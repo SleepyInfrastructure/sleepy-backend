@@ -1,6 +1,6 @@
 /* Types */
-import { DatabaseAddOptions, DatabaseEditOptions, DatabaseFetchOptions, DatabaseDeleteOptions, Status, DatabaseFetchMultipleOptions, DatabaseFetchSelector, DatabaseItemValue, DatabaseSelectorValue } from "../../../ts/base";
-import { DatabaseMySQLFieldModifier, DatabaseMySQLOptions } from "../../types";
+import { Status } from "../../../ts/base";
+import { DatabaseAddOptions, DatabaseDeleteOptions, DatabaseEditOptions, DatabaseFetchMultipleOptions, DatabaseFetchOptions, DatabaseFetchSelector, DatabaseItemValue, DatabaseMySQLFieldModifier, DatabaseMySQLOptions, DatabaseSelectorValue, DatabaseUnserializedItemValue } from "../../types";
 
 /* Node Imports */
 import { createConnection, Connection, FieldPacket } from "mysql2/promise";
@@ -19,10 +19,20 @@ class DatabaseMySQL extends Database {
     }
 
     async start(): Promise<void> {
+        let password;
+        if(this.options.password !== undefined) {
+            password = this.options.password;
+        } else if(this.options.passwordEnv !== undefined) {
+            password = process.env[this.options.passwordEnv];
+        } else {
+            this.state = { status: Status.ERROR, message: "NO_PASSWORD" };
+            return;
+        }
+
         this.connection = await createConnection({
             host: this.options.host,
             user: this.options.user,
-            password: this.options.password,
+            password: password,
             database: this.options.database,
             charset: "utf8mb4",
         }).catch((e) => {
@@ -45,7 +55,8 @@ class DatabaseMySQL extends Database {
             return this.deserialize(options, items[0][0]);
         } catch(e) {
             console.error("Error trying to fetch an item:");
-            console.log(options);
+            console.error(e);
+            console.error(options);
             throw e;
         }
     }
@@ -70,7 +81,8 @@ class DatabaseMySQL extends Database {
             return items[0].map((item: any) => this.deserialize(options, item));
         } catch(e) {
             console.error("Error trying to fetch items:");
-            console.log(options);
+            console.error(e);
+            console.error(options);
             throw e;
         }
     }
@@ -85,7 +97,8 @@ class DatabaseMySQL extends Database {
             await this.connection.execute(`INSERT INTO \`${options.destination}\` (${this.itemToKeys(item)}) VALUES (${this.itemToValuesWithQuestions(item)})`, values);
         } catch(e) {
             console.error("Error trying to add an item:");
-            console.log(options);
+            console.error(e);
+            console.error(options);
             throw e;
         }
     }
@@ -100,7 +113,8 @@ class DatabaseMySQL extends Database {
             await this.connection.execute(`UPDATE \`${options.destination}\` SET ${this.itemToKeysWithQuestions(item)} ${this.selectorsToSyntax(options.selectors)}`, values);
         } catch(e) {
             console.error("Error trying to edit an item:");
-            console.log(options);
+            console.error(e);
+            console.error(options);
             throw e;
         }
     }
@@ -115,7 +129,8 @@ class DatabaseMySQL extends Database {
             return items[0].affectedRows;
         } catch(e) {
             console.error("Error trying to delete an item:");
-            console.log(options);
+            console.error(e);
+            console.error(options);
             throw e;
         }
     }
@@ -149,47 +164,49 @@ class DatabaseMySQL extends Database {
         return Object.values(item).map(() => "?").join(", ");
     }
 
-    deserialize(options: DatabaseFetchOptions, item: any): any {
+    deserialize(options: DatabaseFetchOptions, item: any): Record<string, DatabaseUnserializedItemValue> {
         if(item === undefined) {
             return item;
         }
 
+        const newItem: any = item;
         if(this.options.structure !== undefined && this.options.structure[options.source] !== undefined) {
             for(const field of Object.keys(this.options.structure[options.source])) {
-                if(this.options.structure === undefined || item[field] === undefined) { return; }
-
                 /* Apply modifiers */
                 const fieldOptions = this.options.structure[options.source][field];
                 switch(fieldOptions.modifier) {
                     case DatabaseMySQLFieldModifier.ARRAY:
-                        item[field] = item[field].split(",").filter((e: string) => e !== "");
+                        newItem[field] = newItem[field].split(",").filter((e: string) => e !== "");
                         break;
                 }
 
                 /* Apply other options */
                 if(options.ignoreSensitive !== true && fieldOptions.sensitive === true) {
-                    delete item[field];
+                    delete newItem[field];
                 }
             }
         }
 
-        return item;
+        return newItem;
     }
 
-    serialize(table: string, item: any): any {
+    serialize(table: string, item: Record<string, DatabaseUnserializedItemValue>): Record<string, DatabaseItemValue> {
+        const newItem: any = item;
         if(this.options.structure !== undefined && this.options.structure[table] !== undefined) {
-            for(const field of Object.keys(this.options.structure[table])) {
+            const fields = Object.keys(this.options.structure[table]).filter(e => newItem[e] !== undefined);
+            for(const field of fields) {
                 /* Apply modifiers */
                 const fieldOptions = this.options.structure[table][field];
                 switch(fieldOptions.modifier) {
                     case DatabaseMySQLFieldModifier.ARRAY:
-                        item[field] = item[field].join(",");
+                        const fieldArray = newItem[field] as string[];
+                        newItem[field] = fieldArray.join(",");
                         break;
                 }
             }
         }
 
-        return item;
+        return newItem;
     }
 
 }

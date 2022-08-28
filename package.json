@@ -20,21 +20,21 @@
         "finstall:push": "yarn add web-push@^3.4.5 && yarn add -D @types/web-push@^3.3.2",
         "finstall:mysql": "yarn add mysql2@^2.3.3",
         "finstall:redis": "yarn add redis@^3.1.2 && yarn add -D @types/redis@^2.8.32",
-        "finstall:ws": "yarn add @fastify/websocket@^7.0.0 && yarn add -D @types/ws@^8.5.3",
+        "finstall:ws": "yarn add @fastify/websocket@^7.0.0 bufferutil@^4.0.6 utf-8-validate@^5.0.9 && yarn add -D @types/ws@^8.5.3",
         "finstall:cron": "yarn add node-cron@^3.0.2 && yarn add -D @types/node-cron@^3.0.2",
-        "funinstall": "yarn remove bcrypt mysql2 redis fastify @fastify/cors @fastify/cookie @fastify/static @fastify/websocket node-cron @fastify/type-provider-typebox @types/bcrypt @types/web-push @types/ws @types/redis"
+        "funinstall": "yarn remove bcrypt mysql2 redis fastify @fastify/cors @fastify/cookie @fastify/static @fastify/websocket bufferutil utf-8-validate node-cron @fastify/type-provider-typebox @types/bcrypt @types/web-push @types/ws @types/redis"
     },
     "devDependencies": {
         "@commitlint/cli": "^17.0.3",
         "@commitlint/config-conventional": "^17.0.3",
         "@fastify/type-provider-typebox": "^2.3.0",
         "@types/bcrypt": "^5.0.0",
-        "@types/node": "^18.7.6",
+        "@types/node": "^18.7.13",
         "@types/node-cron": "^3.0.2",
         "@types/web-push": "^3.3.2",
         "@types/ws": "^8.5.3",
-        "@typescript-eslint/eslint-plugin": "^5.33.1",
-        "@typescript-eslint/parser": "^5.33.1",
+        "@typescript-eslint/eslint-plugin": "^5.35.1",
+        "@typescript-eslint/parser": "^5.35.1",
         "eslint": "^8.22.0",
         "eslint-config-prettier": "^8.5.0",
         "husky": "^8.0.1",
@@ -50,11 +50,14 @@
         "@fastify/websocket": "^7.0.0",
         "axios": "^0.27.2",
         "bcrypt": "^5.0.1",
+        "bufferutil": "^4.0.6",
         "fastify": "^4.5.2",
         "mysql2": "^2.3.3",
         "nanocolors": "^0.2.12",
         "node-cron": "^3.0.2",
         "node-ssh": "^13.0.0",
+        "pingman": "^1.1.5",
+        "utf-8-validate": "^5.0.9",
         "web-push": "^3.5.0"
     }
 }

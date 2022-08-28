@@ -1,7 +1,8 @@
 /* Types */
 import Feature from "../..";
 import Instance from "../../../instance";
-import { DatabaseType, Status } from "../../../ts/base";
+import { Status } from "../../../ts/base";
+import { DatabaseType } from "../../../database/types";
 import { Client, Connection, Daemon, FeatureDaemonOptions } from "./types";
 
 /* Node Imports */

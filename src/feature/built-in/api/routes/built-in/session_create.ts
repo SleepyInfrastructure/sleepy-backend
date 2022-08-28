@@ -1,5 +1,6 @@
 /* Types */
-import { DatabaseType, DatabaseFetchOptions, Status } from "../../../../../ts/base";
+import { Status } from "../../../../../ts/base";
+import { DatabaseFetchOptions, DatabaseType } from "../../../../../database/types";
 import { RouteSessionCreateOptions } from "./index";
 
 /* Node Imports */
@@ -30,8 +31,8 @@ const schema: FastifySchema = {
 class RouteSessionCreate extends APIRoute {
     options: RouteSessionCreateOptions;
 
-    constructor(options: RouteSessionCreateOptions) {
-        super(options);
+    constructor(feature: FeatureAPI, options: RouteSessionCreateOptions) {
+        super(feature, options);
         this.options = options;
     }
 

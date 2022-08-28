@@ -1,5 +1,6 @@
 /* Types */
-import { DatabaseType, Status } from "../../../../../ts/base";
+import { Status } from "../../../../../ts/base";
+import { DatabaseType } from "../../../../../database/types";
 import { RoutePushUnsubscribeOptions } from "./index";
 
 /* Local Imports */
@@ -9,8 +10,8 @@ import FeatureAPI from "../..";
 class RoutePushUnsubscribe extends APIRoute {
     options: RoutePushUnsubscribeOptions;
 
-    constructor(options: RoutePushUnsubscribeOptions) {
-        super(options);
+    constructor(feature: FeatureAPI, options: RoutePushUnsubscribeOptions) {
+        super(feature, options);
         this.options = options;
     }
 

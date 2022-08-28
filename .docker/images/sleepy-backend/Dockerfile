@@ -2,7 +2,11 @@
 FROM node:16-alpine AS builder
 WORKDIR /usr/src/app
 RUN apk update
-RUN apk add bash jq
+RUN apk add bash jq build-base git
+
+RUN apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python
+RUN python3 -m ensurepip
+RUN pip3 install --no-cache --upgrade pip setuptools
 
 COPY package*.json yarn.lock ./
 RUN yarn --no-cache

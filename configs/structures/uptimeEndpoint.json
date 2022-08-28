@@ -1,0 +1,14 @@
+{
+    "id": "uptimeEndpoint",
+    "structure": {
+        "statistics": {
+            "type": "ARRAY",
+            "table": "uptimestatistics",
+            "idField": "parent",
+            "baseIdField": "id",
+            "authorField": "author",
+            "sort": { "field": "timestamp", "order": "DESC" },
+            "limit": 10
+        }
+    }
+}

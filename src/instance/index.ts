@@ -1,17 +1,18 @@
 /* Types */
-import { DatabaseType, FeatureType, InstanceOptions, StateDescriptor, Status } from "../ts/base";
+import { APIStructureOptions, FeatureType, InstanceOptions, StateDescriptor, Status } from "../ts/base";
+import { DatabaseType } from "../database/types";
 
 /* Node Imports */
 import { workerData } from "worker_threads";
 import { bold, green, red, yellow, gray } from "nanocolors";
-import { readFileSync } from "fs";
+import { readdirSync, readFileSync } from "fs";
 
 /* Local Imports */
 import Feature from "../feature";
 import FeatureStatic from "../feature/built-in/static";
 import FeatureAPI from "../feature/built-in/api";
 import FeatureDaemon from "../feature/custom/daemon";
-import FeatureDaemonCron from "../feature/custom/daemon-cron";
+import FeatureCron from "../feature/custom/cron";
 import Database from "../database";
 import DatabaseMySQL from "../database/addons/mysql";
 
@@ -22,6 +23,7 @@ class Instance {
 
     databaseContainer: Map<string, Database>;
     featureContainer: Map<string, Feature>;
+    structureContainer: Map<string, APIStructureOptions>;
 
     constructor(id: string) {
         this.id = id;
@@ -30,6 +32,7 @@ class Instance {
 
         this.databaseContainer = new Map();
         this.featureContainer = new Map();
+        this.structureContainer = new Map();
     }
 
     load(): void {
@@ -64,8 +67,8 @@ class Instance {
                     feature = new FeatureDaemon(this, options);
                     break;
 
-                case FeatureType.DAEMON_CRON:
-                    feature = new FeatureDaemonCron(this, options);
+                case FeatureType.CRON:
+                    feature = new FeatureCron(this, options);
                     break;
             }
 
@@ -73,6 +76,12 @@ class Instance {
                 continue;
             }
             this.featureContainer.set(feature.id, feature);
+        }
+
+        const structurePaths = readdirSync("configs/structures");
+        for (const structurePath of structurePaths) {
+            const options = JSON.parse(readFileSync(`configs/structures/${structurePath}`, "utf-8"));
+            this.structureContainer.set(options.id, options);
         }
     }
 

@@ -1,0 +1,22 @@
+{
+    "id": "mysql",
+    "name": "mysql",
+    "type": "MYSQL",
+    
+    "host": "sleepy-mysql",
+    "user": "root",
+    "passwordEnv": "SLEEPY_MYSQL_PASSWORD",
+    "database": "sleepy-db",
+    "structure": {
+        "users": {
+            "password": {
+                "sensitive": true
+            }
+        },
+        "servers": {
+            "netInterfaces": {
+                "modifier": "ARRAY"
+            }
+        }
+    }
+}

@@ -1,0 +1,14 @@
+{
+    "id": "disk",
+    "structure": {
+        "statistics": {
+            "type": "ARRAY",
+            "table": "diskstatistics",
+            "idField": "parent",
+            "baseIdField": "id",
+            "authorField": "author",
+            "sort": { "field": "timestamp", "order": "DESC" },
+            "limit": 10
+        }
+    }
+}

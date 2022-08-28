@@ -1,5 +1,6 @@
 /* Types */
-import { DatabaseType, DatabaseFetchOptions, Status } from "../../../../../ts/base";
+import { Status } from "../../../../../ts/base";
+import { DatabaseFetchOptions, DatabaseType } from "../../../../../database/types";
 import { RouteSessionDeleteOptions } from "./index";
 
 /* Local Imports */
@@ -9,8 +10,8 @@ import FeatureAPI from "../..";
 class RouteSessionDelete extends APIRoute {
     options: RouteSessionDeleteOptions;
 
-    constructor(options: RouteSessionDeleteOptions) {
-        super(options);
+    constructor(feature: FeatureAPI, options: RouteSessionDeleteOptions) {
+        super(feature, options);
         this.options = options;
     }
 

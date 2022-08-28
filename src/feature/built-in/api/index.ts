@@ -4,6 +4,7 @@ import { FeatureAPIOptions } from "./types";
 
 /* Node Imports */
 import * as fastify from "fastify";
+import { bold, green, yellow } from "nanocolors";
 
 /* Local Imports */
 import Feature from "../..";
@@ -12,7 +13,6 @@ import APIRoute from "./routes";
 import { createFastifyInstance, startFastifyInstance } from "../../util";
 import BuiltinRoutes, { BuiltinRouteType } from "./routes/built-in";
 import CustomRoutes, { CustomRouteType } from "./routes/custom";
-import { bold, green, yellow } from "nanocolors";
 
 class FeatureAPI extends Feature {
     options: FeatureAPIOptions;
@@ -39,11 +39,11 @@ class FeatureAPI extends Feature {
             let route: APIRoute | undefined;
             const builtinType = Object.values(BuiltinRouteType).find(e => e === (options.type as BuiltinRouteType));
             if(builtinType !== undefined) {
-                route = BuiltinRoutes[builtinType](options);
+                route = BuiltinRoutes[builtinType](this, options);
             } else {
                 const customType = Object.values(CustomRouteType).find(e => e === (options.type as CustomRouteType));
                 if(customType !== undefined) {
-                    route = CustomRoutes[customType](options);
+                    route = CustomRoutes[customType](this, options);
                 } else {
                     this.state = { status: Status.ERROR, message: `${options.type} is not a valid route type` };
                     return;

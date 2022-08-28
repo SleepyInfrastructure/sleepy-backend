@@ -1,5 +1,6 @@
 import { RouteOptions } from "../types";
-import { DatabaseSort } from "../../../../../ts/base";
+import { APIStructure } from "../../../../../ts/base";
+import { DatabaseSort } from "../../../../../database/types";
 import APIRoute from "..";
 import RouteFetch from "./fetch";
 import RouteFetchMultiple from "./fetch_multiple";
@@ -11,6 +12,7 @@ import RouteAuthCreate from "./auth_create";
 import RoutePushSend from "./push_send";
 import RoutePushSubscribe from "./push_subscribe";
 import RoutePushUnsubscribe from "./push_unsubscribe";
+import FeatureAPI from "../..";
 
 export enum BuiltinRouteType {
     FETCH = "FETCH",
@@ -36,7 +38,7 @@ export type RouteFetchMultipleOptions = RouteOptions & RouteFetchArrayOptions & 
 export type RouteFetchStructuredOptions = RouteOptions & {
     type: BuiltinRouteType.FETCH_STRUCTURED;
     base?: RouteFetchArrayOptions& { type: "SINGLE" | "ARRAY" };
-    structure: Record<string, RouteFetchStructuredItemOptions & { type: "SINGLE" | "ARRAY" }>;
+    structure: string | APIStructure;
 };
 
 export type RouteFetchSingleOptions = {
@@ -87,16 +89,16 @@ export type RoutePushUnsubscribeOptions = RouteOptions & {
     type: BuiltinRouteType.PUSH_UNSUBSCRIBE;
 };
 
-const routes: Record<BuiltinRouteType, (options: RouteOptions) => APIRoute> = {
-    [BuiltinRouteType.FETCH]: (options: RouteOptions) => {return new RouteFetch(options as RouteFetchOptions);},
-    [BuiltinRouteType.FETCH_MULTIPLE]: (options: RouteOptions) => {return new RouteFetchMultiple(options as RouteFetchMultipleOptions);},
-    [BuiltinRouteType.FETCH_STRUCTURED]: (options: RouteOptions) => {return new RouteFetchStructured(options as RouteFetchStructuredOptions);},
-    [BuiltinRouteType.DELETE]: (options: RouteOptions) => {return new RouteDelete(options as RouteDeleteOptions);},
-    [BuiltinRouteType.SESSION_CREATE]: (options: RouteOptions) => {return new RouteSessionCreate(options as RouteSessionCreateOptions);},
-    [BuiltinRouteType.SESSION_DELETE]: (options: RouteOptions) => {return new RouteSessionDelete(options as RouteSessionDeleteOptions);},
-    [BuiltinRouteType.AUTH_CREATE]: (options: RouteOptions) => {return new RouteAuthCreate(options as RouteAuthCreateOptions);},
-    [BuiltinRouteType.PUSH_SEND]: (options: RouteOptions) => {return new RoutePushSend(options as RoutePushSendOptions);},
-    [BuiltinRouteType.PUSH_SUBSCRIBE]: (options: RouteOptions) => {return new RoutePushSubscribe(options as RoutePushSubscribeOptions);},
-    [BuiltinRouteType.PUSH_UNSUBSCRIBE]: (options: RouteOptions) => {return new RoutePushUnsubscribe(options as RoutePushUnsubscribeOptions);},
+const routes: Record<BuiltinRouteType, (feature: FeatureAPI, options: RouteOptions) => APIRoute> = {
+    [BuiltinRouteType.FETCH]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteFetch(feature, options as RouteFetchOptions);},
+    [BuiltinRouteType.FETCH_MULTIPLE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteFetchMultiple(feature, options as RouteFetchMultipleOptions);},
+    [BuiltinRouteType.FETCH_STRUCTURED]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteFetchStructured(feature, options as RouteFetchStructuredOptions);},
+    [BuiltinRouteType.DELETE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteDelete(feature, options as RouteDeleteOptions);},
+    [BuiltinRouteType.SESSION_CREATE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteSessionCreate(feature, options as RouteSessionCreateOptions);},
+    [BuiltinRouteType.SESSION_DELETE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteSessionDelete(feature, options as RouteSessionDeleteOptions);},
+    [BuiltinRouteType.AUTH_CREATE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteAuthCreate(feature, options as RouteAuthCreateOptions);},
+    [BuiltinRouteType.PUSH_SEND]: (feature: FeatureAPI, options: RouteOptions) => {return new RoutePushSend(feature, options as RoutePushSendOptions);},
+    [BuiltinRouteType.PUSH_SUBSCRIBE]: (feature: FeatureAPI, options: RouteOptions) => {return new RoutePushSubscribe(feature, options as RoutePushSubscribeOptions);},
+    [BuiltinRouteType.PUSH_UNSUBSCRIBE]: (feature: FeatureAPI, options: RouteOptions) => {return new RoutePushUnsubscribe(feature, options as RoutePushUnsubscribeOptions);},
 }
 export default routes;

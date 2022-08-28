@@ -1,5 +1,6 @@
 /* Types */
-import { DatabaseType, Status, DatabaseDeleteOptions } from "../../../../../ts/base";
+import { Status } from "../../../../../ts/base";
+import { DatabaseDeleteOptions, DatabaseType } from "../../../../../database/types";
 import { RouteDeleteOptions } from "./index";
 
 /* Node Imports */
@@ -26,8 +27,8 @@ const schema: FastifySchema = {
 class RouteDelete extends APIRoute {
     options: RouteDeleteOptions;
 
-    constructor(options: RouteDeleteOptions) {
-        super(options);
+    constructor(feature: FeatureAPI, options: RouteDeleteOptions) {
+        super(feature, options);
         this.options = options;
     }
 

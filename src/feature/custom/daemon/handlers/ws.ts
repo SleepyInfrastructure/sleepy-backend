@@ -113,7 +113,7 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                             author: connection.daemon.author,
                             parent: connection.daemon.id,
                             name: disk.name,
-                            ssd: disk.ssd,
+                            ssd: disk.ssd === true ? 1 : 0,
                             size: disk.size,
                             model: disk.model
                         }
@@ -214,7 +214,7 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
             }
         }
     });
-    connection.stream.on("close", () => {
+    connection.stream.socket.on("close", () => {
         if(connection.daemon !== null) {
             console.log(`${red("<")} Daemon disconnected! (server: ${bold(yellow(connection.daemon.id))})`);
             feature.daemons.splice(feature.daemons.indexOf(connection.daemon), 1);

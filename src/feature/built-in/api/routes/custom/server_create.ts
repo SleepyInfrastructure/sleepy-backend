@@ -1,5 +1,6 @@
 /* Types */
-import { DatabaseType, Status } from "../../../../../ts/base";
+import { Status } from "../../../../../ts/base";
+import { DatabaseType } from "../../../../../database/types";
 import { RouteServerCreateOptions } from "./index";
 
 /* Node Imports */
@@ -27,8 +28,8 @@ const schema: FastifySchema = {
 class RouteServerCreate extends APIRoute {
     options: RouteServerCreateOptions;
 
-    constructor(options: RouteServerCreateOptions) {
-        super(options);
+    constructor(feature: FeatureAPI, options: RouteServerCreateOptions) {
+        super(feature, options);
         this.options = options;
     }
 
@@ -81,7 +82,8 @@ class RouteServerCreate extends APIRoute {
                     name: req.body.name,
                     color: "ff3645",
                     memory: 0,
-                    swap: 0
+                    swap: 0,
+                    netInterfaces: []
                 };
                 database.add({ destination: "servers", item: server });
 
