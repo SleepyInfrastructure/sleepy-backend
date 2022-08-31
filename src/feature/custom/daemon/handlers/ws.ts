@@ -97,21 +97,22 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
             }
 
             case DaemonWebsocketMessageType.DAEMON_REQUEST_REFRESH_REPLY: {
-                if(message.disks == null || message.containers == null) { return; }
+                if(message.disks == null || message.containers == null || message.containerProjects == null) { return; }
                 if(connection.daemon === null) {
                     return;
                 }
 
-                await database.delete({ source: "disks", selectors: { parent: connection.daemon.id } });
+                await database.delete({ source: "disks", selectors: { server: connection.daemon.id } });
                 await database.delete({ source: "partitions", selectors: { server: connection.daemon.id } });
-                await database.delete({ source: "containers", selectors: { parent: connection.daemon.id } });
+                await database.delete({ source: "containers", selectors: { server: connection.daemon.id } });
+                await database.delete({ source: "containerprojects", selectors: { server: connection.daemon.id } });
                 for(const disk of message.disks) {
                     database.add({ destination: "disks", item:
                         {
                             id: disk.id,
                             ptuuid: disk.ptuuid,
                             author: connection.daemon.author,
-                            parent: connection.daemon.id,
+                            server: connection.daemon.id,
                             name: disk.name,
                             ssd: disk.ssd === true ? 1 : 0,
                             size: disk.size,
@@ -136,12 +137,25 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                         });
                     }
                 }
+                for(const containerProject of message.containerProjects) {
+                    database.add({ destination: "containerprojects", item:
+                        {
+                            id: containerProject.id,
+                            author: connection.daemon.author,
+                            server: connection.daemon.id,
+                            name: containerProject.name,
+                            status: containerProject.status,
+                            path: containerProject.path
+                        }
+                    });
+                }
                 for(const container of message.containers) {
                     database.add({ destination: "containers", item:
                         {
                             id: container.id,
                             author: connection.daemon.author,
-                            parent: connection.daemon.id,
+                            server: connection.daemon.id,
+                            parent: container.parent,
                             image: container.image,
                             creation: container.creation,
                             ports: container.ports,
@@ -180,7 +194,7 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                     {
                         id: randomBytes(16).toString("hex"),
                         author: connection.daemon.author,
-                        parent: connection.daemon.id,
+                        server: connection.daemon.id,
                         timestamp: timestamp,
                         rx: message.network.rx,
                         tx: message.network.tx,

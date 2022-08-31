@@ -146,6 +146,40 @@
             "disableIdField": true
         },
         {
+            "path": "/v1/containerProjects/fetch",
+            "type": "FETCH",
+            "table": "containerprojects",
+            "authorField": "author"
+        },
+        {
+            "path": "/v1/containerProjects/all/fetch",
+            "type": "FETCH_MULTIPLE",
+            "table": "containerprojects",
+            "authorField": "author",
+            "disableIdField": true
+        },
+        {
+            "path": "/v1/containerProjects/structured/fetch",
+            "type": "FETCH_STRUCTURED",
+            "base": {
+                "type": "SINGLE",
+                "table": "containerprojects",
+                "authorField": "author"
+            },
+            "structure": "containerProject"
+        },
+        {
+            "path": "/v1/containerProjects/all/structured/fetch",
+            "type": "FETCH_STRUCTURED",
+            "base": {
+                "type": "ARRAY",
+                "table": "containerprojects",
+                "authorField": "author",
+                "disableIdField": true
+            },
+            "structure": "containerProject"
+        },
+        {
             "path": "/v1/databases/fetch",
             "type": "FETCH",
             "table": "databases",

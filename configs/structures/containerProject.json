@@ -1,0 +1,12 @@
+{
+    "id": "containerProject",
+    "structure": {
+        "containers": {
+            "type": "ARRAY",
+            "table": "containers",
+            "idField": "parent",
+            "baseIdField": "id",
+            "authorField": "author"
+        }
+    }
+}

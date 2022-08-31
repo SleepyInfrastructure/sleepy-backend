@@ -16,7 +16,7 @@
         "disks": {
             "type": "ARRAY",
             "table": "disks",
-            "idField": "parent",
+            "idField": "server",
             "baseIdField": "id",
             "authorField": "author"
         },
@@ -30,21 +30,28 @@
         "containers": {
             "type": "ARRAY",
             "table": "containers",
-            "idField": "parent",
+            "idField": "server",
+            "baseIdField": "id",
+            "authorField": "author"
+        },
+        "containerProjects": {
+            "type": "ARRAY",
+            "table": "containerprojects",
+            "idField": "server",
             "baseIdField": "id",
             "authorField": "author"
         },
         "databases": {
             "type": "ARRAY",
             "table": "databases",
-            "idField": "parent",
+            "idField": "server",
             "baseIdField": "id",
             "authorField": "author"
         },
         "statistics": {
             "type": "ARRAY",
             "table": "statistics",
-            "idField": "parent",
+            "idField": "server",
             "baseIdField": "id",
             "authorField": "author",
             "sort": { "field": "timestamp", "order": "DESC" },
