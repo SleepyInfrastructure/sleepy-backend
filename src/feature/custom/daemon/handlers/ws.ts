@@ -184,7 +184,7 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
             }
 
             case DaemonWebsocketMessageType.DAEMON_REQUEST_STATS_REPLY: {
-                if(message.network == null || message.cpu == null || message.disks == null) { return; }
+                if(message.network == null || message.cpu == null || message.disks == null || message.containers == null) { return; }
                 if(connection.daemon === null) {
                     return;
                 }
@@ -214,6 +214,22 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                             write: disk.write,
                             readLatency: disk.readLatency,
                             writeLatency: disk.writeLatency
+                        }
+                    });
+                }
+                for (const container of message.containers) {
+                    database.add({ destination: "containerstatistics", item:
+                        {
+                            id: randomBytes(16).toString("hex"),
+                            author: connection.daemon.author,
+                            parent: container.parent,
+                            timestamp: timestamp,
+                            rx: container.rx,
+                            tx: container.tx,
+                            cpu: container.cpu,
+                            memory: container.memory,
+                            read: container.read,
+                            write: container.write,
                         }
                     });
                 }

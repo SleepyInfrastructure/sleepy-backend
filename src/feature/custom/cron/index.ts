@@ -153,7 +153,8 @@ class FeatureCron extends Feature {
             case "STATISTICS": {
                 const deletedStats = await database.delete({ source: "statistics", selectors: { timestamp: { value: (Math.round(Date.now() / 1000) - clean.time), comparison: "<" } } });
                 const deletedDiskStats = await database.delete({ source: "diskstatistics", selectors: { timestamp: { value: (Math.round(Date.now() / 1000) - clean.time), comparison: "<" } } });
-                console.log(`${gray("-")} Deleted ${bold(yellow((deletedStats + deletedDiskStats)))} old statistics...`);
+                const deletedContainerStats = await database.delete({ source: "containerstatistics", selectors: { timestamp: { value: (Math.round(Date.now() / 1000) - clean.time), comparison: "<" } } });
+                console.log(`${gray("-")} Deleted ${bold(yellow((deletedStats + deletedDiskStats + deletedContainerStats)))} old statistics...`);
                 break;
             }
 

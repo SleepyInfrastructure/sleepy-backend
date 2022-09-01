@@ -1,0 +1,14 @@
+{
+    "id": "container",
+    "structure": {
+        "statistics": {
+            "type": "ARRAY",
+            "table": "containerstatistics",
+            "idField": "parent",
+            "baseIdField": "id",
+            "authorField": "author",
+            "sort": { "field": "timestamp", "order": "DESC" },
+            "limit": 10
+        }
+    }
+}

@@ -146,6 +146,27 @@
             "disableIdField": true
         },
         {
+            "path": "/v1/containers/structured/fetch",
+            "type": "FETCH_STRUCTURED",
+            "base": {
+                "type": "SINGLE",
+                "table": "containers",
+                "authorField": "author"
+            },
+            "structure": "container"
+        },
+        {
+            "path": "/v1/containers/all/structured/fetch",
+            "type": "FETCH_STRUCTURED",
+            "base": {
+                "type": "ARRAY",
+                "table": "containers",
+                "authorField": "author",
+                "disableIdField": true
+            },
+            "structure": "container"
+        },
+        {
             "path": "/v1/containerProjects/fetch",
             "type": "FETCH",
             "table": "containerprojects",

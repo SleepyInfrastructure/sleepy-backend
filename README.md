@@ -12,6 +12,7 @@ Other: <a href="https://www.docker.com/">Docker<a>
 Building is done with <code>docker-compose build</code>.  
 Running is done with <code>docker-compose up</code>.  
 Shutting down is with <code>docker-compose down</code>.
+For faster testing you can do <code>docker-compose rm -s sleepy-backend; docker-compose build; docker-compose up -d</code>.
 
 ## CLI Commands
 | Command                                 | Description                                    |
