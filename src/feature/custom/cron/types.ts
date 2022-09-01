@@ -14,7 +14,7 @@ export type CronInterval = {
 };
 
 export enum CronUpdateType {
-    REFRESH = "REFRESH",
+    RESOURCES = "RESOURCES",
     STATISTICS = "STATISTICS",
     UPTIME_ENDPOINTS = "UPTIME_ENDPOINTS",
 };

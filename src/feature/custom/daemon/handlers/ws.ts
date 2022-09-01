@@ -86,17 +86,17 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                 break;
             }
 
-            case DaemonWebsocketMessageType.DAEMON_CLIENT_REQUEST_REFRESH: {
+            case DaemonWebsocketMessageType.DAEMON_CLIENT_REQUEST_RESOURCES: {
                 const requestedDaemon = feature.getDaemon(connection.client, message.id);
                 if(requestedDaemon === null) {
                     break;
                 }
 
-                requestedDaemon.send({ type: DaemonWebsocketMessageType.DAEMON_REQUEST_REFRESH });
+                requestedDaemon.send({ type: DaemonWebsocketMessageType.DAEMON_REQUEST_RESOURCES });
                 break;
             }
 
-            case DaemonWebsocketMessageType.DAEMON_REQUEST_REFRESH_REPLY: {
+            case DaemonWebsocketMessageType.DAEMON_REQUEST_RESOURCES_REPLY: {
                 if(message.disks == null || message.containers == null || message.containerProjects == null) { return; }
                 if(connection.daemon === null) {
                     return;
@@ -168,7 +168,7 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                 }
 
                 for(const daemonClient of feature.getClients(connection.daemon.author)) {
-                    daemonClient.send({ type: DaemonWebsocketMessageType.DAEMON_CLIENT_REQUEST_REFRESH_REPLY, id: connection.daemon?.id });
+                    daemonClient.send({ type: DaemonWebsocketMessageType.DAEMON_CLIENT_REQUEST_RESOURCES_REPLY, id: connection.daemon?.id });
                 }
                 break;
             }

@@ -57,9 +57,9 @@ class FeatureCron extends Feature {
 
     async processUpdate(featureDaemon: FeatureDaemon, database: Database, update: CronUpdateType) {
         switch(update) {
-            case CronUpdateType.REFRESH:
+            case CronUpdateType.RESOURCES:
                 for(const daemon of featureDaemon.daemons) {
-                    daemon.send({ type: DaemonWebsocketMessageType.DAEMON_REQUEST_REFRESH });
+                    daemon.send({ type: DaemonWebsocketMessageType.DAEMON_REQUEST_RESOURCES });
                 }
                 break;
                 

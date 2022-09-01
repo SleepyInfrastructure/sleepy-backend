@@ -5,7 +5,7 @@
 	"intervals": [
 		{
 			"time": "*/1 * * * *",
-			"updates": ["STATISTICS"],
+			"updates": ["STATISTICS", "RESOURCES"],
 			"cleans": [{ "type": "STATISTICS", "time": 600 }]
 		},
 		{
