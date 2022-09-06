@@ -68,7 +68,7 @@ class DatabaseMySQL extends Database {
             }
             let query = `SELECT * FROM \`${options.source}\` ${this.selectorsToSyntax(options.selectors)}`;
             if(options.sort !== undefined) {
-                query += ` ORDER BY ${options.sort.field} ${options.sort.order}`;
+                query += ` ORDER BY ${options.sort.field} ${options.sort.order ?? "ASC"}`;
             }
             if(options.limit !== undefined) {
                 query += ` LIMIT ${options.limit}`;

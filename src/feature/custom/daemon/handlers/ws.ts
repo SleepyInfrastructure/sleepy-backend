@@ -106,7 +106,7 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                     break;
                 }
 
-                requestedDaemon.send({ type: DaemonWebsocketMessageType.DAEMON_REQUEST_RESOURCES });
+                requestedDaemon.send({ type: DaemonWebsocketMessageType.DAEMON_REQUEST_RESOURCES, resources: message.resources });
                 break;
             }
 
@@ -116,39 +116,39 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                 }
 
                 if(message.disks != null && message.zfsPools != null) {
-                await database.delete({ source: "disks", selectors: { server: connection.daemon.id } });
-                await database.delete({ source: "partitions", selectors: { server: connection.daemon.id } });
+                    await database.delete({ source: "disks", selectors: { server: connection.daemon.id } });
+                    await database.delete({ source: "partitions", selectors: { server: connection.daemon.id } });
                     await database.delete({ source: "zfspools", selectors: { server: connection.daemon.id } });
                     await database.delete({ source: "zfspartitions", selectors: { server: connection.daemon.id } });
-                for(const disk of message.disks) {
-                    database.add({ destination: "disks", item:
-                        {
-                            id: disk.id,
-                            ptuuid: disk.ptuuid,
-                            author: connection.daemon.author,
-                            server: connection.daemon.id,
-                            name: disk.name,
-                            ssd: disk.ssd === true ? 1 : 0,
-                            size: disk.size,
-                            model: disk.model
-                        }
-                    });
-                    for(const partition of disk.children) {
-                        database.add({ destination: "partitions", item:
+                    for(const disk of message.disks) {
+                        database.add({ destination: "disks", item:
                             {
-                                id: partition.id,
-                                uuid: partition.uuid,
-                                partuuid: partition.partuuid,
+                                id: disk.id,
+                                ptuuid: disk.ptuuid,
                                 author: connection.daemon.author,
-                                parent: disk.id,
                                 server: connection.daemon.id,
-                                name: partition.name,
-                                type: partition.type,
-                                size: partition.size,
-                                used: partition.used,
-                                mountpoint: partition.mountpoint
+                                name: disk.name,
+                                ssd: disk.ssd === true ? 1 : 0,
+                                size: disk.size,
+                                model: disk.model
                             }
                         });
+                        for(const partition of disk.children) {
+                            database.add({ destination: "partitions", item:
+                                {
+                                    id: partition.id,
+                                    uuid: partition.uuid,
+                                    partuuid: partition.partuuid,
+                                    author: connection.daemon.author,
+                                    parent: disk.id,
+                                    server: connection.daemon.id,
+                                    name: partition.name,
+                                    type: partition.type,
+                                    size: partition.size,
+                                    used: partition.used,
+                                    mountpoint: partition.mountpoint
+                                }
+                            });
                         }
                     }
                     for(const pool of message.zfsPools) {
@@ -186,34 +186,34 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                 if(message.containers != null && message.containerProjects != null) {
                     await database.delete({ source: "containers", selectors: { server: connection.daemon.id } });
                     await database.delete({ source: "containerprojects", selectors: { server: connection.daemon.id } });
-                for(const containerProject of message.containerProjects) {
-                    database.add({ destination: "containerprojects", item:
-                        {
-                            id: containerProject.id,
-                            author: connection.daemon.author,
-                            server: connection.daemon.id,
-                            name: containerProject.name,
-                            status: containerProject.status,
-                            path: containerProject.path
-                        }
-                    });
-                }
-                for(const container of message.containers) {
-                    database.add({ destination: "containers", item:
-                        {
-                            id: container.id,
-                            author: connection.daemon.author,
-                            server: connection.daemon.id,
-                            parent: container.parent,
-                            image: container.image,
-                            creation: container.creation,
-                            ports: container.ports,
-                            status: container.status,
-                            names: container.names,
-                            mounts: container.mounts,
-                            networks: container.networks
-                        }
-                    });
+                    for(const containerProject of message.containerProjects) {
+                        database.add({ destination: "containerprojects", item:
+                            {
+                                id: containerProject.id,
+                                author: connection.daemon.author,
+                                server: connection.daemon.id,
+                                name: containerProject.name,
+                                status: containerProject.status,
+                                path: containerProject.path
+                            }
+                        });
+                    }
+                    for(const container of message.containers) {
+                        database.add({ destination: "containers", item:
+                            {
+                                id: container.id,
+                                author: connection.daemon.author,
+                                server: connection.daemon.id,
+                                parent: container.parent,
+                                image: container.image,
+                                creation: container.creation,
+                                ports: container.ports,
+                                status: container.status,
+                                names: container.names,
+                                mounts: container.mounts,
+                                networks: container.networks
+                            }
+                        });
                     }
                 }
 
