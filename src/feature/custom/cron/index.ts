@@ -3,7 +3,7 @@ import Feature from "../..";
 import Instance from "../../../instance";
 import { Status } from "../../../ts/base";
 import { DatabaseType } from "../../../database/types";
-import { CronClean, CronInterval, CronUpdateType, FeatureCronOptions } from "./types";
+import { CronClean, CronInterval, CronUpdate, CronUpdateResources, CronUpdateType, FeatureCronOptions } from "./types";
 import { DaemonWebsocketMessageType } from "../daemon/types";
 import FeatureDaemon from "../daemon";
 
@@ -47,7 +47,7 @@ class FeatureCron extends Feature {
 
     processInterval(featureDaemon: FeatureDaemon, database: Database, interval: CronInterval) {
         for(const update of interval.updates) {
-            console.log(`${gray("-")} Launching ${bold(yellow(update))} cron-job...`);
+            console.log(`${gray("-")} Launching ${bold(yellow(update.type))} cron-job...`);
             this.processUpdate(featureDaemon, database, update);
         }
         for(const clean of interval.cleans) {
@@ -55,11 +55,12 @@ class FeatureCron extends Feature {
         }
     }
 
-    async processUpdate(featureDaemon: FeatureDaemon, database: Database, update: CronUpdateType) {
-        switch(update) {
+    async processUpdate(featureDaemon: FeatureDaemon, database: Database, update: CronUpdate) {
+        switch(update.type) {
             case CronUpdateType.RESOURCES:
+                const resourcesUpdate = update as CronUpdateResources;
                 for(const daemon of featureDaemon.daemons) {
-                    daemon.send({ type: DaemonWebsocketMessageType.DAEMON_REQUEST_RESOURCES });
+                    daemon.send({ type: DaemonWebsocketMessageType.DAEMON_REQUEST_RESOURCES, resources: resourcesUpdate.resources });
                 }
                 break;
                 

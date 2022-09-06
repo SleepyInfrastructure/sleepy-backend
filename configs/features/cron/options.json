@@ -5,12 +5,17 @@
 	"intervals": [
 		{
 			"time": "*/1 * * * *",
-			"updates": ["STATISTICS", "RESOURCES"],
+			"updates": [{ "type": "STATISTICS" }, { "type": "RESOURCES", "resources": ["CONTAINERS"] }],
 			"cleans": [{ "type": "STATISTICS", "time": 600 }]
 		},
 		{
 			"time": "*/1 * * * *",
-			"updates": ["UPTIME_ENDPOINTS"],
+			"updates": [{ "type": "RESOURCES", "resources": ["DISKS"] }],
+			"cleans": [{ "type": "STATISTICS", "time": 600 }]
+		},
+		{
+			"time": "*/1 * * * *",
+			"updates": [{ "type": "UPTIME_ENDPOINTS" }],
 			"cleans": [{ "type": "UPTIME_STATISTICS", "time": 600 }]
 		}
 	]

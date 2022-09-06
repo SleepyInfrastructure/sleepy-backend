@@ -19,7 +19,18 @@ export enum CronUpdateType {
     UPTIME_ENDPOINTS = "UPTIME_ENDPOINTS",
 };
 
-export type CronUpdate = CronUpdateType;
+export enum CronUpdateResourcesType {
+    CONTAINERS = "CONTAINERS",
+    DISKS = "DISKS"
+};
+
+export type CronUpdate = {
+    type: CronUpdateType;
+};
+
+export type CronUpdateResources = CronUpdate & {
+    resources: CronUpdateResourcesType[];
+};
 
 export enum CronCleanType {
     STATISTICS = "STATISTICS",
