@@ -1,6 +1,5 @@
 /* Types */
 import { SocketStream } from "@fastify/websocket";
-import { FastifyRequest } from "fastify";
 import FeatureDaemon from ".";
 import { FeatureServerOptions, FeatureType } from "../../../ts/base";
 

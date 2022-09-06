@@ -1,5 +1,5 @@
 /* Types */
-import { APIStructure, Status } from "../../../../../ts/base";
+import { APIStructure, APIStructureImported, Status } from "../../../../../ts/base";
 import { DatabaseType } from "../../../../../database/types";
 import { RouteFetchStructuredOptions } from "./index";
 
@@ -27,23 +27,53 @@ const schema: FastifySchema = {
 
 class RouteFetchStructured extends APIRoute {
     options: RouteFetchStructuredOptions;
-    structure: APIStructure;
+    structure: APIStructureImported;
 
     constructor(feature: FeatureAPI, options: RouteFetchStructuredOptions) {
         super(feature, options);
         this.options = options;
+        this.structure = {};
 
-        if(typeof(this.options.structure) === "object") {
-            this.structure = this.options.structure;
-        } else {
-            const structureTemp = feature.parent.structureContainer.get(this.options.structure);
-            if(structureTemp === undefined) {
-                this.structure = {};
-                this.state = { status: Status.ERROR, message: "NO_STRUCTURE_FOUND" };
-                return;
-            }
-            this.structure = structureTemp.structure;
+        if(this.options.base === undefined) {
+            this.state = { status: Status.ERROR, message: "NO_BASE_FOUND" };
+            return;
         }
+        if(this.options.base.structure === undefined) {
+            this.state = { status: Status.ERROR, message: "NO_BASE_STRUCTURE_FOUND" };
+            return;
+        }
+        const structureTemp = this.validateStructure(feature, this.options.base.structure);
+        if(structureTemp === null) {
+            return;
+        }
+        this.structure = structureTemp;
+    }
+
+    validateStructure(feature: FeatureAPI, structure: APIStructure | string): APIStructureImported | null {
+        let apiStructure: APIStructure | null = null;
+        if(typeof(structure) === "object") {
+            apiStructure = structure;
+        } else {
+            const structureTemp = feature.parent.structureContainer.get(structure);
+            if(structureTemp === undefined) {
+                this.state = { status: Status.ERROR, message: `NO_STRUCTURE_FOUND - ${structure}` };
+                return null;
+            }
+            apiStructure = structureTemp.structure;
+        }
+        
+        for (const [key, value] of Object.entries(apiStructure)) {
+            if(value.structure === undefined) {
+                continue;
+            }
+            const childStructure = this.validateStructure(feature, value.structure);
+            if(childStructure === null) {
+                return null;
+            }
+            apiStructure[key].structure = childStructure;
+        }
+
+        return apiStructure as APIStructureImported;
     }
 
     async hook(feature: FeatureAPI): Promise<void> {
@@ -105,10 +135,10 @@ class RouteFetchStructured extends APIRoute {
                 
                 /* Construct rest of the structure */
                 if(Array.isArray(base)) {
-                    const promises: Promise<any>[] = base.map(e => this.decorateBase(database, req, session, e));
+                    const promises: Promise<any>[] = base.map(e => this.decorateBase(database, req, session, e, this.structure));
                     base = await Promise.all(promises);
                 } else {
-                    base = await this.decorateBase(database, req, session, base);
+                    base = await this.decorateBase(database, req, session, base, this.structure);
                 }
 
                 rep.send(base);
@@ -116,9 +146,9 @@ class RouteFetchStructured extends APIRoute {
         );
     }
 
-    async decorateBase(database: Database, req: Request, session: any, base: any): Promise<any> {
+    async decorateBase(database: Database, req: Request, session: any, base: any, structure: APIStructureImported): Promise<any> {
         const decoratorPromises: Promise<{ key: string, value: any }>[] = [];
-        for (const [key, value] of Object.entries(this.structure)) {
+        for (const [key, value] of Object.entries(structure)) {
             decoratorPromises.push(new Promise(async(resolve, reject) => {
                 /* Construct selectors */
                 const selectors = value.disableIdField ? {} : { [value.idField === undefined ? "id": value.idField]: value.baseIdField === undefined ? req.query.id : base[value.baseIdField] };
@@ -129,17 +159,31 @@ class RouteFetchStructured extends APIRoute {
                 }
 
                 /* Fetch */
+                let decorator: any = {};
                 switch(value.type) {
                     case "SINGLE":
                         const item = await database.fetch({ source: value.table, selectors: selectors });
-                        resolve({ key, value: item });
+                        decorator = { key, value: item };
                         break;
 
                     case "ARRAY":
                         const items = await database.fetchMultiple({ source: value.table, selectors: selectors, sort: value.sort, limit: value.limit });
-                        resolve({ key, value: items });
+                        decorator = { key, value: items };
                         break;
                 }
+                
+                /* Construct rest of the structure */
+                if(value.structure !== undefined) {
+                    const decoratorStructure = value.structure;
+                    if(Array.isArray(decorator.value)) {
+                        const promises: Promise<any>[] = decorator.value.map((e: any) => this.decorateBase(database, req, session, e, decoratorStructure));
+                        decorator.value = await Promise.all(promises);
+                    } else {
+                        decorator.value = await this.decorateBase(database, req, session, base, decoratorStructure);
+                    }
+                }
+
+                resolve(decorator);
             }));
         }
         const decorators = await Promise.all(decoratorPromises);

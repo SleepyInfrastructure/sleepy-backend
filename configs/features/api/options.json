@@ -51,9 +51,9 @@
             "base": {
                 "type": "SINGLE",
                 "table": "servers",
-                "authorField": "author"
-            },
-            "structure": "server"
+                "authorField": "author",
+                "structure": "server"
+            }
         },
         {
             "path": "/v1/servers/all/structured/fetch",
@@ -62,9 +62,9 @@
                 "type": "ARRAY",
                 "table": "servers",
                 "authorField": "author",
-                "disableIdField": true
-            },
-            "structure": "server"
+                "disableIdField": true,
+                "structure": "server"
+            }
         },
         {
             "path": "/v1/serverconfigs/fetch",
@@ -104,9 +104,9 @@
             "base": {
                 "type": "SINGLE",
                 "table": "disks",
-                "authorField": "author"
-            },
-            "structure": "disk"
+                "authorField": "author",
+                "structure": "disk"
+            }
         },
         {
             "path": "/v1/disks/all/structured/fetch",
@@ -115,9 +115,9 @@
                 "type": "ARRAY",
                 "table": "disks",
                 "authorField": "author",
-                "disableIdField": true
-            },
-            "structure": "disk"
+                "disableIdField": true,
+                "structure": "disk"
+            }
         },
         {
             "path": "/v1/partitions/fetch",
@@ -129,6 +129,53 @@
             "path": "/v1/partitions/all/fetch",
             "type": "FETCH_MULTIPLE",
             "table": "partitions",
+            "authorField": "author",
+            "disableIdField": true
+        },
+        {
+            "path": "/v1/zfsPools/fetch",
+            "type": "FETCH",
+            "table": "zfspools",
+            "authorField": "author"
+        },
+        {
+            "path": "/v1/zfsPools/all/fetch",
+            "type": "FETCH_MULTIPLE",
+            "table": "zfspools",
+            "authorField": "author",
+            "disableIdField": true
+        },
+        {
+            "path": "/v1/zfsPools/structured/fetch",
+            "type": "FETCH_STRUCTURED",
+            "base": {
+                "type": "SINGLE",
+                "table": "zfspools",
+                "authorField": "author",
+                "structure": "zfsPool"
+            }
+        },
+        {
+            "path": "/v1/zfsPools/all/structured/fetch",
+            "type": "FETCH_STRUCTURED",
+            "base": {
+                "type": "ARRAY",
+                "table": "zfspools",
+                "authorField": "author",
+                "disableIdField": true,
+                "structure": "zfsPool"
+            }
+        },
+        {
+            "path": "/v1/zfsPartitions/fetch",
+            "type": "FETCH",
+            "table": "zfspartitions",
+            "authorField": "author"
+        },
+        {
+            "path": "/v1/zfsPartitions/all/fetch",
+            "type": "FETCH_MULTIPLE",
+            "table": "zfspartitions",
             "authorField": "author",
             "disableIdField": true
         },
@@ -151,9 +198,9 @@
             "base": {
                 "type": "SINGLE",
                 "table": "containers",
-                "authorField": "author"
-            },
-            "structure": "container"
+                "authorField": "author",
+                "structure": "container"
+            }
         },
         {
             "path": "/v1/containers/all/structured/fetch",
@@ -162,9 +209,9 @@
                 "type": "ARRAY",
                 "table": "containers",
                 "authorField": "author",
-                "disableIdField": true
-            },
-            "structure": "container"
+                "disableIdField": true,
+                "structure": "container"
+            }
         },
         {
             "path": "/v1/containerProjects/fetch",
@@ -185,9 +232,9 @@
             "base": {
                 "type": "SINGLE",
                 "table": "containerprojects",
-                "authorField": "author"
-            },
-            "structure": "containerProject"
+                "authorField": "author",
+                "structure": "containerProject"
+            }
         },
         {
             "path": "/v1/containerProjects/all/structured/fetch",
@@ -196,9 +243,9 @@
                 "type": "ARRAY",
                 "table": "containerprojects",
                 "authorField": "author",
-                "disableIdField": true
-            },
-            "structure": "containerProject"
+                "disableIdField": true,
+                "structure": "containerProject"
+            }
         },
         {
             "path": "/v1/databases/fetch",
@@ -240,9 +287,9 @@
             "base": {
                 "type": "SINGLE",
                 "table": "uptimeendpoints",
-                "authorField": "author"
-            },
-            "structure": "uptimeEndpoint"
+                "authorField": "author",
+                "structure": "uptimeEndpoint"
+            }
         },
         {
             "path": "/v1/uptimeEndpoints/all/structured/fetch",
@@ -251,9 +298,9 @@
                 "type": "ARRAY",
                 "table": "uptimeendpoints",
                 "authorField": "author",
-                "disableIdField": true
-            },
-            "structure": "uptimeEndpoint"
+                "disableIdField": true,
+                "structure": "uptimeEndpoint"
+            }
         },
         {
             "path": "/v1/server/daemon/tokens/fetch",

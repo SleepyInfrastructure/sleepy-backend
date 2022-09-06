@@ -9,6 +9,14 @@
             "authorField": "author",
             "sort": { "field": "timestamp", "order": "DESC" },
             "limit": 10
+        },
+        "partitions": {
+            "type": "ARRAY",
+            "table": "partitions",
+            "idField": "parent",
+            "baseIdField": "id",
+            "authorField": "author",
+            "sort": { "field": "name" }
         }
     }
 }

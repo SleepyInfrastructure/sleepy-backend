@@ -18,21 +18,24 @@
             "table": "disks",
             "idField": "server",
             "baseIdField": "id",
-            "authorField": "author"
+            "authorField": "author",
+            "structure": "disk"
         },
-        "partitions": {
+        "zfsPools": {
             "type": "ARRAY",
-            "table": "partitions",
+            "table": "zfspools",
             "idField": "server",
             "baseIdField": "id",
-            "authorField": "author"
+            "authorField": "author",
+            "structure": "zfsPool"
         },
         "containers": {
             "type": "ARRAY",
             "table": "containers",
             "idField": "server",
             "baseIdField": "id",
-            "authorField": "author"
+            "authorField": "author",
+            "structure": "container"
         },
         "containerProjects": {
             "type": "ARRAY",

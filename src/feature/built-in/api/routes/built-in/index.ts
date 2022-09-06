@@ -1,5 +1,5 @@
 import { RouteOptions } from "../types";
-import { APIStructure } from "../../../../../ts/base";
+import { APIStructure, APIStructureImported } from "../../../../../ts/base";
 import { DatabaseSort } from "../../../../../database/types";
 import APIRoute from "..";
 import RouteFetch from "./fetch";
@@ -37,8 +37,7 @@ export type RouteFetchMultipleOptions = RouteOptions & RouteFetchArrayOptions & 
 
 export type RouteFetchStructuredOptions = RouteOptions & {
     type: BuiltinRouteType.FETCH_STRUCTURED;
-    base?: RouteFetchArrayOptions& { type: "SINGLE" | "ARRAY" };
-    structure: string | APIStructure;
+    base?: RouteFetchStructuredBaseItemOptions;
 };
 
 export type RouteFetchSingleOptions = {
@@ -53,8 +52,17 @@ export type RouteFetchArrayOptions = RouteFetchSingleOptions & {
     sort?: DatabaseSort;
 };
 
-export type RouteFetchStructuredItemOptions = RouteFetchArrayOptions & {
+export type RouteFetchStructuredBaseItemOptions = RouteFetchArrayOptions & {
+    type: "SINGLE" | "ARRAY";
+    structure?: string | APIStructure;
+};
+
+export type RouteFetchStructuredItemOptions = RouteFetchStructuredBaseItemOptions & {
     baseIdField?: string;
+};
+
+export type RouteFetchStructuredItemImportedOptions = Omit<RouteFetchStructuredItemOptions, "structure"> & {
+    structure?: APIStructureImported;
 };
 
 export type RouteDeleteOptions = RouteOptions & {

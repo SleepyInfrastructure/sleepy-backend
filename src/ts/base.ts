@@ -1,4 +1,4 @@
-import { RouteFetchStructuredItemOptions } from "../feature/built-in/api/routes/built-in";
+import { RouteFetchStructuredItemImportedOptions, RouteFetchStructuredItemOptions } from "../feature/built-in/api/routes/built-in";
 
 /* Root Options */
 export type RootOptions = {
@@ -37,13 +37,13 @@ export type FeatureServerOptions = FeatureOptions & {
 };
 
 /* API Structures */
-export type APIStructure = Record<string, RouteFetchStructuredItemOptions & { type: "SINGLE" | "ARRAY" }>;
+export type APIStructure = Record<string, RouteFetchStructuredItemOptions>;
+export type APIStructureImported = Record<string, RouteFetchStructuredItemImportedOptions>;
 
 export type APIStructureOptions = {
     id: string;
     structure: APIStructure;
 };
-
 
 /* Statuses */
 export type StateDescriptor = {

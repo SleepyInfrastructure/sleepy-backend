@@ -1,0 +1,12 @@
+{
+    "id": "zfsPool",
+    "structure": {
+        "partitions": {
+            "type": "ARRAY",
+            "table": "zfspartitions",
+            "idField": "parent",
+            "baseIdField": "id",
+            "authorField": "author"
+        }
+    }
+}

@@ -6,7 +6,8 @@
             "table": "containers",
             "idField": "parent",
             "baseIdField": "id",
-            "authorField": "author"
+            "authorField": "author",
+            "structure": "container"
         }
     }
 }
