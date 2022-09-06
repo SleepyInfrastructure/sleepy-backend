@@ -1,0 +1,11 @@
+{
+    "id": "wsDaemonAuth",
+    "schema": {
+        "type": "object",
+        "properties": {
+            "token": { "type": "string" },
+            "version": { "type": "string" }
+        },
+        "required": ["token", "version"]
+    }
+}

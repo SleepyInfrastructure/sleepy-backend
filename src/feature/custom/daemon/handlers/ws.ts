@@ -29,19 +29,33 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
         connection.send({ type: DaemonWebsocketMessageType.AUTH_SUCCESS, id: user.id, username: user.username });
     }
 
+    const validate = (id: string, data: any) => {
+        if(!feature.parent.validator.validate(id, data)) {
+            console.log(`${red("X")} Message failed validation! (${feature.parent.validator.errorsText()})`);
+            return false;
+        }
+        return true;
+    }
+
     connection.stream.socket.on("message", async(messageRaw) => {
+        const messageRawText = messageRaw.toString();
         let message: any;
         try {
-            message = JSON.parse(messageRaw.toString());
+            message = JSON.parse(messageRawText);
         } catch(e) {
-            console.log(messageRaw.toString());
+            console.log(`${red("X")} Message failed parsing! (${e})`);
+            return;
+        }
+        if(!validate("wsMessage", message)) {
             return;
         }
 
         console.log(`${gray("-")} Got message of type ${bold(yellow(message.type))}.`);
         switch(message.type) {
             case DaemonWebsocketMessageType.DAEMON_AUTH: {
-                if(message.token == null || message.version == null) { return; }
+                if(!validate("wsDaemonAuth", message)) {
+                    return;
+                }
                 if(connection.daemon !== null) {
                     console.log(`${red("X")} Daemon already authenticated!`);
                     return;
