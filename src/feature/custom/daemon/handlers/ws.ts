@@ -111,15 +111,15 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
             }
 
             case DaemonWebsocketMessageType.DAEMON_REQUEST_RESOURCES_REPLY: {
-                if(message.disks == null || message.containers == null || message.containerProjects == null) { return; }
                 if(connection.daemon === null) {
                     return;
                 }
 
+                if(message.disks != null && message.zfsPools != null) {
                 await database.delete({ source: "disks", selectors: { server: connection.daemon.id } });
                 await database.delete({ source: "partitions", selectors: { server: connection.daemon.id } });
-                await database.delete({ source: "containers", selectors: { server: connection.daemon.id } });
-                await database.delete({ source: "containerprojects", selectors: { server: connection.daemon.id } });
+                    await database.delete({ source: "zfspools", selectors: { server: connection.daemon.id } });
+                    await database.delete({ source: "zfspartitions", selectors: { server: connection.daemon.id } });
                 for(const disk of message.disks) {
                     database.add({ destination: "disks", item:
                         {
@@ -149,8 +149,43 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                                 mountpoint: partition.mountpoint
                             }
                         });
+                        }
+                    }
+                    for(const pool of message.zfsPools) {
+                        database.add({ destination: "zfspools", item:
+                            {
+                                id: pool.id,
+                                author: connection.daemon.author,
+                                server: connection.daemon.id,
+                                name: pool.name,
+                                size: pool.size,
+                                used: pool.used,
+                                compression: pool.compression,
+                                compressRatio: pool.compressRatio,
+                                encryption: pool.encryption === true ? 1 : 0,
+                                atime: pool.atime === true ? 1 : 0,
+                                version: pool.version,
+                                deduplication: pool.deduplication === true ? 1 : 0,
+                                relatime: pool.relatime === true ? 1 : 0
+                            }
+                        });
+                        for(const partition of pool.children) {
+                            database.add({ destination: "zfspartitions", item:
+                                {
+                                    id: partition.id,
+                                    author: connection.daemon.author,
+                                    parent: pool.id,
+                                    server: connection.daemon.id,
+                                    size: partition.size,
+                                    used: partition.used
+                                }
+                            });
+                        }
                     }
                 }
+                if(message.containers != null && message.containerProjects != null) {
+                    await database.delete({ source: "containers", selectors: { server: connection.daemon.id } });
+                    await database.delete({ source: "containerprojects", selectors: { server: connection.daemon.id } });
                 for(const containerProject of message.containerProjects) {
                     database.add({ destination: "containerprojects", item:
                         {
@@ -179,6 +214,7 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                             networks: container.networks
                         }
                     });
+                    }
                 }
 
                 for(const daemonClient of feature.getClients(connection.daemon.author)) {
