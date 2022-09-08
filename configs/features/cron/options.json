@@ -10,8 +10,7 @@
 		},
 		{
 			"time": "*/1 * * * *",
-			"updates": [{ "type": "RESOURCES", "resources": ["DISKS"] }],
-			"cleans": [{ "type": "STATISTICS", "time": 600 }]
+			"updates": [{ "type": "RESOURCES", "resources": ["GENERAL", "DISKS"] }]
 		},
 		{
 			"time": "*/1 * * * *",

@@ -13,6 +13,13 @@
             "baseIdField": "network",
             "authorField": "author"
         },
+        "software": {
+            "type": "ARRAY",
+            "table": "serversoftware",
+            "idField": "server",
+            "baseIdField": "id",
+            "authorField": "author"
+        },
         "disks": {
             "type": "ARRAY",
             "table": "disks",

@@ -9,8 +9,8 @@ export type FeatureCronOptions = FeatureOptions & {
 
 export type CronInterval = {
     time: string;
-    updates: CronUpdate[];
-    cleans: CronClean[];
+    updates?: CronUpdate[];
+    cleans?: CronClean[];
 };
 
 export enum CronUpdateType {
@@ -20,6 +20,7 @@ export enum CronUpdateType {
 };
 
 export enum CronUpdateResourcesType {
+    GENERAL = "GENERAL",
     CONTAINERS = "CONTAINERS",
     DISKS = "DISKS"
 };

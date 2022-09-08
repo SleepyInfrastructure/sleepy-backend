@@ -46,12 +46,16 @@ class FeatureCron extends Feature {
     }
 
     processInterval(featureDaemon: FeatureDaemon, database: Database, interval: CronInterval) {
-        for(const update of interval.updates) {
-            console.log(`${gray("-")} Launching ${bold(yellow(update.type))} cron-job...`);
-            this.processUpdate(featureDaemon, database, update);
+        if(interval.updates !== undefined) {
+            for(const update of interval.updates) {
+                console.log(`${gray("-")} Launching ${bold(yellow(update.type))} cron-job...`);
+                this.processUpdate(featureDaemon, database, update);
+            }
         }
-        for(const clean of interval.cleans) {
-            this.processClean(database, clean);
+        if(interval.cleans !== undefined) {
+            for(const clean of interval.cleans) {
+                this.processClean(database, clean);
+            }
         }
     }
 
