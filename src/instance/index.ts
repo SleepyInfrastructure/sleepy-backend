@@ -6,7 +6,6 @@ import { DatabaseType } from "../database/types";
 import { workerData } from "worker_threads";
 import { bold, green, red, yellow, gray } from "nanocolors";
 import { readdirSync, readFileSync } from "fs";
-import Ajv from "ajv";
 
 /* Local Imports */
 import Feature from "../feature";
@@ -22,7 +21,6 @@ class Instance {
     state: StateDescriptor;
     options: InstanceOptions;
 
-    validator: Ajv;
     databaseContainer: Map<string, Database>;
     featureContainer: Map<string, Feature>;
     structureContainer: Map<string, APIStructureOptions>;
@@ -32,7 +30,6 @@ class Instance {
         this.state = { status: Status.WAITING, message: "WAITING" };
         this.options = JSON.parse(readFileSync(`configs/instances/${id}/options.json`, "utf-8"));
 
-        this.validator = new Ajv();
         this.databaseContainer = new Map();
         this.featureContainer = new Map();
         this.structureContainer = new Map();
@@ -85,12 +82,6 @@ class Instance {
         for (const structurePath of structurePaths) {
             const options = JSON.parse(readFileSync(`configs/structures/${structurePath}`, "utf-8"));
             this.structureContainer.set(options.id, options);
-        }
-
-        const schemaPaths = readdirSync("configs/schemas");
-        for (const schemaPath of schemaPaths) {
-            const options = JSON.parse(readFileSync(`configs/schemas/${schemaPath}`, "utf-8"));
-            this.validator.addSchema(options.schema, options.id);
         }
     }
 

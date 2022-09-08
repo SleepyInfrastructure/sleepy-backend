@@ -7,6 +7,10 @@ import Database from "../../../../database";
 import { bold, gray, green, red, yellow } from "nanocolors"; 
 import { randomBytes } from "crypto";
 import { FastifyRequest } from "fastify";
+import { z } from "zod";
+
+// Local
+import * as schemas from "../schemas";
 
 export async function handleWebsocket(feature: FeatureDaemon, database: Database, connection: Connection, request: FastifyRequest) {
     console.log(`${green(">")} Socket connected!`);
@@ -29,44 +33,47 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
         connection.send({ type: DaemonWebsocketMessageType.AUTH_SUCCESS, id: user.id, username: user.username });
     }
 
-    const validate = (id: string, data: any) => {
-        if(!feature.parent.validator.validate(id, data)) {
-            console.log(`${red("X")} Message failed validation! (${feature.parent.validator.errorsText()})`);
-            return false;
+    const validate = <T>(schema: z.Schema, data: object): (T | null) => {
+        const result = schema.safeParse(data);
+        if(!result.success) {
+            console.log(`${red("X")} Message failed validation! (${result.error.toString()})`);
+            return null;
         }
-        return true;
+        return result.data;
     }
 
     connection.stream.socket.on("message", async(messageRaw) => {
         const messageRawText = messageRaw.toString();
-        let message: any;
+        let messageRawJson: any;
         try {
-            message = JSON.parse(messageRawText);
+            messageRawJson = JSON.parse(messageRawText);
         } catch(e) {
             console.log(`${red("X")} Message failed parsing! (${e})`);
             return;
         }
-        if(!validate("wsMessage", message)) {
+        const message = validate<schemas.WebsocketMessageType>(schemas.WebsocketMessage, messageRawJson);
+        if(message === null) {
             return;
         }
 
         console.log(`${gray("-")} Got message of type ${bold(yellow(message.type))}.`);
         switch(message.type) {
             case DaemonWebsocketMessageType.DAEMON_AUTH: {
-                if(!validate("wsDaemonAuth", message)) {
+                const detailedMessage = validate<schemas.WebsocketDaemonAuthMessageType>(schemas.WebsocketDaemonAuthMessage, messageRawJson);
+                if(detailedMessage === null) {
                     return;
                 }
                 if(connection.daemon !== null) {
                     console.log(`${red("X")} Daemon already authenticated!`);
                     return;
                 }
-                if(message.version !== feature.options.version) {
-                    console.log(`${red("X")} Socket failed to promote to daemon! (daemon version ${bold(red(message.version))} is not ${bold(green(feature.options.version))})`);
+                if(detailedMessage.version !== feature.options.version) {
+                    console.log(`${red("X")} Socket failed to promote to daemon! (daemon version ${bold(red(detailedMessage.version))} is not ${bold(green(feature.options.version))})`);
                     connection.send({ type: DaemonWebsocketMessageType.DAEMON_AUTH_FAILURE, reason: DaemonWebsocketAuthFailure.VERSION_MISMATCH, version: feature.options.version });
                     return;
                 }
 
-                const daemonToken = await database.fetch({ source: "daemontokens", selectors: { "id": message.token } });
+                const daemonToken = await database.fetch({ source: "daemontokens", selectors: { "id": detailedMessage.token } });
                 if(daemonToken === undefined) {
                     console.log(`${red("X")} Socket failed to promote to daemon!`);
                     connection.send({ type: DaemonWebsocketMessageType.DAEMON_AUTH_FAILURE, reason: DaemonWebsocketAuthFailure.WRONG_TOKEN });
@@ -101,26 +108,57 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
             }
 
             case DaemonWebsocketMessageType.DAEMON_CLIENT_REQUEST_RESOURCES: {
-                const requestedDaemon = feature.getDaemon(connection.client, message.id);
+                const detailedMessage = validate<schemas.WebsocketDaemonClientRequestResourcesMessageType>(schemas.WebsocketDaemonClientRequestResourcesMessage, messageRawJson);
+                if(detailedMessage === null) {
+                    return;
+                }
+                const requestedDaemon = feature.getDaemon(connection.client, detailedMessage.id);
                 if(requestedDaemon === null) {
                     break;
                 }
 
-                requestedDaemon.send({ type: DaemonWebsocketMessageType.DAEMON_REQUEST_RESOURCES, resources: message.resources });
+                requestedDaemon.send({ type: DaemonWebsocketMessageType.DAEMON_REQUEST_RESOURCES, resources: detailedMessage.resources });
                 break;
             }
 
             case DaemonWebsocketMessageType.DAEMON_REQUEST_RESOURCES_REPLY: {
+                const detailedMessage = validate<schemas.WebsocketDaemonRequestResourcesMessageType>(schemas.WebsocketDaemonRequestResourcesMessage, messageRawJson);
+                if(detailedMessage === null) {
+                    return;
+                }
                 if(connection.daemon === null) {
                     return;
                 }
 
-                if(message.disks != null && message.zfsPools != null) {
+                if(detailedMessage.software !== null) {
+                    await database.delete({ source: "serversoftware", selectors: { server: connection.daemon.id } });
+                    for(const software of detailedMessage.software) {
+                        database.add({ destination: "serversoftware",
+                            item: {
+                                id: randomBytes(16).toString("hex"),
+                                author: connection.daemon.author,
+                                server: connection.daemon.id,
+                                name: software.name,
+                                version: software.version
+                            }
+                        });
+                    }
+                }
+                if(detailedMessage.memory !== null) {
+                    database.edit({ destination: "servers",
+                        item: {
+                            memory: detailedMessage.memory.total,
+                            swap: detailedMessage.memory.swapTotal
+                        },
+                        selectors: { id: connection.daemon.id }
+                    });
+                }
+                if(detailedMessage.disks !== null && detailedMessage.zfsPools !== null) {
                     await database.delete({ source: "disks", selectors: { server: connection.daemon.id } });
                     await database.delete({ source: "partitions", selectors: { server: connection.daemon.id } });
                     await database.delete({ source: "zfspools", selectors: { server: connection.daemon.id } });
                     await database.delete({ source: "zfspartitions", selectors: { server: connection.daemon.id } });
-                    for(const disk of message.disks) {
+                    for(const disk of detailedMessage.disks) {
                         database.add({ destination: "disks", item:
                             {
                                 id: disk.id,
@@ -151,7 +189,7 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                             });
                         }
                     }
-                    for(const pool of message.zfsPools) {
+                    for(const pool of detailedMessage.zfsPools) {
                         database.add({ destination: "zfspools", item:
                             {
                                 id: pool.id,
@@ -183,10 +221,10 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                         }
                     }
                 }
-                if(message.containers != null && message.containerProjects != null) {
+                if(detailedMessage.containers !== null && detailedMessage.containerProjects !== null) {
                     await database.delete({ source: "containers", selectors: { server: connection.daemon.id } });
                     await database.delete({ source: "containerprojects", selectors: { server: connection.daemon.id } });
-                    for(const containerProject of message.containerProjects) {
+                    for(const containerProject of detailedMessage.containerProjects) {
                         database.add({ destination: "containerprojects", item:
                             {
                                 id: containerProject.id,
@@ -198,7 +236,7 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                             }
                         });
                     }
-                    for(const container of message.containers) {
+                    for(const container of detailedMessage.containers) {
                         database.add({ destination: "containers", item:
                             {
                                 id: container.id,
@@ -224,17 +262,24 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
             }
 
             case DaemonWebsocketMessageType.DAEMON_CLIENT_REQUEST_DATABASE_BACKUP: {
-                const requestedDaemon = feature.getDaemon(connection.client, message.id);
+                const detailedMessage = validate<schemas.WebsocketDaemonClientRequestDatabaseMessageType>(schemas.WebsocketDaemonClientRequestDatabaseMessage, messageRawJson);
+                if(detailedMessage === null) {
+                    return;
+                }
+                const requestedDaemon = feature.getDaemon(connection.client, detailedMessage.id);
                 if(requestedDaemon === null) {
                     break;
                 }
 
-                requestedDaemon.send({ type: DaemonWebsocketMessageType.DAEMON_REQUEST_DATABASE_BACKUP, database: message.database });
+                requestedDaemon.send({ type: DaemonWebsocketMessageType.DAEMON_REQUEST_DATABASE_BACKUP, database: detailedMessage.database });
                 break;
             }
 
             case DaemonWebsocketMessageType.DAEMON_REQUEST_STATS_REPLY: {
-                if(message.network == null || message.cpu == null || message.disks == null || message.containers == null) { return; }
+                const detailedMessage = validate<schemas.WebsocketDaemonRequestStatsReplyMessageType>(schemas.WebsocketDaemonRequestStatsReplyMessage, messageRawJson);
+                if(detailedMessage === null) {
+                    return;
+                }
                 if(connection.daemon === null) {
                     return;
                 }
@@ -246,14 +291,15 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                         author: connection.daemon.author,
                         server: connection.daemon.id,
                         timestamp: timestamp,
-                        rx: message.network.rx,
-                        tx: message.network.tx,
-                        cpu: message.cpu.total,
-                        memory: ((message.memory.used / (message.memory.total === 0 ? 1 : message.memory.total)) * 100),
-                        swap: ((message.memory.swapUsed / (message.memory.swapTotal === 0 ? 1 : message.memory.swapTotal)) * 100)
+                        cpuSystem: detailedMessage.cpu.system,
+                        cpuUser: detailedMessage.cpu.user,
+                        rx: detailedMessage.network.rx,
+                        tx: detailedMessage.network.tx,
+                        memory: detailedMessage.memory.used,
+                        swap: detailedMessage.memory.swapUsed
                     }
                 });
-                for (const disk of message.disks) {
+                for (const disk of detailedMessage.disks) {
                     database.add({ destination: "diskstatistics", item:
                         {
                             id: randomBytes(16).toString("hex"),
@@ -267,7 +313,7 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                         }
                     });
                 }
-                for (const container of message.containers) {
+                for (const container of detailedMessage.containers) {
                     database.add({ destination: "containerstatistics", item:
                         {
                             id: randomBytes(16).toString("hex"),
@@ -283,14 +329,7 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                         }
                     });
                 }
-
-                database.edit({ destination: "servers",
-                    item: {
-                        memory: message.memory.total,
-                        swap: message.memory.swapTotal
-                    },
-                    selectors: { id: connection.daemon.id }
-                });
+                break;
             }
         }
     });
