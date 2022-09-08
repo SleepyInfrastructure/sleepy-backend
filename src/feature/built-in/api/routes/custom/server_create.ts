@@ -12,15 +12,16 @@ import APIRoute from "..";
 import FeatureAPI from "../..";
 
 type Request = FastifyRequest<{
-    Body: { name: string };
+    Body: { name: string, color: string };
 }>;
 
 const schema: FastifySchema = {
     body: {
         type: "object",
-        required: ["name"],
+        required: ["name", "color"],
         properties: {
-            name: { type: "string", minLength: 3, maxLength: 64 }
+            name: { type: "string", minLength: 3, maxLength: 64 },
+            color: { type: "string", minLength: 6, maxLength: 6 }
         }
     }
 };
@@ -73,26 +74,23 @@ class RouteServerCreate extends APIRoute {
                 database.add({ destination: "networks", item: serverNetwork });
 
                 /* Create server */
-                const server = {
+                const newServer = {
                     id: randomBytes(16).toString("hex"),
                     author: session.user,
                     timestamp: Math.round(Date.now() / 1000),
                     network: serverNetwork.id,
                     config: serverConfig.id,
                     name: req.body.name,
-                    color: "ff3645",
-                    memory: 0,
-                    swap: 0,
-                    netInterfaces: []
+                    color: req.body.color
                 };
-                database.add({ destination: "servers", item: server });
+                database.add({ destination: "servers", item: newServer });
+                
+                /* Get server */
+                const server = await database.fetch({ source: "servers", selectors: { "id": newServer.id } });
+                if(server === undefined) { rep.code(404); rep.send(); return; }
 
-                /* Send structured */
-                rep.send({
-                    ...server,
-                    config: serverConfig,
-                    network: serverNetwork
-                });
+                /* Send */
+                rep.send(server);
             }
         );
     }

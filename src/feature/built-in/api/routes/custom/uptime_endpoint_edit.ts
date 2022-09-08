@@ -1,6 +1,6 @@
 /* Types */
 import { Status } from "../../../../../ts/base";
-import { DatabaseType } from "../../../../../database/types";
+import { DatabaseType, DatabaseUnserializedItemValue } from "../../../../../database/types";
 import { RouteUptimeEndpointEditOptions } from "./index";
 
 /* Node Imports */
@@ -52,14 +52,19 @@ class RouteUptimeEndpointEdit extends APIRoute {
                 if(req.cookies.Token === undefined) { rep.code(403); rep.send(); return; }
 
                 /* Get session */
-                const session = await database.fetch({ source: "sessions", selectors: { "id": req.cookies.Token } });
+                const session = await database.fetch({ source: "sessions", selectors: { id: req.cookies.Token } });
                 if(session === undefined) { rep.code(403); rep.send(); return; }
 
-                /* Edit */
-                await database.edit({ destination: "uptimeendpoints", item: { name: req.body.name, host: req.body.host ?? null, requestEndpoint: req.body.requestEndpoint ?? null }, selectors: { id: req.body.id, author: session.user }});
+                /* Edit (author is checked in selectors) */
+                const edit: Record<string, DatabaseUnserializedItemValue> = {
+                    name: req.body.name,
+                    host: req.body.host ?? null,
+                    requestEndpoint: req.body.requestEndpoint ?? null
+                };
+                await database.edit({ destination: "uptimeendpoints", item: edit, selectors: { id: req.body.id, author: session.user }});
 
                 /* Get endpoint */
-                const endpoint = await database.fetch({ source: "uptimeendpoints", selectors: { "id": req.body.id } });
+                const endpoint = await database.fetch({ source: "uptimeendpoints", selectors: { id: req.body.id, author: session.user } });
                 if(endpoint === undefined) { rep.code(404); rep.send(); return; }
 
                 /* Send */

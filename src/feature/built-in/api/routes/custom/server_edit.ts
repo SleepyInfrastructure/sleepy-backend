@@ -1,6 +1,6 @@
 /* Types */
 import { Status } from "../../../../../ts/base";
-import { DatabaseType } from "../../../../../database/types";
+import { DatabaseType, DatabaseUnserializedItemValue } from "../../../../../database/types";
 import { RouteServerEditOptions } from "./index";
 
 /* Node Imports */
@@ -11,16 +11,17 @@ import APIRoute from "..";
 import FeatureAPI from "../..";
 
 type Request = FastifyRequest<{
-    Body: { id: string, name: string };
+    Body: { id: string, name: string, color: string };
 }>;
 
 const schema: FastifySchema = {
     body: {
         type: "object",
-        required: ["id", "name"],
+        required: ["id", "name", "color"],
         properties: {
             id: { type: "string", minLength: 32, maxLength: 32 },
-            name: { type: "string", minLength: 3, maxLength: 64 }
+            name: { type: "string", minLength: 3, maxLength: 64 },
+            color: { type: "string", minLength: 6, maxLength: 6 }
         }
     }
 };
@@ -50,14 +51,18 @@ class RouteServerEdit extends APIRoute {
                 if(req.cookies.Token === undefined) { rep.code(403); rep.send(); return; }
 
                 /* Get session */
-                const session = await database.fetch({ source: "sessions", selectors: { "id": req.cookies.Token } });
+                const session = await database.fetch({ source: "sessions", selectors: { id: req.cookies.Token } });
                 if(session === undefined) { rep.code(403); rep.send(); return; }
 
-                /* Edit */
-                await database.edit({ destination: "servers", item: { name: req.body.name }, selectors: { id: req.body.id, author: session.user }});
+                /* Edit (author is checked in selectors) */
+                const edit: Record<string, DatabaseUnserializedItemValue> = {
+                    name: req.body.name,
+                    color: req.body.color
+                };
+                await database.edit({ destination: "servers", item: edit, selectors: { id: req.body.id, author: session.user }});
 
                 /* Get server */
-                const server = await database.fetch({ source: "servers", selectors: { "id": req.body.id } });
+                const server = await database.fetch({ source: "servers", selectors: { id: req.body.id, author: session.user } });
                 if(server === undefined) { rep.code(404); rep.send(); return; }
 
                 /* Send */

@@ -57,16 +57,20 @@ class RouteUptimeEndpointCreate extends APIRoute {
                 if(session === undefined) { rep.code(403); rep.send(); return; }
 
                 /* Create endpoint */
-                const endpoint = {
+                const newEndpoint = {
                     id: randomBytes(16).toString("hex"),
                     author: session.user,
                     name: req.body.name,
                     host: req.body.host ?? null,
                     requestEndpoint: req.body.requestEndpoint ?? null
                 };
-                database.add({ destination: "uptimeendpoints", item: endpoint });
+                database.add({ destination: "uptimeendpoints", item: newEndpoint });
+                
+                /* Get endpoint */
+                const endpoint = await database.fetch({ source: "uptimeendpoints", selectors: { "id": newEndpoint.id } });
+                if(endpoint === undefined) { rep.code(404); rep.send(); return; }
 
-                /* Send structured */
+                /* Send */
                 rep.send(endpoint);
             }
         );
