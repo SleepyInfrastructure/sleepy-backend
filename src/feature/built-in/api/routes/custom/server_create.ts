@@ -2,29 +2,16 @@
 import { Status } from "../../../../../ts/base";
 import { DatabaseType } from "../../../../../database/types";
 import { RouteServerCreateOptions } from "./index";
+import { ServerCreateSchema, ServerCreateSchemaType } from "./_schemas";
+import { RequestWithSchema } from "../types";
 
 /* Node Imports */
 import { randomBytes } from "crypto";
-import { FastifyRequest, FastifySchema } from "fastify";
 
 /* Local Imports */
 import APIRoute from "..";
 import FeatureAPI from "../..";
-
-type Request = FastifyRequest<{
-    Body: { name: string, color: string };
-}>;
-
-const schema: FastifySchema = {
-    body: {
-        type: "object",
-        required: ["name", "color"],
-        properties: {
-            name: { type: "string", minLength: 3, maxLength: 64 },
-            color: { type: "string", minLength: 6, maxLength: 6 }
-        }
-    }
-};
+import { getSession, validateSchemaBody } from "../util";
 
 class RouteServerCreate extends APIRoute {
     options: RouteServerCreateOptions;
@@ -45,14 +32,18 @@ class RouteServerCreate extends APIRoute {
         }
 
         feature.instance.post(this.path,
-            { schema: schema, config: { rateLimit: { timeWindow: 10000, max: 1 } } },
-            async (req: Request, rep) => {
-                /* Validate schema */
-                if(req.cookies.Token === undefined) { rep.code(403); rep.send(); return; }
+            { config: { rateLimit: { timeWindow: 10000, max: 1 } } },
+            async (req: RequestWithSchema<ServerCreateSchemaType>, rep) => {
+                /* Validate schemas */
+                if(!validateSchemaBody(ServerCreateSchema, req, rep)) {
+                    return;
+                }
 
                 /* Get session */
-                const session = await database.fetch({ source: "sessions", selectors: { "id": req.cookies.Token } });
-                if(session === undefined) { rep.code(403); rep.send(); return; }
+                const session = await getSession(database, req, rep);
+                if(session === null) {
+                    return;
+                }
 
                 /* Create config */
                 const serverConfig = {
@@ -81,7 +72,7 @@ class RouteServerCreate extends APIRoute {
                     network: serverNetwork.id,
                     config: serverConfig.id,
                     name: req.body.name,
-                    color: req.body.color
+                    color: req.body.color ?? "ff3645"
                 };
                 database.add({ destination: "servers", item: newServer });
                 

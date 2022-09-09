@@ -2,27 +2,13 @@
 import { Status } from "../../../../../ts/base";
 import { DatabaseType } from "../../../../../database/types";
 import { RouteFetchOptions } from "./index";
-
-/* Node Imports */
-import { FastifyRequest, FastifySchema } from "fastify";
+import { FetchSchema, FetchSchemaType } from "./_schemas";
+import { RequestWithSchemaQuery } from "../types";
 
 /* Local Imports */
 import APIRoute from "..";
 import FeatureAPI from "../..";
-
-type Request = FastifyRequest<{
-    Querystring: { id: string };
-}>;
-
-const schema: FastifySchema = {
-    querystring: {
-        type: "object",
-        required: ["id"],
-        properties: {
-            id: { type: "string", minLength: 32, maxLength: 32 }
-        }
-    }
-};
+import { getSession, validateSchemaQuery } from "../util";
 
 class RouteFetch extends APIRoute {
     options: RouteFetchOptions;
@@ -43,20 +29,20 @@ class RouteFetch extends APIRoute {
         }
 
         feature.instance.get(this.path,
-            { schema: schema, config: { rateLimit: { timeWindow: 1000, max: 10 } } },
-            async (req: Request, rep) => {
+            { config: { rateLimit: { timeWindow: 1000, max: 10 } } },
+            async (req: RequestWithSchemaQuery<FetchSchemaType>, rep) => {
+                /* Validate schemas */
+                if(!validateSchemaQuery(FetchSchema, req, rep)) {
+                    return;
+                }
+
                 /* Construct selectors */
                 const selectors = { [this.options.idField === undefined ? "id": this.options.idField]: req.query.id };
 
                 /* Add a selector if route needs an author */
                 if(this.options.authorField !== undefined) {
-                    if(req.cookies.Token === undefined) {
-                        rep.code(403); rep.send();
-                        return;
-                    }
-                    const session = await database.fetch({ source: "sessions", selectors: { "id": req.cookies.Token } });
-                    if(session === undefined) {
-                        rep.code(403); rep.send();
+                    const session = await getSession(database, req, rep);
+                    if(session === null) {
                         return;
                     }
 

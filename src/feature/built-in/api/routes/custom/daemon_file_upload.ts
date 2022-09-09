@@ -3,6 +3,7 @@ import { Status } from "../../../../../ts/base";
 import { RouteDaemonFileUploadOptions } from "./index";
 import { DatabaseType } from "../../../../../database/types";
 import { DaemonFileUploadType } from "../../../../custom/daemon/types";
+import { pad } from "../../../../../util/general";
 
 /* Node Imports */
 import fs from "fs";
@@ -15,7 +16,6 @@ const pump = util.promisify(pipeline);
 /* Local Imports */
 import APIRoute from "..";
 import FeatureAPI from "../..";
-import { pad } from "../../../../util";
 
 class RouteDaemonFileUpload extends APIRoute {
     options: RouteDaemonFileUploadOptions;

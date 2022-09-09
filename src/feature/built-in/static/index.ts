@@ -11,7 +11,7 @@ import { join } from "path";
 /* Local Imports */
 import Feature from "../..";
 import Instance from "../../../instance";
-import { createFastifyInstance, startFastifyInstance } from "../../util";
+import { createFastifyInstance, startFastifyInstance } from "../../../util/fastify";
 
 class FeatureStatic extends Feature {
     options: FeatureStaticOptions;

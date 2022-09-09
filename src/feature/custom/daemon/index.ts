@@ -10,7 +10,7 @@ import * as fastify from "fastify";
 import { SocketStream } from "@fastify/websocket";
 
 /* Local Imports */
-import { createFastifyInstance, startFastifyInstance } from "../../util";
+import { createFastifyInstance, startFastifyInstance } from "../../../util/fastify";
 import { handleWebsocket } from "./handlers/ws";
 
 class FeatureDaemon extends Feature {

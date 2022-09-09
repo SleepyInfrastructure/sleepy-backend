@@ -2,17 +2,13 @@
 import { Status } from "../../../../../ts/base";
 import { DatabaseType } from "../../../../../database/types";
 import { RoutePushSubscribeOptions } from "./index";
-
-/* Node Imports */
-import { FastifyRequest } from "fastify";
+import { PushSubscribeSchema, PushSubscribeSchemaType } from "./_schemas";
+import { RequestWithSchema } from "../types";
 
 /* Local Imports */
 import APIRoute from "..";
 import FeatureAPI from "../..";
-
-type Request = FastifyRequest<{
-    Querystring: { url: string, key: string, auth: string };
-}>;
+import { getSession, validateSchemaBody } from "../util";
 
 class RoutePushSubscribe extends APIRoute {
     options: RoutePushSubscribeOptions;
@@ -34,17 +30,20 @@ class RoutePushSubscribe extends APIRoute {
 
         feature.instance.post(this.path,
             { config: { rateLimit: { timeWindow: 1000, max: 4 } } },
-            async (req: Request, rep) => {
-                /* Validate schema */
-                if(req.query.url === undefined || req.query.key === undefined || req.query.auth === undefined) { rep.code(400); rep.send(); return; }
-                if(req.cookies.Token === undefined) { rep.code(403); rep.send(); return; }
+            async (req: RequestWithSchema<PushSubscribeSchemaType>, rep) => {
+                /* Validate schemas */
+                if(!validateSchemaBody(PushSubscribeSchema, req, rep)) {
+                    return;
+                }
 
-                /* Check if user is logged in */
-                const session = await database.fetch({ source: "sessions", selectors: { "id": req.cookies.Token } });
-                if(session === undefined) { rep.code(403); rep.send(); return; }
+                /* Get session */
+                const session = await getSession(database, req, rep);
+                if(session === null) {
+                    return;
+                }
 
                 /* Subscribe to push notifications */
-                const options = { destination: "users", selectors: { "id": session.user }, item: { pushEnabled: "1", pushUrl: req.query.url, pushKey: req.query.key, pushAuth: req.query.auth } };
+                const options = { destination: "users", selectors: { "id": session.user }, item: { pushEnabled: "1", pushUrl: req.body.url, pushKey: req.body.key, pushAuth: req.body.auth } };
                 database.edit(options);
 
                 rep.code(200);

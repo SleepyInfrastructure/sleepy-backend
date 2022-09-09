@@ -1,33 +1,20 @@
 /* Types */
-import { APIStructure, APIStructureImported, Status } from "../../../../../ts/base";
+import { APIStructure, APIStructureImported, APIStructureImportedDetails, Status } from "../../../../../ts/base";
 import { DatabaseType } from "../../../../../database/types";
 import { RouteFetchStructuredOptions } from "./index";
-
-/* Node Imports */
-import { FastifyRequest, FastifySchema } from "fastify";
+import { FetchStructuredSchema, FetchStructuredSchemaType } from "./_schemas";
+import { RequestWithSchemaQuery } from "../types";
 
 /* Local Imports */
 import APIRoute from "..";
 import FeatureAPI from "../..";
 import Database from "../../../../../database";
-
-type Request = FastifyRequest<{
-    Querystring: { id?: string };
-}>;
-
-const schema: FastifySchema = {
-    querystring: {
-        type: "object",
-        required: [],
-        properties: {
-            id: { type: "string", minLength: 32, maxLength: 32 }
-        }
-    }
-};
+import { getSession, validateSchemaQuery } from "../util";
 
 class RouteFetchStructured extends APIRoute {
     options: RouteFetchStructuredOptions;
     structure: APIStructureImported;
+    details: APIStructureImportedDetails = { hasAuthorField: false };
 
     constructor(feature: FeatureAPI, options: RouteFetchStructuredOptions) {
         super(feature, options);
@@ -41,6 +28,9 @@ class RouteFetchStructured extends APIRoute {
         if(this.options.base.structure === undefined) {
             this.state = { status: Status.ERROR, message: "NO_BASE_STRUCTURE_FOUND" };
             return;
+        }
+        if(this.options.base.authorField !== undefined) {
+           this.details.hasAuthorField = true; 
         }
         const structureTemp = this.validateStructure(feature, this.options.base.structure);
         if(structureTemp === null) {
@@ -63,6 +53,9 @@ class RouteFetchStructured extends APIRoute {
         }
         
         for (const [key, value] of Object.entries(apiStructure)) {
+            if(value.authorField !== undefined) {
+               this.details.hasAuthorField = true; 
+            }
             if(value.structure === undefined) {
                 continue;
             }
@@ -87,16 +80,18 @@ class RouteFetchStructured extends APIRoute {
         }
 
         feature.instance.get(this.path,
-            { schema: schema, config: { rateLimit: { timeWindow: 1000, max: 10 } } },
-            async (req: Request, rep) => {
-                /* Predetermine if a session is needed, then fetch it once */
+            { config: { rateLimit: { timeWindow: 1000, max: 10 } } },
+            async (req: RequestWithSchemaQuery<FetchStructuredSchemaType>, rep) => {
+                /* Validate schemas */
+                if(!validateSchemaQuery(FetchStructuredSchema, req, rep)) {
+                    return;
+                }
+                
+                /* If needed fetch session */
                 let session: any;
-                if((this.options.base !== undefined && this.options.base.authorField !== undefined) ||
-                    Array.from(Object.values(this.structure)).some(e => e.authorField !== undefined)) {
-                    if(req.cookies.Token === undefined) { rep.code(403); rep.send(); return; }
-                    session = await database.fetch({ source: "sessions", selectors: { "id": req.cookies.Token } });
-                    if(session === undefined) {
-                        rep.code(403); rep.send();
+                if(this.options.base !== undefined && this.details.hasAuthorField) {
+                    session = await getSession(database, req, rep);
+                    if(session === null) {
                         return;
                     }
                 }
@@ -146,7 +141,7 @@ class RouteFetchStructured extends APIRoute {
         );
     }
 
-    async decorateBase(database: Database, req: Request, session: any, base: any, structure: APIStructureImported): Promise<any> {
+    async decorateBase(database: Database, req: RequestWithSchemaQuery<FetchStructuredSchemaType>, session: any, base: any, structure: APIStructureImported): Promise<any> {
         const decoratorPromises: Promise<{ key: string, value: any }>[] = [];
         for (const [key, value] of Object.entries(structure)) {
             decoratorPromises.push(new Promise(async(resolve, reject) => {

@@ -28,8 +28,8 @@ class RouteSessionDelete extends APIRoute {
         feature.instance.delete(this.path,
             { config: { rateLimit: { timeWindow: 1000, max: 4 } } },
             async (req, rep) => {
-                /* Validate schema */
-                if(req.cookies.Token === undefined) { rep.code(403); rep.send(); return; }
+                /* If there is no token, it's already done */
+                if(req.cookies.Token === undefined) { rep.code(200); rep.send(); return; }
 
                 /* Clear session */
                 const token = req.cookies.Token;

@@ -2,30 +2,13 @@
 import { Status } from "../../../../../ts/base";
 import { DatabaseType, DatabaseUnserializedItemValue } from "../../../../../database/types";
 import { RouteUptimeEndpointEditOptions } from "./index";
-
-/* Node Imports */
-import { FastifyRequest, FastifySchema } from "fastify";
+import { UptimeEndpointEditSchema, UptimeEndpointEditSchemaType } from "./_schemas";
+import { RequestWithSchema } from "../types";
 
 /* Local Imports */
 import APIRoute from "..";
 import FeatureAPI from "../..";
-
-type Request = FastifyRequest<{
-    Body: { id: string, name: string, host?: string, requestEndpoint?: string };
-}>;
-
-const schema: FastifySchema = {
-    body: {
-        type: "object",
-        required: ["id", "name"],
-        properties: {
-            id: { type: "string", minLength: 32, maxLength: 32 },
-            name: { type: "string", minLength: 3, maxLength: 64 },
-            host: { type: "string", minLength: 3, maxLength: 256 },
-            requestEndpoint: { type: "string", pattern: "(http:\/\/|https:\/\/).*", maxLength: 256 }
-        }
-    }
-};
+import { getSession, validateSchemaBody } from "../util";
 
 class RouteUptimeEndpointEdit extends APIRoute {
     options: RouteUptimeEndpointEditOptions;
@@ -46,21 +29,30 @@ class RouteUptimeEndpointEdit extends APIRoute {
         }
 
         feature.instance.post(this.path,
-            { schema: schema, config: { rateLimit: { timeWindow: 10000, max: 1 } } },
-            async (req: Request, rep) => {
-                /* Validate schema */
-                if(req.cookies.Token === undefined) { rep.code(403); rep.send(); return; }
+            { config: { rateLimit: { timeWindow: 10000, max: 1 } } },
+            async (req: RequestWithSchema<UptimeEndpointEditSchemaType>, rep) => {
+                /* Validate schemas */
+                if(!validateSchemaBody(UptimeEndpointEditSchema, req, rep)) {
+                    return;
+                }
+                if(req.body.host === undefined && req.body.requestEndpoint === undefined) { rep.code(400); rep.send(); return; }
 
                 /* Get session */
-                const session = await database.fetch({ source: "sessions", selectors: { id: req.cookies.Token } });
-                if(session === undefined) { rep.code(403); rep.send(); return; }
+                const session = await getSession(database, req, rep);
+                if(session === null) {
+                    return;
+                }
 
                 /* Edit (author is checked in selectors) */
                 const edit: Record<string, DatabaseUnserializedItemValue> = {
-                    name: req.body.name,
-                    host: req.body.host ?? null,
-                    requestEndpoint: req.body.requestEndpoint ?? null
+                    name: req.body.name
                 };
+                if(req.body.host !== undefined) {
+                    edit.host = req.body.host;
+                }
+                if(req.body.requestEndpoint !== undefined) {
+                    edit.requestEndpoint = req.body.requestEndpoint;
+                }
                 await database.edit({ destination: "uptimeendpoints", item: edit, selectors: { id: req.body.id, author: session.user }});
 
                 /* Get endpoint */

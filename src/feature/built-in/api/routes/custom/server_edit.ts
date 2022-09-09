@@ -2,29 +2,13 @@
 import { Status } from "../../../../../ts/base";
 import { DatabaseType, DatabaseUnserializedItemValue } from "../../../../../database/types";
 import { RouteServerEditOptions } from "./index";
-
-/* Node Imports */
-import { FastifyRequest, FastifySchema } from "fastify";
+import { ServerEditSchema, ServerEditSchemaType } from "./_schemas";
+import { RequestWithSchema } from "../types";
 
 /* Local Imports */
 import APIRoute from "..";
 import FeatureAPI from "../..";
-
-type Request = FastifyRequest<{
-    Body: { id: string, name: string, color: string };
-}>;
-
-const schema: FastifySchema = {
-    body: {
-        type: "object",
-        required: ["id", "name", "color"],
-        properties: {
-            id: { type: "string", minLength: 32, maxLength: 32 },
-            name: { type: "string", minLength: 3, maxLength: 64 },
-            color: { type: "string", minLength: 6, maxLength: 6 }
-        }
-    }
-};
+import { getSession, validateSchemaBody } from "../util";
 
 class RouteServerEdit extends APIRoute {
     options: RouteServerEditOptions;
@@ -45,20 +29,26 @@ class RouteServerEdit extends APIRoute {
         }
 
         feature.instance.post(this.path,
-            { schema: schema, config: { rateLimit: { timeWindow: 10000, max: 1 } } },
-            async (req: Request, rep) => {
-                /* Validate schema */
-                if(req.cookies.Token === undefined) { rep.code(403); rep.send(); return; }
+            { config: { rateLimit: { timeWindow: 10000, max: 1 } } },
+            async (req: RequestWithSchema<ServerEditSchemaType>, rep) => {
+                /* Validate schemas */
+                if(!validateSchemaBody(ServerEditSchema, req, rep)) {
+                    return;
+                }
 
                 /* Get session */
-                const session = await database.fetch({ source: "sessions", selectors: { id: req.cookies.Token } });
-                if(session === undefined) { rep.code(403); rep.send(); return; }
+                const session = await getSession(database, req, rep);
+                if(session === null) {
+                    return;
+                }
 
                 /* Edit (author is checked in selectors) */
                 const edit: Record<string, DatabaseUnserializedItemValue> = {
-                    name: req.body.name,
-                    color: req.body.color
+                    name: req.body.name
                 };
+                if(req.body.color !== undefined) {
+                    edit.color = req.body.color;
+                }
                 await database.edit({ destination: "servers", item: edit, selectors: { id: req.body.id, author: session.user }});
 
                 /* Get server */

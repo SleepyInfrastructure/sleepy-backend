@@ -2,30 +2,17 @@
 import { Status } from "../../../../../ts/base";
 import { RouteAuthCreateOptions } from "./index";
 import { DatabaseFetchOptions, DatabaseType } from "../../../../../database/types";
+import { AuthCreateSchema, AuthCreateSchemaType } from "./_schemas";
+import { RequestWithSchema } from "../types";
 
 /* Node Imports */
 import { hashSync } from "bcrypt";
 import { randomBytes } from "crypto";
-import { FastifyRequest, FastifySchema } from "fastify";
 
 /* Local Imports */
 import APIRoute from "..";
 import FeatureAPI from "../..";
-
-type Request = FastifyRequest<{
-    Body: { username: string; password: string };
-}>;
-
-const schema: FastifySchema = {
-    body: {
-        type: "object",
-        required: ["username", "password"],
-        properties: {
-            username: { type: "string", minLength: 3, maxLength: 64 },
-            password: { type: "string", minLength: 8, maxLength: 64 }
-        }
-    }
-};
+import { validateSchemaBody } from "../util";
 
 class RouteAuthCreate extends APIRoute {
     options: RouteAuthCreateOptions;
@@ -46,8 +33,13 @@ class RouteAuthCreate extends APIRoute {
         }
 
         feature.instance.post(this.path,
-            { schema: schema, config: { rateLimit: { timeWindow: 10000, max: 1 } } },
-            async (req: Request, rep) => {
+            { config: { rateLimit: { timeWindow: 10000, max: 1 } } },
+            async (req: RequestWithSchema<AuthCreateSchemaType>, rep) => {
+                /* Validate schemas */
+                if(!validateSchemaBody(AuthCreateSchema, req, rep)) {
+                    return;
+                }
+
                 /* Check if another user exists under this name */
                 const options: DatabaseFetchOptions = { source: "users", selectors: { username: req.body.username } };
                 const user = await database.fetch(options);

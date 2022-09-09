@@ -2,27 +2,13 @@
 import { Status } from "../../../../../ts/base";
 import { DatabaseDeleteOptions, DatabaseType } from "../../../../../database/types";
 import { RouteDeleteOptions } from "./index";
-
-/* Node Imports */
-import { FastifyRequest, FastifySchema } from "fastify";
+import { DeleteSchema, DeleteSchemaType } from "./_schemas";
+import { RequestWithSchema } from "../types";
 
 /* Local Imports */
 import APIRoute from "..";
 import FeatureAPI from "../..";
-
-type Request = FastifyRequest<{
-    Body: { id: string };
-}>;
-
-const schema: FastifySchema = {
-    body: {
-        type: "object",
-        required: ["id"],
-        properties: {
-            id: { type: "string", minLength: 32, maxLength: 32 }
-        }
-    }
-};
+import { validateSchemaBody } from "../util";
 
 class RouteDelete extends APIRoute {
     options: RouteDeleteOptions;
@@ -43,8 +29,13 @@ class RouteDelete extends APIRoute {
         }
 
         feature.instance.delete(this.path,
-            { schema: schema, config: { rateLimit: { timeWindow: 1000, max: 10 } } },
-            async (req: Request, rep) => {
+            { config: { rateLimit: { timeWindow: 1000, max: 10 } } },
+            async (req: RequestWithSchema<DeleteSchemaType>, rep) => {
+                /* Validate schemas */
+                if(!validateSchemaBody(DeleteSchema, req, rep)) {
+                    return;
+                }
+
                 /* Delete */
                 const selectors: any = { [this.options.idField === undefined ? "id": this.options.idField]: req.body.id };
                 if(this.options.authorField !== undefined) {

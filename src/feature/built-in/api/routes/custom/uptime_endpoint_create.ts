@@ -2,30 +2,16 @@
 import { Status } from "../../../../../ts/base";
 import { DatabaseType } from "../../../../../database/types";
 import { RouteUptimeEndpointCreateOptions } from "./index";
+import { UptimeEndpointCreateSchema, UptimeEndpointCreateSchemaType } from "./_schemas";
+import { RequestWithSchema } from "../types";
 
 /* Node Imports */
 import { randomBytes } from "crypto";
-import { FastifyRequest, FastifySchema } from "fastify";
 
 /* Local Imports */
 import APIRoute from "..";
 import FeatureAPI from "../..";
-
-type Request = FastifyRequest<{
-    Body: { name: string, host?: string, requestEndpoint?: string };
-}>;
-
-const schema: FastifySchema = {
-    body: {
-        type: "object",
-        required: ["name"],
-        properties: {
-            name: { type: "string", minLength: 3, maxLength: 64 },
-            host: { type: "string", minLength: 3, maxLength: 256 },
-            requestEndpoint: { type: "string", pattern: "(http:\/\/|https:\/\/).*", maxLength: 256 }
-        }
-    }
-};
+import { getSession, validateSchemaBody } from "../util";
 
 class RouteUptimeEndpointCreate extends APIRoute {
     options: RouteUptimeEndpointCreateOptions;
@@ -46,15 +32,19 @@ class RouteUptimeEndpointCreate extends APIRoute {
         }
 
         feature.instance.post(this.path,
-            { schema: schema, config: { rateLimit: { timeWindow: 10000, max: 1 } } },
-            async (req: Request, rep) => {
-                /* Validate schema */
+            { config: { rateLimit: { timeWindow: 10000, max: 1 } } },
+            async (req: RequestWithSchema<UptimeEndpointCreateSchemaType>, rep) => {
+                /* Validate schemas */
+                if(!validateSchemaBody(UptimeEndpointCreateSchema, req, rep)) {
+                    return;
+                }
                 if(req.body.host === undefined && req.body.requestEndpoint === undefined) { rep.code(400); rep.send(); return; }
-                if(req.cookies.Token === undefined) { rep.code(403); rep.send(); return; }
 
                 /* Get session */
-                const session = await database.fetch({ source: "sessions", selectors: { "id": req.cookies.Token } });
-                if(session === undefined) { rep.code(403); rep.send(); return; }
+                const session = await getSession(database, req, rep);
+                if(session === null) {
+                    return;
+                }
 
                 /* Create endpoint */
                 const newEndpoint = {

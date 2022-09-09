@@ -2,31 +2,17 @@
 import { Status } from "../../../../../ts/base";
 import { DatabaseFetchOptions, DatabaseType } from "../../../../../database/types";
 import { RouteSessionCreateOptions } from "./index";
+import { SessionCreateSchema, SessionCreateSchemaType } from "./_schemas";
+import { RequestWithSchema } from "../types";
 
 /* Node Imports */
 import { compare } from "bcrypt";
 import { randomBytes } from "crypto";
-import { FastifyRequest, FastifySchema } from "fastify";
 
 /* Local Imports */
 import APIRoute from "..";
 import FeatureAPI from "../..";
-
-type Request = FastifyRequest<{
-    Body: { type: string, username?: string; password?: string };
-}>;
-
-const schema: FastifySchema = {
-    body: {
-        type: "object",
-        required: ["type"],
-        properties: {
-            type: { type: "string", pattern: "token|classic" },
-            username: { type: "string", minLength: 3, maxLength: 64 },
-            password: { type: "string", minLength: 8, maxLength: 64 }
-        }
-    }
-};
+import { validateSchemaBody } from "../util";
 
 class RouteSessionCreate extends APIRoute {
     options: RouteSessionCreateOptions;
@@ -47,8 +33,13 @@ class RouteSessionCreate extends APIRoute {
         }
 
         feature.instance.post(this.path,
-            { schema: schema, config: { rateLimit: { timeWindow: 1000, max: 4 } } },
-            async (req: Request, rep) => {
+            { config: { rateLimit: { timeWindow: 1000, max: 4 } } },
+            async (req: RequestWithSchema<SessionCreateSchemaType>, rep) => {
+                /* Validate schemas */
+                if(!validateSchemaBody(SessionCreateSchema, req, rep)) {
+                    return;
+                }
+                
                 switch(req.body.type) {
                     case "token": {
                         /* Validate schema */

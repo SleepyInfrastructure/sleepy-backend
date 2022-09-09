@@ -6,6 +6,7 @@ import { RoutePushUnsubscribeOptions } from "./index";
 /* Local Imports */
 import APIRoute from "..";
 import FeatureAPI from "../..";
+import { getSession } from "../util";
 
 class RoutePushUnsubscribe extends APIRoute {
     options: RoutePushUnsubscribeOptions;
@@ -28,12 +29,11 @@ class RoutePushUnsubscribe extends APIRoute {
         feature.instance.post(this.path,
             { config: { rateLimit: { timeWindow: 1000, max: 4 } } },
             async (req, rep) => {
-                /* Validate schema */
-                if(req.cookies.Token === undefined) { rep.code(403); rep.send(); return; }
-
                 /* Get session */
-                const session = await database.fetch({ source: "sessions", selectors: { "id": req.cookies.Token } });
-                if(session === undefined) { rep.code(403); rep.send(); return; }
+                const session = await getSession(database, req, rep);
+                if(session === null) {
+                    return;
+                }
 
                 /* Unsubscribe from push notifications */
                 const options = { destination: "users", selectors: { "id": session.user }, item: { pushEnabled: "0" } };

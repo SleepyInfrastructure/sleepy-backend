@@ -5,25 +5,13 @@ import { DatabaseType } from "../../../../../database/types";
 
 /* Node Imports */
 import { randomBytes } from "crypto";
-import { FastifyRequest, FastifySchema } from "fastify";
 
 /* Local Imports */
 import APIRoute from "..";
 import FeatureAPI from "../..";
-
-type Request = FastifyRequest<{
-    Body: { id: string };
-}>;
-
-const schema: FastifySchema = {
-    body: {
-        type: "object",
-        required: ["id"],
-        properties: {
-            id: { type: "string", minLength: 32, maxLength: 32 }
-        }
-    }
-};
+import { DaemonTokenCreateSchema, DaemonTokenCreateSchemaType } from "./_schemas";
+import { RequestWithSchema } from "../types";
+import { getSession, validateSchemaBody } from "../util";
 
 class RouteDaemonTokenCreate extends APIRoute {
     options: RouteDaemonTokenCreateOptions;
@@ -44,15 +32,18 @@ class RouteDaemonTokenCreate extends APIRoute {
         }
 
         feature.instance.post(this.path,
-            { schema: schema, config: { rateLimit: { timeWindow: 10000, max: 1 } } },
-            async (req: Request, rep) => {
-                /* Validate schema */
-                if(req.body.id === undefined) { rep.code(400); rep.send(); return; }
-                if(req.cookies.Token === undefined) { rep.code(403); rep.send(); return; }
+            { config: { rateLimit: { timeWindow: 10000, max: 1 } } },
+            async (req: RequestWithSchema<DaemonTokenCreateSchemaType>, rep) => {
+                /* Validate schemas */
+                if(!validateSchemaBody(DaemonTokenCreateSchema, req, rep)) {
+                    return;
+                }
 
                 /* Get session */
-                const session = await database.fetch({ source: "sessions", selectors: { "id": req.cookies.Token } });
-                if(session === undefined) { rep.code(403); rep.send(); return; }
+                const session = await getSession(database, req, rep);
+                if(session === null) {
+                    return;
+                }
 
                 /* Get server */
                 const server = await database.fetch({ source: "servers", selectors: { "id": req.body.id } });

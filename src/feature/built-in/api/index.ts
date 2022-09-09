@@ -10,7 +10,7 @@ import { bold, green, yellow } from "nanocolors";
 import Feature from "../..";
 import Instance from "../../../instance";
 import APIRoute from "./routes";
-import { createFastifyInstance, startFastifyInstance } from "../../util";
+import { createFastifyInstance, startFastifyInstance } from "../../../util/fastify";
 import BuiltinRoutes, { BuiltinRouteType } from "./routes/built-in";
 import CustomRoutes, { CustomRouteType } from "./routes/custom";
 
