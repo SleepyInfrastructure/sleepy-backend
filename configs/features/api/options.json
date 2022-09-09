@@ -73,6 +73,14 @@
             "authorField": "author"
         },
         {
+            "path": "/v1/networks/create",
+            "type": "NETWORK_CREATE"
+        },
+        {
+            "path": "/v1/networks/edit",
+            "type": "NETWORK_EDIT"
+        },
+        {
             "path": "/v1/networks/fetch",
             "type": "FETCH",
             "table": "networks",

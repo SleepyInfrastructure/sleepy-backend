@@ -7,6 +7,8 @@ import RouteServerEdit from "./server_edit";
 import FeatureAPI from "../..";
 import RouteUptimeEndpointCreate from "./uptime_endpoint_create";
 import RouteUptimeEndpointEdit from "./uptime_endpoint_edit";
+import RouteNetworkCreate from "./network_create";
+import RouteNetworkEdit from "./network_edit";
 
 export enum CustomRouteType {
     DAEMON_TOKEN_CREATE = "DAEMON_TOKEN_CREATE",
@@ -14,7 +16,9 @@ export enum CustomRouteType {
     SERVER_CREATE = "SERVER_CREATE",
     SERVER_EDIT = "SERVER_EDIT",
     UPTIME_ENDPOINT_CREATE = "UPTIME_ENDPOINT_CREATE",
-    UPTIME_ENDPOINT_EDIT = "UPTIME_ENDPOINT_EDIT"
+    UPTIME_ENDPOINT_EDIT = "UPTIME_ENDPOINT_EDIT",
+    NETWORK_CREATE = "NETWORK_CREATE",
+    NETWORK_EDIT = "NETWORK_EDIT",
 };
 
 export type RouteDaemonTokenCreateOptions = RouteOptions & {
@@ -41,6 +45,14 @@ export type RouteUptimeEndpointEditOptions = RouteOptions & {
     type: CustomRouteType.UPTIME_ENDPOINT_EDIT;
 };
 
+export type RouteNetworkCreateOptions = RouteOptions & {
+    type: CustomRouteType.NETWORK_CREATE;
+};
+
+export type RouteNetworkEditOptions = RouteOptions & {
+    type: CustomRouteType.NETWORK_EDIT;
+};
+
 const routes: Record<CustomRouteType, (feature: FeatureAPI, options: RouteOptions) => APIRoute> = {
     [CustomRouteType.DAEMON_TOKEN_CREATE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteDaemonTokenCreate(feature, options as RouteDaemonTokenCreateOptions);},
     [CustomRouteType.DAEMON_FILE_UPLOAD]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteDaemonFileUpload(feature, options as RouteDaemonFileUploadOptions);},
@@ -48,5 +60,7 @@ const routes: Record<CustomRouteType, (feature: FeatureAPI, options: RouteOption
     [CustomRouteType.SERVER_EDIT]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteServerEdit(feature, options as RouteServerEditOptions);},
     [CustomRouteType.UPTIME_ENDPOINT_CREATE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteUptimeEndpointCreate(feature, options as RouteUptimeEndpointCreateOptions);},
     [CustomRouteType.UPTIME_ENDPOINT_EDIT]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteUptimeEndpointEdit(feature, options as RouteUptimeEndpointEditOptions);},
+    [CustomRouteType.NETWORK_CREATE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteNetworkCreate(feature, options as RouteNetworkCreateOptions);},
+    [CustomRouteType.NETWORK_EDIT]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteNetworkEdit(feature, options as RouteNetworkEditOptions);},
 }
 export default routes;
