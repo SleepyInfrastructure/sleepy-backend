@@ -35,3 +35,14 @@ export const UptimeEndpointEditSchema = z.intersection(z.object({
     requestEndpoint: z.string().min(3).max(256).optional()
 }), IDSchema);
 export type UptimeEndpointEditSchemaType = z.infer<typeof UptimeEndpointEditSchema>;
+
+export const DatabaseCreateSchema = z.object({
+    server: z.string().min(32).max(32),
+    name: z.string().min(3).max(64)
+});
+export type DatabaseCreateSchemaType = z.infer<typeof DatabaseCreateSchema>;
+export const DatabaseEditSchema = z.intersection(z.object({
+    server: z.string().min(32).max(32).optional(),
+    name: z.string().min(3).max(64).optional()
+}), IDSchema);
+export type DatabaseEditSchemaType = z.infer<typeof DatabaseEditSchema>;

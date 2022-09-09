@@ -256,6 +256,14 @@
             }
         },
         {
+            "path": "/v1/databases/create",
+            "type": "DATABASE_CREATE"
+        },
+        {
+            "path": "/v1/databases/edit",
+            "type": "DATABASE_EDIT"
+        },
+        {
             "path": "/v1/databases/fetch",
             "type": "FETCH",
             "table": "databases",
