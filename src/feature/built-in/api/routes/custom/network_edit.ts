@@ -43,9 +43,10 @@ class RouteNetworkEdit extends APIRoute {
                 }
 
                 /* Edit (author is checked in selectors) */
-                const edit: Record<string, DatabaseUnserializedItemValue> = {
-                    name: req.body.name
-                };
+                const edit: Record<string, DatabaseUnserializedItemValue> = {};
+                if(req.body.name !== undefined) {
+                    edit.name = req.body.name;
+                }
                 if(req.body.ipv4 !== undefined) {
                     edit.ipv4 = req.body.ipv4;
                 }
