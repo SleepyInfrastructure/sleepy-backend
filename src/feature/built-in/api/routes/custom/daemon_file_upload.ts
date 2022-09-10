@@ -2,11 +2,12 @@
 import { Status } from "../../../../../ts/base";
 import { RouteDaemonFileUploadOptions } from "./index";
 import { DatabaseType } from "../../../../../database/types";
-import { DaemonFileUploadType } from "../../../../custom/daemon/types";
+import { DaemonFileType } from "../../../../custom/daemon/types";
 import { pad } from "../../../../../util/general";
 
 /* Node Imports */
-import fs from "fs";
+import { randomBytes } from "crypto";
+import fs, { statSync } from "fs";
 import util from "util";
 import { pipeline } from "stream";
 import path from "path";
@@ -53,27 +54,42 @@ class RouteDaemonFileUpload extends APIRoute {
                     return;
                 }
 
+                /* Get files */
                 const data = await req.file();
                 const fileDataRaw: any = data.fields.data;
                 const fileData = JSON.parse(fileDataRaw.value);
-                const date = new Date();
 
-                console.log(`${green("^")} Created a new backup of database ${bold(yellow(fileData.database))}!`);
                 switch(fileData.type) {
-                    case DaemonFileUploadType.BACKUP_DATABASE:
-                        const directory = path.join("/usr/src/sleepy/user/", server.id, fileData.database, `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}`);
+                    case DaemonFileType.BACKUP_DATABASE:
+                        console.log(`${green("^")} Created a new backup of database ${bold(yellow(fileData.database))}!`);
+                        
+                        const date = new Date();
+                        const fileName = `${pad(date.getUTCHours())}-${pad(date.getUTCMinutes())}-${pad(date.getUTCSeconds())}.sql`;
+                        const partialPath = path.join(server.id, fileData.database, `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}`, fileName);
+                        const filePath = path.join(this.options.root, partialPath);
                         await new Promise((resolve, reject) => {
-                            fs.mkdir(directory, { recursive: true }, async(err) => {
+                            fs.mkdir(path.dirname(filePath), { recursive: true }, async(err) => {
                                 if(err) {
                                     console.log(err);
                                     reject(err);
                                     return;
                                 }
         
-                                await pump(data.file, fs.createWriteStream(path.join(directory, `${pad(date.getUTCHours())}-${pad(date.getUTCMinutes())}-${pad(date.getUTCSeconds())}.sql`)));
+                                await pump(data.file, fs.createWriteStream(filePath));
                                 resolve(null);
                             });
                         });
+                        const fileStats = statSync(filePath);
+                        
+                        const userFile = {
+                            id: randomBytes(16).toString("hex"),
+                            author: daemonToken.author,
+                            type: DaemonFileType.BACKUP_DATABASE,
+                            size: fileStats.size,
+                            path: partialPath
+                        };
+                        database.add({ destination: "userfiles", item: userFile });
+                        database.edit({ destination: "tasks", item: { result: userFile.id }, selectors: { id: fileData.task } });
                         break;
                 }
 

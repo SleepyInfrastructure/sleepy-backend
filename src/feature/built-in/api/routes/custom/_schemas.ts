@@ -46,3 +46,6 @@ export const DatabaseEditSchema = z.intersection(z.object({
     name: z.string().min(3).max(64).optional()
 }), IDSchema);
 export type DatabaseEditSchemaType = z.infer<typeof DatabaseEditSchema>;
+
+export const FileAccessSchema = IDSchema;
+export type FileAccessSchemaType = z.infer<typeof FileAccessSchema>;

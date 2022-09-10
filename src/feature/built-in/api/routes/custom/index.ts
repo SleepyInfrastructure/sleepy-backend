@@ -11,6 +11,7 @@ import RouteNetworkCreate from "./network_create";
 import RouteNetworkEdit from "./network_edit";
 import RouteDatabaseCreate from "./database_create";
 import RouteDatabaseEdit from "./database_edit";
+import RouteUserFileAccess from "./user_file_access";
 
 export enum CustomRouteType {
     DAEMON_TOKEN_CREATE = "DAEMON_TOKEN_CREATE",
@@ -23,6 +24,7 @@ export enum CustomRouteType {
     NETWORK_EDIT = "NETWORK_EDIT",
     DATABASE_CREATE = "DATABASE_CREATE",
     DATABASE_EDIT = "DATABASE_EDIT",
+    USER_FILE_ACCESS = "USER_FILE_ACCESS",
 };
 
 export type RouteDaemonTokenCreateOptions = RouteOptions & {
@@ -30,6 +32,7 @@ export type RouteDaemonTokenCreateOptions = RouteOptions & {
 };
 export type RouteDaemonFileUploadOptions = RouteOptions & {
     type: CustomRouteType.DAEMON_FILE_UPLOAD;
+    root: string;
 };
 
 export type RouteServerCreateOptions = RouteOptions & {
@@ -60,6 +63,11 @@ export type RouteDatabaseEditOptions = RouteOptions & {
     type: CustomRouteType.DATABASE_EDIT;
 };
 
+export type RouteUserFileAccessOptions = RouteOptions & {
+    type: CustomRouteType.USER_FILE_ACCESS;
+    root: string;
+};
+
 const routes: Record<CustomRouteType, (feature: FeatureAPI, options: RouteOptions) => APIRoute> = {
     [CustomRouteType.DAEMON_TOKEN_CREATE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteDaemonTokenCreate(feature, options as RouteDaemonTokenCreateOptions);},
     [CustomRouteType.DAEMON_FILE_UPLOAD]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteDaemonFileUpload(feature, options as RouteDaemonFileUploadOptions);},
@@ -71,5 +79,6 @@ const routes: Record<CustomRouteType, (feature: FeatureAPI, options: RouteOption
     [CustomRouteType.NETWORK_EDIT]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteNetworkEdit(feature, options as RouteNetworkEditOptions);},
     [CustomRouteType.DATABASE_CREATE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteDatabaseCreate(feature, options as RouteDatabaseCreateOptions);},
     [CustomRouteType.DATABASE_EDIT]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteDatabaseEdit(feature, options as RouteDatabaseEditOptions);},
+    [CustomRouteType.USER_FILE_ACCESS]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteUserFileAccess(feature, options as RouteUserFileAccessOptions);},
 }
 export default routes;

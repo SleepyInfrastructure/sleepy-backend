@@ -41,7 +41,7 @@ class FeatureStatic extends Feature {
         });
         if(this.options.roots !== undefined) {
             for(const root of this.options.roots) {
-                this.instance.get(root, (req: any, rep: any) => {
+                this.instance.get(root, (req: fastify.FastifyRequest, rep: fastify.FastifyReply) => {
                     const stream = createReadStream(join(this.options.root, "index.html"));
                     rep.type("text/html").send(stream);
                 });

@@ -35,7 +35,8 @@ export type CronUpdateResources = CronUpdate & {
 
 export enum CronCleanType {
     STATISTICS = "STATISTICS",
-    UPTIME_STATISTICS = "UPTIME_STATISTICS"
+    UPTIME_STATISTICS = "UPTIME_STATISTICS",
+    TASKS = "TASKS"
 };
 
 export type CronClean = {

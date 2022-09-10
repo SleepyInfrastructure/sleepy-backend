@@ -319,6 +319,32 @@
             }
         },
         {
+            "path": "/v1/tasks/fetch",
+            "type": "FETCH",
+            "table": "tasks",
+            "authorField": "author"
+        },
+        {
+            "path": "/v1/tasks/all/fetch",
+            "type": "FETCH_MULTIPLE",
+            "table": "tasks",
+            "authorField": "author",
+            "disableIdField": true,
+            "sort": { "field": "end", "order": "DESC" },
+            "limit": 20
+        },
+        {
+            "path": "/v1/user/files/fetch",
+            "type": "FETCH",
+            "table": "userfiles",
+            "authorField": "author"
+        },
+        {
+            "path": "/v1/user/files/access",
+            "type": "USER_FILE_ACCESS",
+            "root": "/usr/src/sleepy/data/user"
+        },
+        {
             "path": "/v1/server/daemon/tokens/fetch",
             "type": "FETCH_MULTIPLE",
             "table": "daemontokens",
@@ -337,7 +363,8 @@
         },
         {
             "path": "/v1/daemon/file/upload",
-            "type": "DAEMON_FILE_UPLOAD"
+            "type": "DAEMON_FILE_UPLOAD",
+            "root": "/usr/src/sleepy/data/user"
         }
     ]
 }

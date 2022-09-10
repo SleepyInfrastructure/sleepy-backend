@@ -17,6 +17,11 @@
             "netInterfaces": {
                 "modifier": "ARRAY"
             }
+        },
+        "userfiles": {
+            "path": {
+                "sensitive": true
+            }
         }
     }
 }

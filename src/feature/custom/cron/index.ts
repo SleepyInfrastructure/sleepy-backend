@@ -3,7 +3,7 @@ import Feature from "../..";
 import Instance from "../../../instance";
 import { Status } from "../../../ts/base";
 import { DatabaseType } from "../../../database/types";
-import { CronClean, CronInterval, CronUpdate, CronUpdateResources, CronUpdateType, FeatureCronOptions } from "./types";
+import { CronClean, CronCleanType, CronInterval, CronUpdate, CronUpdateResources, CronUpdateType, FeatureCronOptions } from "./types";
 import { DaemonWebsocketMessageType } from "../daemon/types";
 import FeatureDaemon from "../daemon";
 
@@ -155,7 +155,7 @@ class FeatureCron extends Feature {
 
     async processClean(database: Database, clean: CronClean) {
         switch(clean.type) {
-            case "STATISTICS": {
+            case CronCleanType.STATISTICS: {
                 const deletedStats = await database.delete({ source: "statistics", selectors: { timestamp: { value: (Math.round(Date.now() / 1000) - clean.time), comparison: "<" } } });
                 const deletedDiskStats = await database.delete({ source: "diskstatistics", selectors: { timestamp: { value: (Math.round(Date.now() / 1000) - clean.time), comparison: "<" } } });
                 const deletedContainerStats = await database.delete({ source: "containerstatistics", selectors: { timestamp: { value: (Math.round(Date.now() / 1000) - clean.time), comparison: "<" } } });
@@ -163,9 +163,15 @@ class FeatureCron extends Feature {
                 break;
             }
 
-            case "UPTIME_STATISTICS": {
+            case CronCleanType.UPTIME_STATISTICS: {
                 const deletedStats = await database.delete({ source: "uptimestatistics", selectors: { timestamp: { value: (Math.round(Date.now() / 1000) - clean.time), comparison: "<" } } });
                 console.log(`${gray("-")} Deleted ${bold(yellow(deletedStats))} old uptime statistics...`);
+                break;
+            }
+
+            case CronCleanType.TASKS: {
+                const deletedTasks = await database.delete({ source: "tasks", selectors: { end: { value: (Math.round(Date.now() / 1000) - clean.time), comparison: "<" } } });
+                console.log(`${gray("-")} Deleted ${bold(yellow(deletedTasks))} old tasks...`);
                 break;
             }
         }

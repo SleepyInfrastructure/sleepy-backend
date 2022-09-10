@@ -1,6 +1,6 @@
 /* Types */ 
 import FeatureDaemon from "..";
-import { Client, Connection, Daemon, DaemonWebsocketAuthFailure, DaemonWebsocketMessageType } from "../types";
+import { Client, Connection, Daemon, DaemonWebsocketAuthFailure, DaemonWebsocketMessageType, TaskType } from "../types";
 import Database from "../../../../database";
 
 /* Node Imports */
@@ -73,25 +73,29 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                     return;
                 }
 
-                const daemonToken = await database.fetch({ source: "daemontokens", selectors: { "id": detailedMessage.token } });
+                const daemonToken = await database.fetch({ source: "daemontokens", selectors: { id: detailedMessage.token } });
                 if(daemonToken === undefined) {
                     console.log(`${red("X")} Socket failed to promote to daemon!`);
                     connection.send({ type: DaemonWebsocketMessageType.DAEMON_AUTH_FAILURE, reason: DaemonWebsocketAuthFailure.WRONG_TOKEN });
                     return;
                 }
-                const server = await database.fetch({ source: "servers", selectors: { "id": daemonToken.server } });
+                const server = await database.fetch({ source: "servers", selectors: { id: daemonToken.server } });
                 if(server === undefined) {
                     console.log(`${red("X")} Socket failed to promote to daemon! (server: ${bold(yellow(daemonToken.server))})`);
                     connection.send({ type: DaemonWebsocketMessageType.DAEMON_AUTH_FAILURE, reason: DaemonWebsocketAuthFailure.WRONG_TOKEN });
                     return;
                 }
                 console.log(`${yellow("^")} Socket promoted to daemon! (server: ${bold(yellow(daemonToken.server))})`);
+                database.edit({ destination: "daemontokens", selectors: { id: daemonToken.id }, item: { used: Math.round(Date.now() / 1000) } });
+                await database.edit({ destination: "databases", selectors: { server: daemonToken.server }, item: { credentials: 0 } });
+                for(const id of detailedMessage.databases) {
+                    console.log(id);
+                    database.edit({ destination: "databases", selectors: { id, server: daemonToken.server }, item: { credentials: 1 } });
+                }
+
                 connection.daemon = new Daemon(connection, server.id, server.author);
                 feature.daemons.push(connection.daemon);
                 connection.send({ type: DaemonWebsocketMessageType.DAEMON_AUTH_SUCCESS, id: server.id, name: server.name });
-
-                const options = { destination: "daemontokens", selectors: { "id": daemonToken.id }, item: { used: Math.round(Date.now() / 1000) } };
-                database.edit(options);
                 break;
             }
 
@@ -262,7 +266,10 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
             }
 
             case DaemonWebsocketMessageType.DAEMON_CLIENT_REQUEST_DATABASE_BACKUP: {
-                const detailedMessage = validate<schemas.WebsocketDaemonClientRequestDatabaseMessageType>(schemas.WebsocketDaemonClientRequestDatabaseMessage, messageRawJson);
+                if(connection.client === null) {
+                    return;
+                }
+                const detailedMessage = validate<schemas.WebsocketDaemonClientRequestDatabaseBackupMessageType>(schemas.WebsocketDaemonClientRequestDatabaseBackupMessage, messageRawJson);
                 if(detailedMessage === null) {
                     return;
                 }
@@ -270,20 +277,40 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                 if(requestedDaemon === null) {
                     break;
                 }
+                const serverDatabase = await database.fetch({ source: "databases", selectors: { id: detailedMessage.database, author: connection.client.id } });
+                if(serverDatabase === undefined) {
+                    console.log(`${red("X")} No database found to backup!`);
+                    return;
+                }
+                const timestamp = Math.round(Date.now() / 1000);
+                
+                const task = {
+                    id: randomBytes(16).toString("hex"),
+                    author: requestedDaemon.author,
+                    type: TaskType.BACKUP_DATABASE,
+                    object: serverDatabase.id,
+                    start: timestamp,
+                    status: "RUNNING",
+                    progress: 0,
+                    end: null,
+                    result: null
+                };
+                database.add({ destination: "tasks", item: task });
 
-                requestedDaemon.send({ type: DaemonWebsocketMessageType.DAEMON_REQUEST_DATABASE_BACKUP, database: detailedMessage.database });
+                connection.client.send({ type: DaemonWebsocketMessageType.DAEMON_CLIENT_TASK_REPLY, task });
+                requestedDaemon.send({ type: DaemonWebsocketMessageType.DAEMON_REQUEST_DATABASE_BACKUP, database: serverDatabase.id, task: task.id });
                 break;
             }
 
             case DaemonWebsocketMessageType.DAEMON_REQUEST_STATS_REPLY: {
+                if(connection.daemon === null) {
+                    return;
+                }
                 const detailedMessage = validate<schemas.WebsocketDaemonRequestStatsReplyMessageType>(schemas.WebsocketDaemonRequestStatsReplyMessage, messageRawJson);
                 if(detailedMessage === null) {
                     return;
                 }
-                if(connection.daemon === null) {
-                    return;
-                }
-                const timestamp = Math.round(Date.now() / 1000).toString();
+                const timestamp = Math.round(Date.now() / 1000);
 
                 database.add({ destination: "statistics", item:
                     {
@@ -328,6 +355,32 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                             write: container.write,
                         }
                     });
+                }
+                break;
+            }
+
+            case DaemonWebsocketMessageType.DAEMON_TASK_PROGRESS: {
+                if(connection.daemon === null) {
+                    return;
+                }
+                const detailedMessage = validate<schemas.WebsocketDaemonTaskProgressMessageType>(schemas.WebsocketDaemonTaskProgressMessage, messageRawJson);
+                if(detailedMessage === null) {
+                    return;
+                }
+                const task = await database.fetch({ source: "tasks", selectors: { id: detailedMessage.task, author: connection.daemon.author } });
+                if(task === undefined) {
+                    console.log(`${red("X")} No task found to progress!`);
+                    return;
+                }
+                const timestamp = Math.round(Date.now() / 1000);
+
+                task.status = detailedMessage.status ?? task.status;
+                task.progress = detailedMessage.progress ?? task.progress;
+                task.end = task.status !== "RUNNING" ? timestamp : null;
+                database.edit({ destination: "tasks", item: { progress: task.progress, status: task.status, end: task.end }, selectors: { id: detailedMessage.task, author: connection.daemon.author }});
+
+                for(const daemonClient of feature.getClients(connection.daemon.author)) {
+                    daemonClient.send({ type: DaemonWebsocketMessageType.DAEMON_CLIENT_TASK_REPLY, task });
                 }
                 break;
             }
