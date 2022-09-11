@@ -3,12 +3,12 @@ import { Status } from "../../../../../ts/base";
 import { DatabaseDeleteOptions, DatabaseType } from "../../../../../database/types";
 import { RouteDeleteOptions } from "./index";
 import { DeleteSchema, DeleteSchemaType } from "./_schemas";
-import { RequestWithSchema } from "../types";
+import { RequestWithSchemaQuery } from "../types";
 
 /* Local Imports */
 import APIRoute from "..";
 import FeatureAPI from "../..";
-import { validateSchemaBody } from "../util";
+import { validateSchemaQuery } from "../util";
 
 class RouteDelete extends APIRoute {
     options: RouteDeleteOptions;
@@ -30,14 +30,14 @@ class RouteDelete extends APIRoute {
 
         feature.instance.delete(this.path,
             { config: { rateLimit: { timeWindow: 1000, max: 10 } } },
-            async (req: RequestWithSchema<DeleteSchemaType>, rep) => {
+            async (req: RequestWithSchemaQuery<DeleteSchemaType>, rep) => {
                 /* Validate schemas */
-                if(!validateSchemaBody(DeleteSchema, req, rep)) {
+                if(!validateSchemaQuery(DeleteSchema, req, rep)) {
                     return;
                 }
 
                 /* Delete */
-                const selectors: any = { [this.options.idField === undefined ? "id": this.options.idField]: req.body.id };
+                const selectors: any = { [this.options.idField === undefined ? "id": this.options.idField]: req.query.id };
                 if(this.options.authorField !== undefined) {
                     if(req.cookies.Token === undefined) { rep.code(403); rep.send(); return; }
                     const session = await database.fetch({ source: "sessions", selectors: { "id": req.cookies.Token } });

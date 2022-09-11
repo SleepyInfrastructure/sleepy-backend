@@ -29,7 +29,7 @@ class RouteNetworkEdit extends APIRoute {
         }
 
         feature.instance.post(this.path,
-            { config: { rateLimit: { timeWindow: 10000, max: 1 } } },
+            { config: { rateLimit: { timeWindow: 3000, max: 1 } } },
             async (req: RequestWithSchema<NetworkEditSchemaType>, rep) => {
                 /* Validate schemas */
                 if(!validateSchemaBody(NetworkEditSchema, req, rep)) {
@@ -54,7 +54,10 @@ class RouteNetworkEdit extends APIRoute {
 
                 /* Get network */
                 const network = await database.fetch({ source: "networks", selectors: { id: req.body.id, author: session.user } });
-                if(network === undefined) { rep.code(404); rep.send(); return; }
+                if(network === undefined) {
+                    rep.code(404); rep.send();
+                    return;
+                }
 
                 /* Send */
                 rep.send(network);

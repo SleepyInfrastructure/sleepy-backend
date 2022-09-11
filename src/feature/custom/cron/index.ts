@@ -63,13 +63,13 @@ class FeatureCron extends Feature {
         switch(update.type) {
             case CronUpdateType.RESOURCES:
                 const resourcesUpdate = update as CronUpdateResources;
-                for(const daemon of featureDaemon.daemons) {
+                for(const daemon of featureDaemon.getDaemons()) {
                     daemon.send({ type: DaemonWebsocketMessageType.DAEMON_REQUEST_RESOURCES, resources: resourcesUpdate.resources });
                 }
                 break;
                 
             case CronUpdateType.STATISTICS:
-                for(const daemon of featureDaemon.daemons) {
+                for(const daemon of featureDaemon.getDaemons()) {
                     daemon.send({ type: DaemonWebsocketMessageType.DAEMON_REQUEST_STATS });
                 }
                 break;

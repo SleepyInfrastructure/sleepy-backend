@@ -32,7 +32,7 @@ class RouteNetworkCreate extends APIRoute {
         }
 
         feature.instance.post(this.path,
-            { config: { rateLimit: { timeWindow: 10000, max: 1 } } },
+            { config: { rateLimit: { timeWindow: 5000, max: 1 } } },
             async (req: RequestWithSchema<NetworkCreateSchemaType>, rep) => {
                 /* Validate schemas */
                 if(!validateSchemaBody(NetworkCreateSchema, req, rep)) {
@@ -56,7 +56,10 @@ class RouteNetworkCreate extends APIRoute {
                 
                 /* Get network */
                 const network = await database.fetch({ source: "networks", selectors: { "id": newNetwork.id } });
-                if(network === undefined) { rep.code(404); rep.send(); return; }
+                if(network === undefined) {
+                    rep.code(404); rep.send();
+                    return;
+                }
 
                 /* Send */
                 rep.send(network);

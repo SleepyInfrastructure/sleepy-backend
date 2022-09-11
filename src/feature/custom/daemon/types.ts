@@ -40,10 +40,12 @@ export enum DaemonWebsocketAuthFailure {
 };
 
 export enum DaemonFileType {
-    BACKUP_DATABASE = "BACKUP_DATABASE"
+    BACKUP_DATABASE = "BACKUP_DATABASE",
+    BACKUP_DATABASE_SCHEMA = "BACKUP_DATABASE_SCHEMA"
 };
 export enum TaskType {
-    BACKUP_DATABASE = "BACKUP_DATABASE"
+    BACKUP_DATABASE = "BACKUP_DATABASE",
+    BACKUP_DATABASE_SCHEMA = "BACKUP_DATABASE_SCHEMA"
 };
 
 export class Connection {
@@ -64,42 +66,26 @@ export class Connection {
             this.stream.destroy(e);
         }
     }
+
+    disconnect() {
+        this.stream.destroy();
+    }
 };
 
 export class Daemon {
-    connection: Connection;
     id: string;
     author: string;
 
-    constructor(connection: Connection, id: string, author: string) {
-        this.connection = connection;
+    constructor(id: string, author: string) {
         this.id = id;
         this.author = author;
-    }
-
-    send(message: any) {
-        try {
-            this.connection.stream.socket.send(JSON.stringify(message));
-        } catch(e: any) {
-            this.connection.stream.destroy(e);
-        }
     }
 };
 
 export class Client {
-    connection: Connection;
     id: string;
 
-    constructor(connection: Connection, id: string) {
-        this.connection = connection;
+    constructor(id: string) {
         this.id = id;
-    }
-
-    send(message: any) {
-        try {
-            this.connection.stream.socket.send(JSON.stringify(message));
-        } catch(e: any) {
-            this.connection.stream.destroy(e);
-        }
     }
 };

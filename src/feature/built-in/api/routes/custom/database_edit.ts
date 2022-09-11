@@ -29,7 +29,7 @@ class RouteDatabaseEdit extends APIRoute {
         }
 
         feature.instance.post(this.path,
-            { config: { rateLimit: { timeWindow: 10000, max: 1 } } },
+            { config: { rateLimit: { timeWindow: 3000, max: 1 } } },
             async (req: RequestWithSchema<DatabaseEditSchemaType>, rep) => {
                 /* Validate schemas */
                 if(!validateSchemaBody(DatabaseEditSchema, req, rep)) {
@@ -46,8 +46,7 @@ class RouteDatabaseEdit extends APIRoute {
                 if(req.body.server !== undefined) {
                     const server = await database.fetch({ source: "servers", selectors: { id: req.body.server, author: session.user } })
                     if(server === undefined) {
-                        rep.code(404);
-                        rep.send();
+                        rep.code(404); rep.send();
                         return;
                     }
                 }

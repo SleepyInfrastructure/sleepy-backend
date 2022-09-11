@@ -32,7 +32,7 @@ class RouteDaemonTokenCreate extends APIRoute {
         }
 
         feature.instance.post(this.path,
-            { config: { rateLimit: { timeWindow: 10000, max: 1 } } },
+            { config: { rateLimit: { timeWindow: 5000, max: 1 } } },
             async (req: RequestWithSchema<DaemonTokenCreateSchemaType>, rep) => {
                 /* Validate schemas */
                 if(!validateSchemaBody(DaemonTokenCreateSchema, req, rep)) {
@@ -47,7 +47,10 @@ class RouteDaemonTokenCreate extends APIRoute {
 
                 /* Get server */
                 const server = await database.fetch({ source: "servers", selectors: { "id": req.body.id } });
-                if(server === undefined) { rep.code(404); rep.send(); return; }
+                if(server === undefined) {
+                    rep.code(404); rep.send();
+                    return;
+                }
 
                 /* Check if server belongs to logged in user */
                 if(server.author !== session.user) {

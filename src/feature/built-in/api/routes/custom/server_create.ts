@@ -32,7 +32,7 @@ class RouteServerCreate extends APIRoute {
         }
 
         feature.instance.post(this.path,
-            { config: { rateLimit: { timeWindow: 10000, max: 1 } } },
+            { config: { rateLimit: { timeWindow: 5000, max: 1 } } },
             async (req: RequestWithSchema<ServerCreateSchemaType>, rep) => {
                 /* Validate schemas */
                 if(!validateSchemaBody(ServerCreateSchema, req, rep)) {
@@ -72,13 +72,17 @@ class RouteServerCreate extends APIRoute {
                     network: serverNetwork.id,
                     config: serverConfig.id,
                     name: req.body.name,
-                    color: req.body.color ?? "ff3645"
+                    color: req.body.color ?? "ff3645",
+                    netInterfaces: ["eth0"]
                 };
                 database.add({ destination: "servers", item: newServer });
                 
                 /* Get server */
                 const server = await database.fetch({ source: "servers", selectors: { "id": newServer.id } });
-                if(server === undefined) { rep.code(404); rep.send(); return; }
+                if(server === undefined) {
+                    rep.code(404); rep.send();
+                    return;
+                }
 
                 /* Send */
                 rep.send(server);

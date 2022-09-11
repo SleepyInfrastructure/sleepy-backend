@@ -3,7 +3,7 @@ import Feature from "../..";
 import Instance from "../../../instance";
 import { Status } from "../../../ts/base";
 import { DatabaseType } from "../../../database/types";
-import { Client, Connection, Daemon, FeatureDaemonOptions } from "./types";
+import { Client, Connection, FeatureDaemonOptions } from "./types";
 
 /* Node Imports */
 import * as fastify from "fastify";
@@ -16,15 +16,13 @@ import { handleWebsocket } from "./handlers/ws";
 class FeatureDaemon extends Feature {
     options: FeatureDaemonOptions;
     instance: fastify.FastifyInstance | null;
-    daemons: Daemon[];
-    clients: Client[];
+    connections: Connection[];
 
     constructor(parent: Instance, options: FeatureDaemonOptions) {
         super(parent, options);
         this.options = options;
         this.instance = null;
-        this.daemons = [];
-        this.clients = [];
+        this.connections = [];
     }
 
     async start(): Promise<void> {
@@ -43,6 +41,7 @@ class FeatureDaemon extends Feature {
         this.instance.register(async(instance: fastify.FastifyInstance) => {
             instance.get('/socket', { websocket: true }, async(stream: SocketStream, request: fastify.FastifyRequest) => {
                 const connection = new Connection(this, stream);
+                this.connections.push(connection);
                 handleWebsocket(this, database, connection, request);
             });
         })
@@ -50,25 +49,33 @@ class FeatureDaemon extends Feature {
         startFastifyInstance(this.instance, this.options);
     }
 
-    getDaemon(client: Client | null, id: string | null | undefined): Daemon | null {
-        if(id == null || client === null) {
+    getDaemonForClient(client: Client | null, id: string | null | undefined): Connection | null {
+        if(id === null || id === undefined || client === null) {
             return null;
         }
 
-        const daemon = this.daemons.find(e => e.id === id);
-        if(daemon === undefined || daemon.author !== client.id) {
+        const connection = this.connections.find(e => e.daemon !== null && e.daemon.id === id);
+        if(connection === undefined || connection.daemon === null || connection.daemon.author !== client.id) {
             return null;
         }
 
-        return daemon;
+        return connection;
     }
 
-    getDaemons(id: string) {
-        return this.daemons.filter(e => e.author === id);
+    getDaemons() {
+        return this.connections.filter(e => e.daemon !== null);
     }
 
-    getClients(id: string) {
-        return this.clients.filter(e => e.id === id);
+    getDaemonsForAuthor(author: string) {
+        return this.connections.filter(e => e.daemon !== null && e.daemon.author === author);
+    }
+
+    getClients() {
+        return this.connections.filter(e => e.client !== null);
+    }
+
+    getClientsForId(id: string) {
+        return this.connections.filter(e => e.client !== null && e.client.id === id);
     }
 }
 

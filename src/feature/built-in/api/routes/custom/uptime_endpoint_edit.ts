@@ -29,7 +29,7 @@ class RouteUptimeEndpointEdit extends APIRoute {
         }
 
         feature.instance.post(this.path,
-            { config: { rateLimit: { timeWindow: 10000, max: 1 } } },
+            { config: { rateLimit: { timeWindow: 3000, max: 1 } } },
             async (req: RequestWithSchema<UptimeEndpointEditSchemaType>, rep) => {
                 /* Validate schemas */
                 if(!validateSchemaBody(UptimeEndpointEditSchema, req, rep)) {

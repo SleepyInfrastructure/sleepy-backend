@@ -29,7 +29,7 @@ class RouteServerEdit extends APIRoute {
         }
 
         feature.instance.post(this.path,
-            { config: { rateLimit: { timeWindow: 10000, max: 1 } } },
+            { config: { rateLimit: { timeWindow: 3000, max: 1 } } },
             async (req: RequestWithSchema<ServerEditSchemaType>, rep) => {
                 /* Validate schemas */
                 if(!validateSchemaBody(ServerEditSchema, req, rep)) {
@@ -54,7 +54,10 @@ class RouteServerEdit extends APIRoute {
 
                 /* Get server */
                 const server = await database.fetch({ source: "servers", selectors: { id: req.body.id, author: session.user } });
-                if(server === undefined) { rep.code(404); rep.send(); return; }
+                if(server === undefined) {
+                    rep.code(404); rep.send();
+                    return;
+                }
 
                 /* Send */
                 rep.send(server);

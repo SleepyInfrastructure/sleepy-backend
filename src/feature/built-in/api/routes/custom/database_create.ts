@@ -32,7 +32,7 @@ class RouteDatabaseCreate extends APIRoute {
         }
 
         feature.instance.post(this.path,
-            { config: { rateLimit: { timeWindow: 10000, max: 1 } } },
+            { config: { rateLimit: { timeWindow: 5000, max: 1 } } },
             async (req: RequestWithSchema<DatabaseCreateSchemaType>, rep) => {
                 /* Validate schemas */
                 if(!validateSchemaBody(DatabaseCreateSchema, req, rep)) {
@@ -48,8 +48,7 @@ class RouteDatabaseCreate extends APIRoute {
                 /* Check server */
                 const server = await database.fetch({ source: "servers", selectors: { id: req.body.server, author: session.user } })
                 if(server === undefined) {
-                    rep.code(404);
-                    rep.send();
+                    rep.code(404); rep.send();
                     return;
                 }
 
@@ -58,7 +57,8 @@ class RouteDatabaseCreate extends APIRoute {
                     id: randomBytes(16).toString("hex"),
                     author: session.user,
                     server: req.body.server,
-                    name: req.body.name
+                    name: req.body.name,
+                    credentials: 0
                 };
                 database.add({ destination: "databases", item: newServerDatabase });
                 

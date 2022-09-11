@@ -8,16 +8,20 @@
     "cors": { "origins": ["https://sleepy.lamkas.dev", "http://localhost:8080"] },
     "routes": [
         {
-            "path": "/v1/users/create",
-            "type": "AUTH_CREATE"
-        },
-        {
             "path": "/v1/sessions/create",
             "type": "SESSION_CREATE"
         },
         {
             "path": "/v1/sessions/delete",
             "type": "SESSION_DELETE"
+        },
+        {
+            "path": "/v1/users/create",
+            "type": "AUTH_CREATE"
+        },
+        {
+            "path": "/v1/users/delete",
+            "type": "USER_DELETE"
         },
         {
             "path": "/v1/users/fetch",
@@ -29,14 +33,18 @@
             "type": "SERVER_CREATE"
         },
         {
+            "path": "/v1/servers/edit",
+            "type": "SERVER_EDIT"
+        },
+        {
+            "path": "/v1/servers/delete",
+            "type": "SERVER_DELETE"
+        },
+        {
             "path": "/v1/servers/fetch",
             "type": "FETCH",
             "table": "servers",
             "authorField": "author"
-        },
-        {
-            "path": "/v1/servers/edit",
-            "type": "SERVER_EDIT"
         },
         {
             "path": "/v1/servers/all/fetch",
@@ -264,6 +272,10 @@
             "type": "DATABASE_EDIT"
         },
         {
+            "path": "/v1/databases/delete",
+            "type": "DATABASE_DELETE"
+        },
+        {
             "path": "/v1/databases/fetch",
             "type": "FETCH",
             "table": "databases",
@@ -283,6 +295,10 @@
         {
             "path": "/v1/uptimeEndpoints/edit",
             "type": "UPTIME_ENDPOINT_EDIT"
+        },
+        {
+            "path": "/v1/uptimeEndpoints/delete",
+            "type": "UPTIME_ENDPOINT_DELETE"
         },
         {
             "path": "/v1/uptimeEndpoints/fetch",
@@ -317,6 +333,10 @@
                 "disableIdField": true,
                 "structure": "uptimeEndpoint"
             }
+        },
+        {
+            "path": "/v1/tasks/delete",
+            "type": "TASK_DELETE"
         },
         {
             "path": "/v1/tasks/fetch",

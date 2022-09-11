@@ -34,7 +34,7 @@ class RouteUserFileAccess extends APIRoute {
         }
 
         feature.instance.get(this.path,
-            { config: { rateLimit: { timeWindow: 2000, max: 1 } } },
+            { config: { rateLimit: { timeWindow: 3000, max: 1 } } },
             async (req: RequestWithSchemaQuery<FileAccessSchemaType>, rep) => {
                 /* Validate schemas */
                 if(!validateSchemaQuery(FileAccessSchema, req, rep)) {
@@ -50,16 +50,14 @@ class RouteUserFileAccess extends APIRoute {
                 /* Get file */
                 const file = await database.fetch({ source: "userfiles", selectors: { id: req.query.id, author: session.user }, ignoreSensitive: true })
                 if(file === undefined) {
-                    rep.code(404);
-                    rep.send();
+                    rep.code(404); rep.send();
                     return;
                 }
 
                 /* Get system file */
                 const filePath = path.join(this.options.root, file.path);
                 if(filePath.indexOf(this.options.root) !== 0) {
-                    rep.code(418);
-                    rep.send();
+                    rep.code(418); rep.send();
                     return;
                 }
 
@@ -78,8 +76,7 @@ class RouteUserFileAccess extends APIRoute {
                     });
                     archive.on("error", (e) => {
                         console.log(e);
-                        rep.code(400);
-                        rep.send();
+                        rep.code(400); rep.send();
                     });
                     
                     /* Send archive */

@@ -28,8 +28,7 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
             return;
         }
         console.log(`${yellow("^")} Socket promoted to client! (user: ${bold(yellow(user.id))})`);
-        connection.client = new Client(connection, user.id);
-        feature.clients.push(connection.client);
+        connection.client = new Client(user.id);
         connection.send({ type: DaemonWebsocketMessageType.AUTH_SUCCESS, id: user.id, username: user.username });
     }
 
@@ -89,12 +88,10 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                 database.edit({ destination: "daemontokens", selectors: { id: daemonToken.id }, item: { used: Math.round(Date.now() / 1000) } });
                 await database.edit({ destination: "databases", selectors: { server: daemonToken.server }, item: { credentials: 0 } });
                 for(const id of detailedMessage.databases) {
-                    console.log(id);
                     database.edit({ destination: "databases", selectors: { id, server: daemonToken.server }, item: { credentials: 1 } });
                 }
 
-                connection.daemon = new Daemon(connection, server.id, server.author);
-                feature.daemons.push(connection.daemon);
+                connection.daemon = new Daemon(server.id, server.author);
                 connection.send({ type: DaemonWebsocketMessageType.DAEMON_AUTH_SUCCESS, id: server.id, name: server.name });
                 break;
             }
@@ -106,7 +103,10 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
 
                 connection.send({
                     type: DaemonWebsocketMessageType.DAEMONS_REPLY,
-                    items: feature.getDaemons(connection.client.id).map(e => { return { "author": e.author, "server": e.id } })
+                    items: feature.getDaemonsForAuthor(connection.client.id).map(e => {
+                        if(e.daemon === null) { return null; }
+                        return { id: e.daemon.id, author: e.daemon.author };
+                    })
                 });
                 break;
             }
@@ -116,7 +116,7 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                 if(detailedMessage === null) {
                     return;
                 }
-                const requestedDaemon = feature.getDaemon(connection.client, detailedMessage.id);
+                const requestedDaemon = feature.getDaemonForClient(connection.client, detailedMessage.id);
                 if(requestedDaemon === null) {
                     break;
                 }
@@ -259,8 +259,8 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                     }
                 }
 
-                for(const daemonClient of feature.getClients(connection.daemon.author)) {
-                    daemonClient.send({ type: DaemonWebsocketMessageType.DAEMON_CLIENT_REQUEST_RESOURCES_REPLY, id: connection.daemon?.id });
+                for(const client of feature.getClientsForId(connection.daemon.author)) {
+                    client.send({ type: DaemonWebsocketMessageType.DAEMON_CLIENT_REQUEST_RESOURCES_REPLY, id: connection.daemon?.id });
                 }
                 break;
             }
@@ -273,7 +273,7 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                 if(detailedMessage === null) {
                     return;
                 }
-                const requestedDaemon = feature.getDaemon(connection.client, detailedMessage.id);
+                const requestedDaemon = feature.getDaemonForClient(connection.client, detailedMessage.id);
                 if(requestedDaemon === null) {
                     break;
                 }
@@ -286,8 +286,8 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                 
                 const task = {
                     id: randomBytes(16).toString("hex"),
-                    author: requestedDaemon.author,
-                    type: TaskType.BACKUP_DATABASE,
+                    author: connection.client.id,
+                    type: detailedMessage.data ? TaskType.BACKUP_DATABASE : TaskType.BACKUP_DATABASE_SCHEMA,
                     object: serverDatabase.id,
                     start: timestamp,
                     status: "RUNNING",
@@ -297,8 +297,8 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                 };
                 database.add({ destination: "tasks", item: task });
 
-                connection.client.send({ type: DaemonWebsocketMessageType.DAEMON_CLIENT_TASK_REPLY, task });
-                requestedDaemon.send({ type: DaemonWebsocketMessageType.DAEMON_REQUEST_DATABASE_BACKUP, database: serverDatabase.id, task: task.id });
+                connection.send({ type: DaemonWebsocketMessageType.DAEMON_CLIENT_TASK_REPLY, task });
+                requestedDaemon.send({ type: DaemonWebsocketMessageType.DAEMON_REQUEST_DATABASE_BACKUP, database: serverDatabase.id, task: task.id, data: detailedMessage.data });
                 break;
             }
 
@@ -379,22 +379,21 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                 task.end = task.status !== "RUNNING" ? timestamp : null;
                 database.edit({ destination: "tasks", item: { progress: task.progress, status: task.status, end: task.end }, selectors: { id: detailedMessage.task, author: connection.daemon.author }});
 
-                for(const daemonClient of feature.getClients(connection.daemon.author)) {
-                    daemonClient.send({ type: DaemonWebsocketMessageType.DAEMON_CLIENT_TASK_REPLY, task });
+                for(const client of feature.getClientsForId(connection.daemon.author)) {
+                    client.send({ type: DaemonWebsocketMessageType.DAEMON_CLIENT_TASK_REPLY, task });
                 }
                 break;
             }
         }
     });
     connection.stream.socket.on("close", () => {
+        feature.connections.splice(feature.connections.indexOf(connection), 1);
         if(connection.daemon !== null) {
             console.log(`${red("<")} Daemon disconnected! (server: ${bold(yellow(connection.daemon.id))})`);
-            feature.daemons.splice(feature.daemons.indexOf(connection.daemon), 1);
             return;
         }
         if(connection.client !== null) {
             console.log(`${red("<")} Client disconnected! (user: ${bold(yellow(connection.client.id))})`);
-            feature.clients.splice(feature.clients.indexOf(connection.client), 1);
             return;
         }
         console.log(`${red("<")} Socket disconnected!`);

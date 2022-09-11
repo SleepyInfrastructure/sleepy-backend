@@ -171,7 +171,8 @@ class DatabaseMySQL extends Database {
 
         const newItem: any = item;
         if(this.options.structure !== undefined && this.options.structure[options.source] !== undefined) {
-            for(const field of Object.keys(this.options.structure[options.source])) {
+            const fields = Object.keys(this.options.structure[options.source]).filter(e => newItem[e] !== undefined);
+            for(const field of fields) {
                 /* Apply modifiers */
                 const fieldOptions = this.options.structure[options.source][field];
                 switch(fieldOptions.modifier) {

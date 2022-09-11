@@ -2,7 +2,7 @@
 import { Status } from "../../../../../ts/base";
 import { RouteDaemonFileUploadOptions } from "./index";
 import { DatabaseType } from "../../../../../database/types";
-import { DaemonFileType } from "../../../../custom/daemon/types";
+import { DaemonFileType, TaskType } from "../../../../custom/daemon/types";
 import { pad } from "../../../../../util/general";
 
 /* Node Imports */
@@ -37,18 +37,18 @@ class RouteDaemonFileUpload extends APIRoute {
         }
 
         feature.instance.post(this.path,
-            { config: { rateLimit: { timeWindow: 1000, max: 4 } } },
+            { config: { rateLimit: { timeWindow: 10000, max: 4 } } },
             async (req, rep) => {
                 /* Validate schema */
                 if(req.cookies.Token === undefined) { rep.code(403); rep.send(); return; }
 
                 /* Get server */
-                const daemonToken = await database.fetch({ source: "daemontokens", selectors: { "id": req.cookies.Token } });
+                const daemonToken = await database.fetch({ source: "daemontokens", selectors: { id: req.cookies.Token } });
                 if(daemonToken === undefined) {
                     rep.code(403); rep.send();
                     return;
                 }
-                const server = await database.fetch({ source: "servers", selectors: { "id": daemonToken.server } });
+                const server = await database.fetch({ source: "servers", selectors: { id: daemonToken.server } });
                 if(server === undefined) {
                     rep.code(404); rep.send();
                     return;
@@ -61,6 +61,11 @@ class RouteDaemonFileUpload extends APIRoute {
 
                 switch(fileData.type) {
                     case DaemonFileType.BACKUP_DATABASE:
+                        const task = await database.fetch({ source: "tasks", selectors: { id: fileData.task } });
+                        if(task === undefined) {
+                            rep.code(404); rep.send();
+                            return;
+                        }
                         console.log(`${green("^")} Created a new backup of database ${bold(yellow(fileData.database))}!`);
                         
                         const date = new Date();
@@ -68,10 +73,9 @@ class RouteDaemonFileUpload extends APIRoute {
                         const partialPath = path.join(server.id, fileData.database, `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}`, fileName);
                         const filePath = path.join(this.options.root, partialPath);
                         await new Promise((resolve, reject) => {
-                            fs.mkdir(path.dirname(filePath), { recursive: true }, async(err) => {
-                                if(err) {
-                                    console.log(err);
-                                    reject(err);
+                            fs.mkdir(path.dirname(filePath), { recursive: true }, async(e) => {
+                                if(e) {
+                                    reject(e);
                                     return;
                                 }
         
@@ -84,7 +88,7 @@ class RouteDaemonFileUpload extends APIRoute {
                         const userFile = {
                             id: randomBytes(16).toString("hex"),
                             author: daemonToken.author,
-                            type: DaemonFileType.BACKUP_DATABASE,
+                            type: task.type === TaskType.BACKUP_DATABASE ? DaemonFileType.BACKUP_DATABASE : DaemonFileType.BACKUP_DATABASE_SCHEMA,
                             size: fileStats.size,
                             path: partialPath
                         };
@@ -93,7 +97,7 @@ class RouteDaemonFileUpload extends APIRoute {
                         break;
                 }
 
-                rep.send();
+                rep.code(200); rep.send();
             }
         );
     }

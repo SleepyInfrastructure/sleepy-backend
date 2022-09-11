@@ -23,9 +23,9 @@ abstract class Database {
     abstract start(): Promise<void>;
     abstract fetch(options: DatabaseFetchOptions): Promise<any>;
     abstract fetchMultiple(options: DatabaseFetchMultipleOptions): Promise<any[]>;
-    abstract add(options: DatabaseAddOptions): Promise<any>;
-    abstract edit(options: DatabaseEditOptions): Promise<any>;
-    abstract delete(options: DatabaseDeleteOptions): Promise<any>;
+    abstract add(options: DatabaseAddOptions): Promise<void>;
+    abstract edit(options: DatabaseEditOptions): Promise<void>;
+    abstract delete(options: DatabaseDeleteOptions): Promise<number>;
 }
 
 export default Database;

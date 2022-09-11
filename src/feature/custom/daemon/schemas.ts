@@ -30,7 +30,8 @@ export type WebsocketDaemonRequestResourcesMessageType = z.infer<typeof Websocke
 
 export const WebsocketDaemonClientRequestDatabaseBackupMessage = z.intersection(WebsocketMessage, z.object({
     id: z.string().max(32),
-    database: z.string()
+    database: z.string(),
+    data: z.boolean()
 }));
 export type WebsocketDaemonClientRequestDatabaseBackupMessageType = z.infer<typeof WebsocketDaemonClientRequestDatabaseBackupMessage>;
 

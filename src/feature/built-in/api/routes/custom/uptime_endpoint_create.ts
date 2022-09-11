@@ -32,7 +32,7 @@ class RouteUptimeEndpointCreate extends APIRoute {
         }
 
         feature.instance.post(this.path,
-            { config: { rateLimit: { timeWindow: 10000, max: 1 } } },
+            { config: { rateLimit: { timeWindow: 5000, max: 1 } } },
             async (req: RequestWithSchema<UptimeEndpointCreateSchemaType>, rep) => {
                 /* Validate schemas */
                 if(!validateSchemaBody(UptimeEndpointCreateSchema, req, rep)) {
@@ -58,7 +58,10 @@ class RouteUptimeEndpointCreate extends APIRoute {
                 
                 /* Get endpoint */
                 const endpoint = await database.fetch({ source: "uptimeendpoints", selectors: { "id": newEndpoint.id } });
-                if(endpoint === undefined) { rep.code(404); rep.send(); return; }
+                if(endpoint === undefined) {
+                    rep.code(404); rep.send();
+                    return;
+                }
 
                 /* Send */
                 rep.send(endpoint);
