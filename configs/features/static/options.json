@@ -7,8 +7,10 @@
 	"https": false,
 	"root": "/usr/src/sleepy/static",
 	"roots": [
-		"/", "/login", "/register", "/tokens", "/settings",
-		"/create-server", "/edit-server", "/server/:id", "/installing-daemon/:id",
+		"/", "/login", "/register", "/tasks", "/tokens", "/settings",
+		"/create-server", "/edit-server/:id", "/server/:id", "/installing-daemon/:id",
+		"/container/:id",
+		"/create-database", "/edit-database/:id", "/database/:id", 
 		"/create-uptime-endpoint", "/edit-uptime-endpoint"
 	]
 }
