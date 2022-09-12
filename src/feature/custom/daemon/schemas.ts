@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { IDSchema } from "../../built-in/api/routes/types";
 
 export const WebsocketMessage = z.object({
     type: z.string(),
@@ -56,4 +57,13 @@ export const WebsocketDaemonTaskProgressMessage = z.intersection(WebsocketMessag
     status: z.enum(["RUNNING", "FAILED", "FINISHED"]).optional()
 }));
 export type WebsocketDaemonTaskProgressMessageType = z.infer<typeof WebsocketDaemonTaskProgressMessage>;
+
+export const WebsocketDaemonClientConnectContainerLogMessage = z.intersection(WebsocketMessage, IDSchema);
+export type WebsocketDaemonClientConnectontainerLogMessageType = z.infer<typeof WebsocketDaemonClientConnectContainerLogMessage>;
+
+export const WebsocketDaemonContainerLogMessageMessage = z.intersection(WebsocketMessage, z.object({
+    container: z.string(),
+    message: z.string()
+}));
+export type WebsocketDaemonContainerLogMessageMessageType = z.infer<typeof WebsocketDaemonContainerLogMessageMessage>;
 

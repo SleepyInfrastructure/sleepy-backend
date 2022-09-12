@@ -12,17 +12,20 @@ import { SocketStream } from "@fastify/websocket";
 /* Local Imports */
 import { createFastifyInstance, startFastifyInstance } from "../../../util/fastify";
 import { handleWebsocket } from "./handlers/ws";
+import DaemonLogManager from "./addons/log";
 
 class FeatureDaemon extends Feature {
     options: FeatureDaemonOptions;
     instance: fastify.FastifyInstance | null;
     connections: Connection[];
+    daemonLogManager: DaemonLogManager;
 
     constructor(parent: Instance, options: FeatureDaemonOptions) {
         super(parent, options);
         this.options = options;
         this.instance = null;
         this.connections = [];
+        this.daemonLogManager = new DaemonLogManager(this);
     }
 
     async start(): Promise<void> {
@@ -68,6 +71,13 @@ class FeatureDaemon extends Feature {
 
     getDaemonsForAuthor(author: string) {
         return this.connections.filter(e => e.daemon !== null && e.daemon.author === author);
+    }
+
+    getDaemonListForAuthor(author: string) {
+        return this.getDaemonsForAuthor(author).map(e => {
+            if(e.daemon === null) { return null; }
+            return { id: e.daemon.id, author: e.daemon.author };
+        })
     }
 
     getClients() {

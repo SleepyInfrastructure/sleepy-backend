@@ -40,6 +40,7 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
         }
         return result.data;
     }
+    const hideMessageTypes: string[] = [DaemonWebsocketMessageType.DAEMON_CONTAINER_LOG_MESSAGE];
 
     connection.stream.socket.on("message", async(messageRaw) => {
         const messageRawText = messageRaw.toString();
@@ -55,7 +56,9 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
             return;
         }
 
-        console.log(`${gray("-")} Got message of type ${bold(yellow(message.type))}.`);
+        if(!hideMessageTypes.includes(message.type)) {
+            console.log(`${gray("-")} Got message of type ${bold(yellow(message.type))}.`);
+        }
         switch(message.type) {
             case DaemonWebsocketMessageType.DAEMON_AUTH: {
                 const detailedMessage = validate<schemas.WebsocketDaemonAuthMessageType>(schemas.WebsocketDaemonAuthMessage, messageRawJson);
@@ -93,6 +96,12 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
 
                 connection.daemon = new Daemon(server.id, server.author);
                 connection.send({ type: DaemonWebsocketMessageType.DAEMON_AUTH_SUCCESS, id: server.id, name: server.name });
+                for(const client of feature.getClientsForId(connection.daemon.author)) {
+                    client.send({
+                        type: DaemonWebsocketMessageType.DAEMONS_REPLY,
+                        items: feature.getDaemonListForAuthor(connection.daemon.author)
+                    });
+                }
                 break;
             }
 
@@ -103,10 +112,7 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
 
                 connection.send({
                     type: DaemonWebsocketMessageType.DAEMONS_REPLY,
-                    items: feature.getDaemonsForAuthor(connection.client.id).map(e => {
-                        if(e.daemon === null) { return null; }
-                        return { id: e.daemon.id, author: e.daemon.author };
-                    })
+                    items: feature.getDaemonListForAuthor(connection.client.id)
                 });
                 break;
             }
@@ -384,16 +390,60 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
                 }
                 break;
             }
+
+            case DaemonWebsocketMessageType.DAEMON_CLIENT_CONNECT_CONTAINER_LOG: {
+                if(connection.client === null) {
+                    return;
+                }
+                const detailedMessage = validate<schemas.WebsocketDaemonClientConnectontainerLogMessageType>(schemas.WebsocketDaemonClientConnectContainerLogMessage, messageRawJson);
+                if(detailedMessage === null) {
+                    return;
+                }
+                const container = await database.fetch({ source: "containers", selectors: { id: detailedMessage.id, author: connection.client.id } });
+                if(container === undefined) {
+                    console.log(`${red("X")} No container found to request logs from!`);
+                    return;
+                }
+                const requestedDaemon = feature.getDaemonForClient(connection.client, container.server);
+                if(requestedDaemon === null) {
+                    console.log(`${red("X")} No daemon found to request container logs from!`);
+                    break;
+                }
+
+                feature.daemonLogManager.connect(connection, container, requestedDaemon);
+                break;
+            }
+
+            case DaemonWebsocketMessageType.DAEMON_CONTAINER_LOG_MESSAGE: {
+                if(connection.daemon === null) {
+                    return;
+                }
+                const detailedMessage = validate<schemas.WebsocketDaemonContainerLogMessageMessageType>(schemas.WebsocketDaemonContainerLogMessageMessage, messageRawJson);
+                if(detailedMessage === null) {
+                    return;
+                }
+
+                const item = feature.daemonLogManager.containers.get(detailedMessage.container);
+                if(item === undefined) {
+                    // console.log(`${red("X")} No container found with connected logger! (${detailedMessage.container})`);
+                    return;
+                }
+                for(const client of item.users) {
+                    client.send({ type: DaemonWebsocketMessageType.DAEMON_CLIENT_CONTAINER_LOG_MESSAGE, container: detailedMessage.container, message: detailedMessage.message });
+                }
+            }
         }
     });
     connection.stream.socket.on("close", () => {
         feature.connections.splice(feature.connections.indexOf(connection), 1);
         if(connection.daemon !== null) {
             console.log(`${red("<")} Daemon disconnected! (server: ${bold(yellow(connection.daemon.id))})`);
+            feature.daemonLogManager.disconnectDaemon(connection);
             return;
         }
         if(connection.client !== null) {
             console.log(`${red("<")} Client disconnected! (user: ${bold(yellow(connection.client.id))})`);
+            feature.daemonLogManager.disconnectClient(connection);
             return;
         }
         console.log(`${red("<")} Socket disconnected!`);
