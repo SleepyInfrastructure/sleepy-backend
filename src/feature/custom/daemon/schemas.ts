@@ -1,8 +1,10 @@
+/* Types */
+import { DaemonWebsocketMessageType, TaskStatus } from "./types";
+/* Node Imports */
 import { z } from "zod";
-import { IDSchema } from "../../built-in/api/routes/types";
 
 export const WebsocketMessage = z.object({
-    type: z.string(),
+    type: z.nativeEnum(DaemonWebsocketMessageType),
 });
 export type WebsocketMessageType = z.infer<typeof WebsocketMessage>;
 
@@ -19,7 +21,7 @@ export const WebsocketDaemonClientRequestResourcesMessage = z.intersection(Webso
 }));
 export type WebsocketDaemonClientRequestResourcesMessageType = z.infer<typeof WebsocketDaemonClientRequestResourcesMessage>;
 
-export const WebsocketDaemonRequestResourcesMessage = z.intersection(WebsocketMessage, z.object({
+export const WebsocketDaemonRequestResourcesReplyMessage = z.intersection(WebsocketMessage, z.object({
     memory: z.any().nullable(),
     software: z.any().nullable(),
     disks: z.array(z.any()).nullable(),
@@ -27,7 +29,7 @@ export const WebsocketDaemonRequestResourcesMessage = z.intersection(WebsocketMe
     containers: z.array(z.any()).nullable(),
     containerProjects: z.array(z.any()).nullable()
 }));
-export type WebsocketDaemonRequestResourcesMessageType = z.infer<typeof WebsocketDaemonRequestResourcesMessage>;
+export type WebsocketDaemonRequestResourcesReplyMessageType = z.infer<typeof WebsocketDaemonRequestResourcesReplyMessage>;
 
 export const WebsocketDaemonClientRequestDatabaseBackupMessage = z.intersection(WebsocketMessage, z.object({
     id: z.string().max(32),
@@ -52,17 +54,25 @@ export const WebsocketDaemonRequestStatsReplyMessage = z.intersection(WebsocketM
 export type WebsocketDaemonRequestStatsReplyMessageType = z.infer<typeof WebsocketDaemonRequestStatsReplyMessage>;
 
 export const WebsocketDaemonTaskProgressMessage = z.intersection(WebsocketMessage, z.object({
-    task: z.string(),
+    id: z.string(),
     progress: z.number().nonnegative().optional(),
-    status: z.enum(["RUNNING", "FAILED", "FINISHED"]).optional()
+    status: z.nativeEnum(TaskStatus).optional()
 }));
 export type WebsocketDaemonTaskProgressMessageType = z.infer<typeof WebsocketDaemonTaskProgressMessage>;
 
-export const WebsocketDaemonClientConnectContainerLogMessage = z.intersection(WebsocketMessage, IDSchema);
-export type WebsocketDaemonClientConnectontainerLogMessageType = z.infer<typeof WebsocketDaemonClientConnectContainerLogMessage>;
+export const WebsocketDaemonClientRequestContainerLogMessage = z.intersection(WebsocketMessage, z.object({
+    id: z.string()
+}));
+export type WebsocketDaemonClientRequestContainerLogMessageType = z.infer<typeof WebsocketDaemonClientRequestContainerLogMessage>;
+
+export const WebsocketDaemonClientConnectContainerLogMessage = z.intersection(WebsocketMessage, z.object({
+    id: z.string(),
+    project: z.boolean()
+}));
+export type WebsocketDaemonClientConnectContainerLogMessageType = z.infer<typeof WebsocketDaemonClientConnectContainerLogMessage>;
 
 export const WebsocketDaemonContainerLogMessageMessage = z.intersection(WebsocketMessage, z.object({
-    container: z.string(),
+    id: z.string(),
     message: z.string()
 }));
 export type WebsocketDaemonContainerLogMessageMessageType = z.infer<typeof WebsocketDaemonContainerLogMessageMessage>;

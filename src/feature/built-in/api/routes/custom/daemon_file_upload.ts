@@ -59,16 +59,18 @@ class RouteDaemonFileUpload extends APIRoute {
                 const fileDataRaw: any = data.fields.data;
                 const fileData = JSON.parse(fileDataRaw.value);
 
+                /* Prepare common data */
+                const date = new Date();
+
                 switch(fileData.type) {
-                    case DaemonFileType.BACKUP_DATABASE:
+                    case DaemonFileType.BACKUP_DATABASE: {
                         const task = await database.fetch({ source: "tasks", selectors: { id: fileData.task } });
                         if(task === undefined) {
                             rep.code(404); rep.send();
                             return;
                         }
-                        console.log(`${green("^")} Created a new backup of database ${bold(yellow(fileData.database))}!`);
+                        console.log(`${green("^")} Created a new database backup! (database: ${bold(yellow(fileData.database))})!`);
                         
-                        const date = new Date();
                         const fileName = `${pad(date.getUTCHours())}-${pad(date.getUTCMinutes())}-${pad(date.getUTCSeconds())}.sql`;
                         const partialPath = path.join(server.id, fileData.database, `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}`, fileName);
                         const filePath = path.join(this.options.root, partialPath);
@@ -95,6 +97,19 @@ class RouteDaemonFileUpload extends APIRoute {
                         database.add({ destination: "userfiles", item: userFile });
                         database.edit({ destination: "tasks", item: { result: userFile.id }, selectors: { id: fileData.task } });
                         break;
+                    }
+
+                    case DaemonFileType.CONTAINER_LOG: {
+                        const task = await database.fetch({ source: "tasks", selectors: { id: fileData.task } });
+                        if(task === undefined) {
+                            rep.code(404); rep.send();
+                            return;
+                        }
+                        console.log(`${green("^")} Created a new container log (id: ${bold(yellow(fileData.container))}!`);
+
+                        // TODO: finish
+                        break;
+                    }
                 }
 
                 rep.code(200); rep.send();
