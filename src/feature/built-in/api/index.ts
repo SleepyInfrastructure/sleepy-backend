@@ -1,6 +1,7 @@
 /* Types */
 import { Status } from "../../../ts/base";
 import { FeatureAPIOptions } from "./types";
+import { DatabaseType } from "../../../database/types";
 
 /* Node Imports */
 import * as fastify from "fastify";
@@ -13,27 +14,35 @@ import APIRoute from "./routes";
 import { createFastifyInstance, startFastifyInstance } from "../../../util/fastify";
 import BuiltinRoutes, { BuiltinRouteType } from "./routes/built-in";
 import CustomRoutes, { CustomRouteType } from "./routes/custom";
+import Database from "../../../database";
 
 class FeatureAPI extends Feature {
     options: FeatureAPIOptions;
-    instance: fastify.FastifyInstance | null;
+    instance: fastify.FastifyInstance;
     routeContainer: Map<string, APIRoute>;
+    database: Database;
 
     constructor(parent: Instance, options: FeatureAPIOptions) {
         super(parent, options);
         this.options = options;
-        this.instance = null;
-
+        this.instance = null as unknown as fastify.FastifyInstance;
         this.routeContainer = new Map();
+        this.database = null as unknown as Database;
     }
 
     async start(): Promise<void> {
-        const result = await createFastifyInstance(this.options, false);
-        if (result instanceof Error) {
-            this.state = { status: Status.ERROR, message: result.message };
+        const instance = await createFastifyInstance(this.options, false);
+        if (instance instanceof Error) {
+            this.state = { status: Status.ERROR, message: instance.message };
             return;
         }
-        this.instance = result;
+        this.instance = instance;
+        const database = this.parent.getDatabase(DatabaseType.MYSQL);
+        if (database === undefined) {
+            this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
+            return;
+        }
+        this.database = database;
 
         for (const options of this.options.routes) {
             let route: APIRoute | undefined;
@@ -54,7 +63,7 @@ class FeatureAPI extends Feature {
         }
 
         const currentRoutes = Array.from(this.routeContainer.values());
-        const routePromises: Promise<void>[] = currentRoutes.map(e => e.hook(this));
+        const routePromises: Promise<void>[] = currentRoutes.map(e => Promise.resolve(e.hook(this)));
         await Promise.all(routePromises);
         for (const route of currentRoutes) {
             if (route.state.status !== Status.WAITING) {

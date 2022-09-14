@@ -14,7 +14,7 @@ abstract class APIRoute {
         this.state = { status: Status.WAITING, message: "WAITING" };
     }
 
-    abstract hook(feature: FeatureAPI): Promise<void>;
+    abstract hook(feature: FeatureAPI): void | Promise<void>;
 }
 
 export default APIRoute;

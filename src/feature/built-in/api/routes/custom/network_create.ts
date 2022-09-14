@@ -1,6 +1,4 @@
 /* Types */
-import { Status } from "../../../../../ts/base";
-import { DatabaseType } from "../../../../../database/types";
 import { RouteNetworkCreateOptions } from "./index";
 import { NetworkCreateSchema, NetworkCreateSchemaType } from "./_schemas";
 import { RequestWithSchema } from "../types";
@@ -21,16 +19,7 @@ class RouteNetworkCreate extends APIRoute {
         this.options = options;
     }
 
-    async hook(feature: FeatureAPI): Promise<void> {
-        if (feature.instance === null) {
-            return;
-        }
-        const database = feature.parent.getDatabase(DatabaseType.MYSQL);
-        if (database === undefined) {
-            this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
-            return;
-        }
-
+    hook(feature: FeatureAPI): void {
         feature.instance.post(this.path,
             { config: { rateLimit: { timeWindow: 5000, max: 1 } } },
             async (req: RequestWithSchema<NetworkCreateSchemaType>, rep) => {
@@ -40,7 +29,7 @@ class RouteNetworkCreate extends APIRoute {
                 }
 
                 /* Get session */
-                const session = await getSession(database, req, rep);
+                const session = await getSession(feature.database, req, rep);
                 if(session === null) {
                     return;
                 }
@@ -52,10 +41,10 @@ class RouteNetworkCreate extends APIRoute {
                     name: req.body.name,
                     ipv4: req.body.ipv4 ?? null
                 };
-                database.add({ destination: "networks", item: newNetwork });
+                feature.database.add({ destination: "networks", item: newNetwork });
                 
                 /* Get network */
-                const network = await database.fetch({ source: "networks", selectors: { "id": newNetwork.id } });
+                const network = await feature.database.fetch({ source: "networks", selectors: { "id": newNetwork.id } });
                 if(network === undefined) {
                     rep.code(404); rep.send();
                     return;

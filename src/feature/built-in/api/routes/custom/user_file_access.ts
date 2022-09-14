@@ -1,6 +1,4 @@
 /* Types */
-import { Status } from "../../../../../ts/base";
-import { DatabaseType } from "../../../../../database/types";
 import { RouteUserFileAccessOptions } from "./index";
 import { FileAccessSchema, FileAccessSchemaType } from "./_schemas";
 import { RequestWithSchemaQuery } from "../types";
@@ -23,16 +21,7 @@ class RouteUserFileAccess extends APIRoute {
         this.options = options;
     }
 
-    async hook(feature: FeatureAPI): Promise<void> {
-        if (feature.instance === null) {
-            return;
-        }
-        const database = feature.parent.getDatabase(DatabaseType.MYSQL);
-        if (database === undefined) {
-            this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
-            return;
-        }
-
+    hook(feature: FeatureAPI): void {
         feature.instance.get(this.path,
             { config: { rateLimit: { timeWindow: 3000, max: 1 } } },
             async (req: RequestWithSchemaQuery<FileAccessSchemaType>, rep) => {
@@ -42,13 +31,13 @@ class RouteUserFileAccess extends APIRoute {
                 }
 
                 /* Get session */
-                const session = await getSession(database, req, rep);
+                const session = await getSession(feature.database, req, rep);
                 if(session === null) {
                     return;
                 }
 
                 /* Get file */
-                const file = await database.fetch({ source: "userfiles", selectors: { id: req.query.id, author: session.user }, ignoreSensitive: true })
+                const file = await feature.database.fetch({ source: "userfiles", selectors: { id: req.query.id, author: session.user }, ignoreSensitive: true })
                 if(file === undefined) {
                     rep.code(404); rep.send();
                     return;

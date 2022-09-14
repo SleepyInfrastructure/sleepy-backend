@@ -1,6 +1,5 @@
 /* Types */
 import { APIStructure, APIStructureImported, APIStructureImportedDetails, Status } from "../../../../../ts/base";
-import { DatabaseType } from "../../../../../database/types";
 import { RouteFetchStructuredOptions } from "./index";
 import { FetchStructuredSchema, FetchStructuredSchemaType } from "./_schemas";
 import { RequestWithSchemaQuery } from "../types";
@@ -69,16 +68,7 @@ class RouteFetchStructured extends APIRoute {
         return apiStructure as APIStructureImported;
     }
 
-    async hook(feature: FeatureAPI): Promise<void> {
-        if (feature.instance === null) {
-            return;
-        }
-        const database = feature.parent.getDatabase(DatabaseType.MYSQL);
-        if (database === undefined) {
-            this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
-            return;
-        }
-
+    hook(feature: FeatureAPI): void {
         feature.instance.get(this.path,
             { config: { rateLimit: { timeWindow: 1000, max: 10 } } },
             async (req: RequestWithSchemaQuery<FetchStructuredSchemaType>, rep) => {
@@ -90,7 +80,7 @@ class RouteFetchStructured extends APIRoute {
                 /* If needed fetch session */
                 let session: any;
                 if(this.options.base !== undefined && this.details.hasAuthorField) {
-                    session = await getSession(database, req, rep);
+                    session = await getSession(feature.database, req, rep);
                     if(session === null) {
                         return;
                     }
@@ -115,7 +105,7 @@ class RouteFetchStructured extends APIRoute {
                     /* Fetch */
                     switch(this.options.base.type) {
                         case "SINGLE":
-                            base = await database.fetch({ source: this.options.base.table, selectors: selectors });
+                            base = await feature.database.fetch({ source: this.options.base.table, selectors: selectors });
                             if (base === undefined) {
                                 rep.code(404); rep.send();
                                 return;
@@ -123,17 +113,17 @@ class RouteFetchStructured extends APIRoute {
                             break;
 
                         case "ARRAY":
-                            base = await database.fetchMultiple({ source: this.options.base.table, selectors: selectors });
+                            base = await feature.database.fetchMultiple({ source: this.options.base.table, selectors: selectors });
                             break;
                     }
                 }
                 
                 /* Construct rest of the structure */
                 if(Array.isArray(base)) {
-                    const promises: Promise<any>[] = base.map(e => this.decorateBase(database, req, session, e, this.structure));
+                    const promises: Promise<any>[] = base.map(e => this.decorateBase(feature.database, req, session, e, this.structure));
                     base = await Promise.all(promises);
                 } else {
-                    base = await this.decorateBase(database, req, session, base, this.structure);
+                    base = await this.decorateBase(feature.database, req, session, base, this.structure);
                 }
 
                 rep.send(base);

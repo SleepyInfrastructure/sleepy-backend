@@ -1,6 +1,4 @@
 /* Types */
-import { Status } from "../../../../../ts/base";
-import { DatabaseType } from "../../../../../database/types";
 import { RouteDatabaseCreateOptions } from "./index";
 import { DatabaseCreateSchema, DatabaseCreateSchemaType } from "./_schemas";
 import { RequestWithSchema } from "../types";
@@ -21,16 +19,7 @@ class RouteDatabaseCreate extends APIRoute {
         this.options = options;
     }
 
-    async hook(feature: FeatureAPI): Promise<void> {
-        if (feature.instance === null) {
-            return;
-        }
-        const database = feature.parent.getDatabase(DatabaseType.MYSQL);
-        if (database === undefined) {
-            this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
-            return;
-        }
-
+    hook(feature: FeatureAPI): void {
         feature.instance.post(this.path,
             { config: { rateLimit: { timeWindow: 5000, max: 1 } } },
             async (req: RequestWithSchema<DatabaseCreateSchemaType>, rep) => {
@@ -40,13 +29,13 @@ class RouteDatabaseCreate extends APIRoute {
                 }
 
                 /* Get session */
-                const session = await getSession(database, req, rep);
+                const session = await getSession(feature.database, req, rep);
                 if(session === null) {
                     return;
                 }
 
                 /* Check server */
-                const server = await database.fetch({ source: "servers", selectors: { id: req.body.server, author: session.user } })
+                const server = await feature.database.fetch({ source: "servers", selectors: { id: req.body.server, author: session.user } })
                 if(server === undefined) {
                     rep.code(404); rep.send();
                     return;
@@ -60,10 +49,10 @@ class RouteDatabaseCreate extends APIRoute {
                     name: req.body.name,
                     credentials: 0
                 };
-                database.add({ destination: "databases", item: newServerDatabase });
+                feature.database.add({ destination: "databases", item: newServerDatabase });
                 
                 /* Get database */
-                const serverDatabase = await database.fetch({ source: "databases", selectors: { "id": newServerDatabase.id } });
+                const serverDatabase = await feature.database.fetch({ source: "databases", selectors: { "id": newServerDatabase.id } });
                 if(serverDatabase === undefined) { rep.code(404); rep.send(); return; }
 
                 /* Send */

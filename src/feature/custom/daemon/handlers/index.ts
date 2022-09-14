@@ -1,6 +1,7 @@
 import DaemonsMessageHandler from "./daemons";
 import DaemonAuthMessageHandler from "./daemon_auth";
 import DaemonClientConnectContainerLogMessageHandler from "./daemon_client_connect_container_log";
+import DaemonClientRequestContainerLogMessageHandler from "./daemon_client_request_container_log";
 import DaemonClientRequestDatabaseBackupMessageHandler from "./daemon_client_request_database_backup";
 import DaemonClientRequestResourcesMessageHandler from "./daemon_client_request_resources";
 import DaemonContainerLogMessageMessageHandler from "./daemon_container_log_message";
@@ -11,6 +12,7 @@ import DaemonTaskProgressMessageHandler from "./daemon_task_progress";
 export default [
     DaemonAuthMessageHandler,
     DaemonClientConnectContainerLogMessageHandler,
+    DaemonClientRequestContainerLogMessageHandler,
     DaemonClientRequestDatabaseBackupMessageHandler,
     DaemonClientRequestResourcesMessageHandler,
     DaemonContainerLogMessageMessageHandler,

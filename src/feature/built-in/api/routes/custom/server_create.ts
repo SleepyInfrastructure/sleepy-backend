@@ -1,6 +1,4 @@
 /* Types */
-import { Status } from "../../../../../ts/base";
-import { DatabaseType } from "../../../../../database/types";
 import { RouteServerCreateOptions } from "./index";
 import { ServerCreateSchema, ServerCreateSchemaType } from "./_schemas";
 import { RequestWithSchema } from "../types";
@@ -21,16 +19,7 @@ class RouteServerCreate extends APIRoute {
         this.options = options;
     }
 
-    async hook(feature: FeatureAPI): Promise<void> {
-        if (feature.instance === null) {
-            return;
-        }
-        const database = feature.parent.getDatabase(DatabaseType.MYSQL);
-        if (database === undefined) {
-            this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
-            return;
-        }
-
+    hook(feature: FeatureAPI): void {
         feature.instance.post(this.path,
             { config: { rateLimit: { timeWindow: 5000, max: 1 } } },
             async (req: RequestWithSchema<ServerCreateSchemaType>, rep) => {
@@ -40,7 +29,7 @@ class RouteServerCreate extends APIRoute {
                 }
 
                 /* Get session */
-                const session = await getSession(database, req, rep);
+                const session = await getSession(feature.database, req, rep);
                 if(session === null) {
                     return;
                 }
@@ -53,7 +42,7 @@ class RouteServerCreate extends APIRoute {
                     statsCleanAge: 600,
                     databaseBackupInterval: null
                 };
-                database.add({ destination: "serverconfigs", item: serverConfig });
+                feature.database.add({ destination: "serverconfigs", item: serverConfig });
 
                 /* Create network */
                 const serverNetwork = {
@@ -62,7 +51,7 @@ class RouteServerCreate extends APIRoute {
                     name: `${req.body.name}-network`,
                     ipv4: null
                 };
-                database.add({ destination: "networks", item: serverNetwork });
+                feature.database.add({ destination: "networks", item: serverNetwork });
 
                 /* Create server */
                 const newServer = {
@@ -75,10 +64,10 @@ class RouteServerCreate extends APIRoute {
                     color: req.body.color ?? "ff3645",
                     netInterfaces: ["eth0"]
                 };
-                database.add({ destination: "servers", item: newServer });
+                feature.database.add({ destination: "servers", item: newServer });
                 
                 /* Get server */
-                const server = await database.fetch({ source: "servers", selectors: { "id": newServer.id } });
+                const server = await feature.database.fetch({ source: "servers", selectors: { "id": newServer.id } });
                 if(server === undefined) {
                     rep.code(404); rep.send();
                     return;

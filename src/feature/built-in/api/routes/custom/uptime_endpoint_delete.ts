@@ -1,6 +1,4 @@
 /* Types */
-import { Status } from "../../../../../ts/base";
-import { DatabaseType } from "../../../../../database/types";
 import { RouteUptimeEndpointDeleteOptions } from "./index";
 import { UptimeEndpointDeleteSchema, UptimeEndpointDeleteSchemaType } from "./_schemas";
 import { RequestWithSchemaQuery } from "../types";
@@ -19,18 +17,9 @@ class RouteUptimeEndpointDelete extends APIRoute {
         this.options = options;
     }
 
-    async hook(feature: FeatureAPI): Promise<void> {
-        if (feature.instance === null) {
-            return;
-        }
-        const database = feature.parent.getDatabase(DatabaseType.MYSQL);
-        if (database === undefined) {
-            this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
-            return;
-        }
-
+    hook(feature: FeatureAPI): void {
         feature.instance.delete(this.path,
-            { config: { rateLimit: { timeWindow: 5000, max: 1 } } },
+            { config: { rateLimit: { timeWindow: 5000, max: 3 } } },
             async (req: RequestWithSchemaQuery<UptimeEndpointDeleteSchemaType>, rep) => {
                 /* Validate schemas */
                 if(!validateSchemaQuery(UptimeEndpointDeleteSchema, req, rep)) {
@@ -38,13 +27,13 @@ class RouteUptimeEndpointDelete extends APIRoute {
                 }
 
                 /* Get session */
-                const session = await getSession(database, req, rep);
+                const session = await getSession(feature.database, req, rep);
                 if(session === null) {
                     return;
                 }
 
                 /* Delete uptime endpoint */
-                const success = await deleteUptimeEndpoint(database, req.query.id, session.user);
+                const success = await deleteUptimeEndpoint(feature.database, req.query.id, session.user);
                 if(!success) {
                     rep.code(404); rep.send();
                     return;

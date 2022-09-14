@@ -1,6 +1,5 @@
 /* Types */
-import { Status } from "../../../../../ts/base";
-import { DatabaseFetchOptions, DatabaseType } from "../../../../../database/types";
+import { DatabaseFetchOptions } from "../../../../../database/types";
 import { RouteSessionDeleteOptions } from "./index";
 
 /* Local Imports */
@@ -15,16 +14,7 @@ class RouteSessionDelete extends APIRoute {
         this.options = options;
     }
 
-    async hook(feature: FeatureAPI): Promise<void> {
-        if (feature.instance === null) {
-            return;
-        }
-        const database = feature.parent.getDatabase(DatabaseType.MYSQL);
-        if (database === undefined) {
-            this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
-            return;
-        }
-
+    hook(feature: FeatureAPI): void {
         feature.instance.delete(this.path,
             { config: { rateLimit: { timeWindow: 1000, max: 4 } } },
             async (req, rep) => {
@@ -37,14 +27,14 @@ class RouteSessionDelete extends APIRoute {
 
                 /* Get session */
                 const options: DatabaseFetchOptions = { source: "sessions", selectors: { id: token } };
-                const session = await database.fetch(options);
+                const session = await feature.database.fetch(options);
                 if (session === undefined) {
                     rep.code(404); rep.send();
                     return;
                 }
 
                 /* Delete session */
-                await database.delete(options);
+                await feature.database.delete(options);
                 rep.code(200); rep.send();
             }
         );

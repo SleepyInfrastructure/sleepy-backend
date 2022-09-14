@@ -1,6 +1,5 @@
 /* Types */
-import { Status } from "../../../../../ts/base";
-import { DatabaseType, DatabaseUnserializedItemValue } from "../../../../../database/types";
+import { DatabaseUnserializedItemValue } from "../../../../../database/types";
 import { RouteDatabaseEditOptions } from "./index";
 import { DatabaseEditSchema, DatabaseEditSchemaType } from "./_schemas";
 import { RequestWithSchema } from "../types";
@@ -18,18 +17,9 @@ class RouteDatabaseEdit extends APIRoute {
         this.options = options;
     }
 
-    async hook(feature: FeatureAPI): Promise<void> {
-        if (feature.instance === null) {
-            return;
-        }
-        const database = feature.parent.getDatabase(DatabaseType.MYSQL);
-        if (database === undefined) {
-            this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
-            return;
-        }
-
+    hook(feature: FeatureAPI): void {
         feature.instance.post(this.path,
-            { config: { rateLimit: { timeWindow: 3000, max: 1 } } },
+            { config: { rateLimit: { timeWindow: 3000, max: 3 } } },
             async (req: RequestWithSchema<DatabaseEditSchemaType>, rep) => {
                 /* Validate schemas */
                 if(!validateSchemaBody(DatabaseEditSchema, req, rep)) {
@@ -37,14 +27,14 @@ class RouteDatabaseEdit extends APIRoute {
                 }
 
                 /* Get session */
-                const session = await getSession(database, req, rep);
+                const session = await getSession(feature.database, req, rep);
                 if(session === null) {
                     return;
                 }
 
                 /* Check server */
                 if(req.body.server !== undefined) {
-                    const server = await database.fetch({ source: "servers", selectors: { id: req.body.server, author: session.user } })
+                    const server = await feature.database.fetch({ source: "servers", selectors: { id: req.body.server, author: session.user } })
                     if(server === undefined) {
                         rep.code(404); rep.send();
                         return;
@@ -59,10 +49,10 @@ class RouteDatabaseEdit extends APIRoute {
                 if(req.body.server !== undefined) {
                     edit.server = req.body.server;
                 }
-                await database.edit({ destination: "databases", item: edit, selectors: { id: req.body.id, author: session.user }});
+                await feature.database.edit({ destination: "databases", item: edit, selectors: { id: req.body.id, author: session.user }});
 
                 /* Get database */
-                const serverDatabase = await database.fetch({ source: "databases", selectors: { id: req.body.id, author: session.user } });
+                const serverDatabase = await feature.database.fetch({ source: "databases", selectors: { id: req.body.id, author: session.user } });
                 if(serverDatabase === undefined) { rep.code(404); rep.send(); return; }
 
                 /* Send */

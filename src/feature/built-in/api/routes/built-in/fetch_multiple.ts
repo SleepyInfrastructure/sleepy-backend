@@ -1,6 +1,4 @@
 /* Types */
-import { Status } from "../../../../../ts/base";
-import { DatabaseType } from "../../../../../database/types";
 import { RouteFetchMultipleOptions } from "./index";
 import { FetchMultipleSchema, FetchMultipleSchemaType } from "./_schemas";
 import { RequestWithSchemaQuery } from "../types";
@@ -18,16 +16,7 @@ class RouteFetchMultiple extends APIRoute {
         this.options = options;
     }
 
-    async hook(feature: FeatureAPI): Promise<void> {
-        if (feature.instance === null) {
-            return;
-        }
-        const database = feature.parent.getDatabase(DatabaseType.MYSQL);
-        if (database === undefined) {
-            this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
-            return;
-        }
-
+    hook(feature: FeatureAPI): void {
         feature.instance.get(this.path,
             { config: { rateLimit: { timeWindow: 1000, max: 10 } } },
             async (req: RequestWithSchemaQuery<FetchMultipleSchemaType>, rep) => {
@@ -45,7 +34,7 @@ class RouteFetchMultiple extends APIRoute {
 
                 /* Add a selector if route needs an author */
                 if(this.options.authorField !== undefined) {
-                    const session = await getSession(database, req, rep);
+                    const session = await getSession(feature.database, req, rep);
                     if(session === null) {
                         return;
                     }
@@ -62,7 +51,7 @@ class RouteFetchMultiple extends APIRoute {
                 }
 
                 /* Fetch */
-                const items = await database.fetchMultiple({ source: this.options.table, selectors: selectors, offset: limit !== undefined ? offset : undefined, limit: limit, sort: this.options.sort });
+                const items = await feature.database.fetchMultiple({ source: this.options.table, selectors: selectors, offset: limit !== undefined ? offset : undefined, limit: limit, sort: this.options.sort });
                 rep.send(items);
             }
         );

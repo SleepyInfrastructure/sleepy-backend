@@ -1,7 +1,5 @@
 /* Types */
-import { Status } from "../../../../../ts/base";
 import { RouteDaemonTokenCreateOptions } from "./index";
-import { DatabaseType } from "../../../../../database/types";
 
 /* Node Imports */
 import { randomBytes } from "crypto";
@@ -21,16 +19,7 @@ class RouteDaemonTokenCreate extends APIRoute {
         this.options = options;
     }
 
-    async hook(feature: FeatureAPI): Promise<void> {
-        if (feature.instance === null) {
-            return;
-        }
-        const database = feature.parent.getDatabase(DatabaseType.MYSQL);
-        if (database === undefined) {
-            this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
-            return;
-        }
-
+    hook(feature: FeatureAPI): void {
         feature.instance.post(this.path,
             { config: { rateLimit: { timeWindow: 5000, max: 1 } } },
             async (req: RequestWithSchema<DaemonTokenCreateSchemaType>, rep) => {
@@ -40,13 +29,13 @@ class RouteDaemonTokenCreate extends APIRoute {
                 }
 
                 /* Get session */
-                const session = await getSession(database, req, rep);
+                const session = await getSession(feature.database, req, rep);
                 if(session === null) {
                     return;
                 }
 
                 /* Get server */
-                const server = await database.fetch({ source: "servers", selectors: { "id": req.body.id } });
+                const server = await feature.database.fetch({ source: "servers", selectors: { "id": req.body.id } });
                 if(server === undefined) {
                     rep.code(404); rep.send();
                     return;
@@ -66,7 +55,7 @@ class RouteDaemonTokenCreate extends APIRoute {
                     timestamp: Math.round(Date.now() / 1000),
                     used: Math.round(Date.now() / 1000)
                 };
-                database.add({ destination: "daemontokens", item: token });
+                feature.database.add({ destination: "daemontokens", item: token });
                 rep.send(token);
             }
         );

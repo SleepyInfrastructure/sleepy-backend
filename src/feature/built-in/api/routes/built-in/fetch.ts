@@ -1,6 +1,4 @@
 /* Types */
-import { Status } from "../../../../../ts/base";
-import { DatabaseType } from "../../../../../database/types";
 import { RouteFetchOptions } from "./index";
 import { FetchSchema, FetchSchemaType } from "./_schemas";
 import { RequestWithSchemaQuery } from "../types";
@@ -18,16 +16,7 @@ class RouteFetch extends APIRoute {
         this.options = options;
     }
 
-    async hook(feature: FeatureAPI): Promise<void> {
-        if (feature.instance === null) {
-            return;
-        }
-        const database = feature.parent.getDatabase(DatabaseType.MYSQL);
-        if (database === undefined) {
-            this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
-            return;
-        }
-
+    hook(feature: FeatureAPI): void {
         feature.instance.get(this.path,
             { config: { rateLimit: { timeWindow: 1000, max: 10 } } },
             async (req: RequestWithSchemaQuery<FetchSchemaType>, rep) => {
@@ -41,7 +30,7 @@ class RouteFetch extends APIRoute {
 
                 /* Add a selector if route needs an author */
                 if(this.options.authorField !== undefined) {
-                    const session = await getSession(database, req, rep);
+                    const session = await getSession(feature.database, req, rep);
                     if(session === null) {
                         return;
                     }
@@ -50,7 +39,7 @@ class RouteFetch extends APIRoute {
                 }
 
                 /* Fetch */
-                const item = await database.fetch({ source: this.options.table, selectors: selectors });
+                const item = await feature.database.fetch({ source: this.options.table, selectors: selectors });
                 if (item === undefined) {
                     rep.code(404); rep.send();
                     return;

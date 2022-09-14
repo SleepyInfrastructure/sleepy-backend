@@ -1,6 +1,5 @@
 /* Types */
 import { Status } from "../../../../../ts/base";
-import { DatabaseType } from "../../../../../database/types";
 import { RouteUserDeleteOptions } from "./index";
 import { UserDeleteSchema, UserDeleteSchemaType } from "./_schemas";
 import { RequestWithSchemaQuery } from "../types";
@@ -20,15 +19,7 @@ class RouteUserDelete extends APIRoute {
         this.options = options;
     }
 
-    async hook(feature: FeatureAPI): Promise<void> {
-        if (feature.instance === null) {
-            return;
-        }
-        const database = feature.parent.getDatabase(DatabaseType.MYSQL);
-        if (database === undefined) {
-            this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
-            return;
-        }
+    hook(feature: FeatureAPI): void {
         const featureDaemon = feature.parent.featureContainer.get("daemon") as FeatureDaemon;
         if (featureDaemon === undefined) {
             this.state = { status: Status.ERROR, message: "NO_FEATURE_DAEMON_FOUND" };
@@ -44,7 +35,7 @@ class RouteUserDelete extends APIRoute {
                 }
 
                 /* Get session */
-                const session = await getSession(database, req, rep);
+                const session = await getSession(feature.database, req, rep);
                 if(session === null) {
                     return;
                 }
@@ -54,28 +45,28 @@ class RouteUserDelete extends APIRoute {
                 }
 
                 /* Delete user */
-                const user = await database.delete({ source: "users", selectors: { id: req.query.id } });
+                const user = await feature.database.delete({ source: "users", selectors: { id: req.query.id } });
                 if(user < 1) {
                     rep.code(404); rep.send();
                     return;
                 }
 
                 /* Delete servers */
-                const servers = await database.fetchMultiple({ source: "servers", selectors: { author: req.query.id } });
+                const servers = await feature.database.fetchMultiple({ source: "servers", selectors: { author: req.query.id } });
                 for(const server of servers) {
-                    deleteServer(featureDaemon, database, server.id, session.user);
+                    deleteServer(featureDaemon, feature.database, server.id, session.user);
                 }
 
                 /* Delete uptime endpoints */
-                const endpoints = await database.fetchMultiple({ source: "uptimeendpoints", selectors: { author: req.query.id } });
+                const endpoints = await feature.database.fetchMultiple({ source: "uptimeendpoints", selectors: { author: req.query.id } });
                 for(const endpoint of endpoints) {
-                    deleteUptimeEndpoint(database, endpoint.id, session.user);
+                    deleteUptimeEndpoint(feature.database, endpoint.id, session.user);
                 }
 
                 /* Delete rest */
-                database.delete({ source: "sessions", selectors: { user: req.query.id } });
-                database.delete({ source: "tasks", selectors: { author: req.query.id } });
-                database.delete({ source: "userfiles", selectors: { author: req.query.id } });
+                feature.database.delete({ source: "sessions", selectors: { user: req.query.id } });
+                feature.database.delete({ source: "tasks", selectors: { author: req.query.id } });
+                feature.database.delete({ source: "userfiles", selectors: { author: req.query.id } });
                 // TODO: actually delete user files
 
                 /* Send */

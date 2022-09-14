@@ -49,7 +49,6 @@ export enum DaemonWebsocketAuthFailure {
 
 export enum DaemonFileType {
     BACKUP_DATABASE = "BACKUP_DATABASE",
-    BACKUP_DATABASE_SCHEMA = "BACKUP_DATABASE_SCHEMA",
     CONTAINER_LOG = "CONTAINER_LOG"
 };
 export enum TaskType {

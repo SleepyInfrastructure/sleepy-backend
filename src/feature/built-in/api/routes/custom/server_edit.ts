@@ -1,6 +1,5 @@
 /* Types */
-import { Status } from "../../../../../ts/base";
-import { DatabaseType, DatabaseUnserializedItemValue } from "../../../../../database/types";
+import { DatabaseUnserializedItemValue } from "../../../../../database/types";
 import { RouteServerEditOptions } from "./index";
 import { ServerEditSchema, ServerEditSchemaType } from "./_schemas";
 import { RequestWithSchema } from "../types";
@@ -18,18 +17,9 @@ class RouteServerEdit extends APIRoute {
         this.options = options;
     }
 
-    async hook(feature: FeatureAPI): Promise<void> {
-        if (feature.instance === null) {
-            return;
-        }
-        const database = feature.parent.getDatabase(DatabaseType.MYSQL);
-        if (database === undefined) {
-            this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
-            return;
-        }
-
+    hook(feature: FeatureAPI): void {
         feature.instance.post(this.path,
-            { config: { rateLimit: { timeWindow: 3000, max: 1 } } },
+            { config: { rateLimit: { timeWindow: 3000, max: 3 } } },
             async (req: RequestWithSchema<ServerEditSchemaType>, rep) => {
                 /* Validate schemas */
                 if(!validateSchemaBody(ServerEditSchema, req, rep)) {
@@ -37,7 +27,7 @@ class RouteServerEdit extends APIRoute {
                 }
 
                 /* Get session */
-                const session = await getSession(database, req, rep);
+                const session = await getSession(feature.database, req, rep);
                 if(session === null) {
                     return;
                 }
@@ -50,10 +40,10 @@ class RouteServerEdit extends APIRoute {
                 if(req.body.color !== undefined) {
                     edit.color = req.body.color;
                 }
-                await database.edit({ destination: "servers", item: edit, selectors: { id: req.body.id, author: session.user }});
+                await feature.database.edit({ destination: "servers", item: edit, selectors: { id: req.body.id, author: session.user }});
 
                 /* Get server */
-                const server = await database.fetch({ source: "servers", selectors: { id: req.body.id, author: session.user } });
+                const server = await feature.database.fetch({ source: "servers", selectors: { id: req.body.id, author: session.user } });
                 if(server === undefined) {
                     rep.code(404); rep.send();
                     return;

@@ -1,6 +1,5 @@
 /* Types */
-import { Status } from "../../../../../ts/base";
-import { DatabaseFetchOptions, DatabaseType } from "../../../../../database/types";
+import { DatabaseFetchOptions } from "../../../../../database/types";
 import { RoutePushSendOptions } from "./index";
 import { PushSendSchema, PushSendSchemaType } from "./_schemas";
 import { RequestWithSchema } from "../types";
@@ -21,16 +20,7 @@ class RoutePushSend extends APIRoute {
         this.options = options;
     }
 
-    async hook(feature: FeatureAPI): Promise<void> {
-        if (feature.instance === null) {
-            return;
-        }
-        const database = feature.parent.getDatabase(DatabaseType.MYSQL);
-        if (database === undefined) {
-            this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
-            return;
-        }
-
+    hook(feature: FeatureAPI): void {
         feature.instance.post(this.path,
             { config: { rateLimit: { timeWindow: 1000, max: 4 } } },
             async (req: RequestWithSchema<PushSendSchemaType>, rep) => {
@@ -43,7 +33,7 @@ class RoutePushSend extends APIRoute {
                 /* Fetch eligble users */
                 const selectors = { "pushEnabled": "1" };
                 const options: DatabaseFetchOptions = { source: "users", selectors: selectors };
-                const users = await database.fetchMultiple(options);
+                const users = await feature.database.fetchMultiple(options);
 
                 /* Send push notification */
                 const publicKey = process.env.FOXXY_PUSH_PUBLIC_KEY;

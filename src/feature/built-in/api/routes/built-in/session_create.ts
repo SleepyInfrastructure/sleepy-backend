@@ -22,16 +22,7 @@ class RouteSessionCreate extends APIRoute {
         this.options = options;
     }
 
-    async hook(feature: FeatureAPI): Promise<void> {
-        if (feature.instance === null) {
-            return;
-        }
-        const database = feature.parent.getDatabase(DatabaseType.MYSQL);
-        if (database === undefined) {
-            this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
-            return;
-        }
-
+    hook(feature: FeatureAPI): void {
         feature.instance.post(this.path,
             { config: { rateLimit: { timeWindow: 1000, max: 4 } } },
             async (req: RequestWithSchema<SessionCreateSchemaType>, rep) => {
@@ -47,7 +38,7 @@ class RouteSessionCreate extends APIRoute {
 
                         /* Get session */
                         const options: DatabaseFetchOptions = { source: "sessions", selectors: { id: req.cookies.Token } };
-                        const session = await database.fetch(options);
+                        const session = await feature.database.fetch(options);
                         if (session === undefined) {
                             rep.code(404); rep.send();
                             return;
@@ -64,7 +55,7 @@ class RouteSessionCreate extends APIRoute {
                         
                         /* Get user */
                         const options: DatabaseFetchOptions = { source: "users", selectors: { username: req.body.username }, ignoreSensitive: true };
-                        const user = await database.fetch(options);
+                        const user = await feature.database.fetch(options);
                         if (user === undefined) {
                             rep.code(404); rep.send();
                             return;
@@ -82,7 +73,7 @@ class RouteSessionCreate extends APIRoute {
                             id: randomBytes(16).toString("hex"),
                             user: user.id
                         };
-                        database.add({ destination: "sessions", item: session });
+                        feature.database.add({ destination: "sessions", item: session });
                         rep.cookie("Token", session.id, { path: "/", httpOnly: true, maxAge: 604800000 });
                         rep.send(session);
                         break;

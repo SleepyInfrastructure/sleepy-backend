@@ -1,6 +1,4 @@
 /* Types */
-import { Status } from "../../../../../ts/base";
-import { DatabaseType } from "../../../../../database/types";
 import { RoutePushSubscribeOptions } from "./index";
 import { PushSubscribeSchema, PushSubscribeSchemaType } from "./_schemas";
 import { RequestWithSchema } from "../types";
@@ -18,16 +16,7 @@ class RoutePushSubscribe extends APIRoute {
         this.options = options;
     }
 
-    async hook(feature: FeatureAPI): Promise<void> {
-        if (feature.instance === null) {
-            return;
-        }
-        const database = feature.parent.getDatabase(DatabaseType.MYSQL);
-        if (database === undefined) {
-            this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
-            return;
-        }
-
+    hook(feature: FeatureAPI): void {
         feature.instance.post(this.path,
             { config: { rateLimit: { timeWindow: 1000, max: 4 } } },
             async (req: RequestWithSchema<PushSubscribeSchemaType>, rep) => {
@@ -37,14 +26,14 @@ class RoutePushSubscribe extends APIRoute {
                 }
 
                 /* Get session */
-                const session = await getSession(database, req, rep);
+                const session = await getSession(feature.database, req, rep);
                 if(session === null) {
                     return;
                 }
 
                 /* Subscribe to push notifications */
                 const options = { destination: "users", selectors: { "id": session.user }, item: { pushEnabled: "1", pushUrl: req.body.url, pushKey: req.body.key, pushAuth: req.body.auth } };
-                database.edit(options);
+                feature.database.edit(options);
 
                 rep.code(200);
                 rep.send();

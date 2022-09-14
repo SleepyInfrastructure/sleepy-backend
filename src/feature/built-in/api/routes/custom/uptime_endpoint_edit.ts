@@ -1,6 +1,5 @@
 /* Types */
-import { Status } from "../../../../../ts/base";
-import { DatabaseType, DatabaseUnserializedItemValue } from "../../../../../database/types";
+import { DatabaseUnserializedItemValue } from "../../../../../database/types";
 import { RouteUptimeEndpointEditOptions } from "./index";
 import { UptimeEndpointEditSchema, UptimeEndpointEditSchemaType } from "./_schemas";
 import { RequestWithSchema } from "../types";
@@ -18,18 +17,9 @@ class RouteUptimeEndpointEdit extends APIRoute {
         this.options = options;
     }
 
-    async hook(feature: FeatureAPI): Promise<void> {
-        if (feature.instance === null) {
-            return;
-        }
-        const database = feature.parent.getDatabase(DatabaseType.MYSQL);
-        if (database === undefined) {
-            this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
-            return;
-        }
-
+    hook(feature: FeatureAPI): void {
         feature.instance.post(this.path,
-            { config: { rateLimit: { timeWindow: 3000, max: 1 } } },
+            { config: { rateLimit: { timeWindow: 3000, max: 3 } } },
             async (req: RequestWithSchema<UptimeEndpointEditSchemaType>, rep) => {
                 /* Validate schemas */
                 if(!validateSchemaBody(UptimeEndpointEditSchema, req, rep)) {
@@ -38,7 +28,7 @@ class RouteUptimeEndpointEdit extends APIRoute {
                 if(req.body.host === undefined && req.body.requestEndpoint === undefined) { rep.code(400); rep.send(); return; }
 
                 /* Get session */
-                const session = await getSession(database, req, rep);
+                const session = await getSession(feature.database, req, rep);
                 if(session === null) {
                     return;
                 }
@@ -54,10 +44,10 @@ class RouteUptimeEndpointEdit extends APIRoute {
                 if(req.body.requestEndpoint !== undefined) {
                     edit.requestEndpoint = req.body.requestEndpoint;
                 }
-                await database.edit({ destination: "uptimeendpoints", item: edit, selectors: { id: req.body.id, author: session.user }});
+                await feature.database.edit({ destination: "uptimeendpoints", item: edit, selectors: { id: req.body.id, author: session.user }});
 
                 /* Get endpoint */
-                const endpoint = await database.fetch({ source: "uptimeendpoints", selectors: { id: req.body.id, author: session.user } });
+                const endpoint = await feature.database.fetch({ source: "uptimeendpoints", selectors: { id: req.body.id, author: session.user } });
                 if(endpoint === undefined) { rep.code(404); rep.send(); return; }
 
                 /* Send */

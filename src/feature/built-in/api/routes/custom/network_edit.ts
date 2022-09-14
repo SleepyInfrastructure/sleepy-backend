@@ -1,6 +1,5 @@
 /* Types */
-import { Status } from "../../../../../ts/base";
-import { DatabaseType, DatabaseUnserializedItemValue } from "../../../../../database/types";
+import { DatabaseUnserializedItemValue } from "../../../../../database/types";
 import { RouteNetworkEditOptions } from "./index";
 import { NetworkEditSchema, NetworkEditSchemaType } from "./_schemas";
 import { RequestWithSchema } from "../types";
@@ -18,18 +17,9 @@ class RouteNetworkEdit extends APIRoute {
         this.options = options;
     }
 
-    async hook(feature: FeatureAPI): Promise<void> {
-        if (feature.instance === null) {
-            return;
-        }
-        const database = feature.parent.getDatabase(DatabaseType.MYSQL);
-        if (database === undefined) {
-            this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
-            return;
-        }
-
+    hook(feature: FeatureAPI): void {
         feature.instance.post(this.path,
-            { config: { rateLimit: { timeWindow: 3000, max: 1 } } },
+            { config: { rateLimit: { timeWindow: 3000, max: 3 } } },
             async (req: RequestWithSchema<NetworkEditSchemaType>, rep) => {
                 /* Validate schemas */
                 if(!validateSchemaBody(NetworkEditSchema, req, rep)) {
@@ -37,7 +27,7 @@ class RouteNetworkEdit extends APIRoute {
                 }
 
                 /* Get session */
-                const session = await getSession(database, req, rep);
+                const session = await getSession(feature.database, req, rep);
                 if(session === null) {
                     return;
                 }
@@ -50,10 +40,10 @@ class RouteNetworkEdit extends APIRoute {
                 if(req.body.ipv4 !== undefined) {
                     edit.ipv4 = req.body.ipv4;
                 }
-                await database.edit({ destination: "networks", item: edit, selectors: { id: req.body.id, author: session.user }});
+                await feature.database.edit({ destination: "networks", item: edit, selectors: { id: req.body.id, author: session.user }});
 
                 /* Get network */
-                const network = await database.fetch({ source: "networks", selectors: { id: req.body.id, author: session.user } });
+                const network = await feature.database.fetch({ source: "networks", selectors: { id: req.body.id, author: session.user } });
                 if(network === undefined) {
                     rep.code(404); rep.send();
                     return;

@@ -1,7 +1,6 @@
 /* Types */
-import { Status } from "../../../../../ts/base";
 import { RouteAuthCreateOptions } from "./index";
-import { DatabaseFetchOptions, DatabaseType } from "../../../../../database/types";
+import { DatabaseFetchOptions } from "../../../../../database/types";
 import { AuthCreateSchema, AuthCreateSchemaType } from "./_schemas";
 import { RequestWithSchema } from "../types";
 
@@ -22,16 +21,7 @@ class RouteAuthCreate extends APIRoute {
         this.options = options;
     }
 
-    async hook(feature: FeatureAPI): Promise<void> {
-        if (feature.instance === null) {
-            return;
-        }
-        const database = feature.parent.getDatabase(DatabaseType.MYSQL);
-        if (database === undefined) {
-            this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
-            return;
-        }
-
+    hook(feature: FeatureAPI): void {
         feature.instance.post(this.path,
             { config: { rateLimit: { timeWindow: 10000, max: 1 } } },
             async (req: RequestWithSchema<AuthCreateSchemaType>, rep) => {
@@ -42,7 +32,7 @@ class RouteAuthCreate extends APIRoute {
 
                 /* Check if another user exists under this name */
                 const options: DatabaseFetchOptions = { source: "users", selectors: { username: req.body.username } };
-                const user = await database.fetch(options);
+                const user = await feature.database.fetch(options);
                 if (user !== undefined) {
                     rep.code(403); rep.send();
                     return;
@@ -55,7 +45,7 @@ class RouteAuthCreate extends APIRoute {
                     password: hashSync(req.body.password, 10),
                     timestamp: Math.round(Date.now() / 1000)
                 };
-                database.add({ destination: "users", item: newUser });
+                feature.database.add({ destination: "users", item: newUser });
                 delete newUser.password;
                 rep.send(newUser);
             }
