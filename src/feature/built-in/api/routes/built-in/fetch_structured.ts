@@ -94,7 +94,7 @@ class RouteFetchStructured extends APIRoute {
                     if(this.options.base.disableIdField !== true) {
                         /* Validate schema */
                         if(req.query.id === undefined) { rep.code(400); rep.send(); return; }
-                        selectors =  { [this.options.base.idField === undefined ? "id": this.options.base.idField]: req.query.id };
+                        selectors =  { ...this.options.base.select, [this.options.base.idField === undefined ? "id": this.options.base.idField]: req.query.id };
                     }
     
                     /* Add a selector if route needs an author */
@@ -134,9 +134,9 @@ class RouteFetchStructured extends APIRoute {
     async decorateBase(database: Database, req: RequestWithSchemaQuery<FetchStructuredSchemaType>, session: any, base: any, structure: APIStructureImported): Promise<any> {
         const decoratorPromises: Promise<{ key: string, value: any }>[] = [];
         for (const [key, value] of Object.entries(structure)) {
-            decoratorPromises.push(new Promise(async(resolve, reject) => {
+            decoratorPromises.push(new Promise(async(resolve) => {
                 /* Construct selectors */
-                const selectors = value.disableIdField ? {} : { [value.idField === undefined ? "id": value.idField]: value.baseIdField === undefined ? req.query.id : base[value.baseIdField] };
+                const selectors = value.disableIdField ? { ...value.select } : { ...value.select, [value.idField === undefined ? "id": value.idField]: value.baseIdField === undefined ? req.query.id : base[value.baseIdField] };
 
                 /* Add a selector if route needs an author */
                 if(value.authorField !== undefined) {

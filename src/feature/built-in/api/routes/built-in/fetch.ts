@@ -26,7 +26,7 @@ class RouteFetch extends APIRoute {
                 }
 
                 /* Construct selectors */
-                const selectors = { [this.options.idField === undefined ? "id": this.options.idField]: req.query.id };
+                const selectors = { ...this.options.select, [this.options.idField === undefined ? "id": this.options.idField]: req.query.id };
 
                 /* Add a selector if route needs an author */
                 if(this.options.authorField !== undefined) {

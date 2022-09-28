@@ -29,7 +29,7 @@ class RouteFetchMultiple extends APIRoute {
                 let selectors: Record<string, string> = {};
                 if(this.options.disableIdField !== true) {
                     if(req.query.id === undefined) { rep.code(400); rep.send(); return; }
-                    selectors =  { [this.options.idField === undefined ? "id": this.options.idField]: req.query.id };
+                    selectors =  { ...this.options.select, [this.options.idField === undefined ? "id": this.options.idField]: req.query.id };
                 }
 
                 /* Add a selector if route needs an author */

@@ -6,6 +6,7 @@ import { randomBytes } from "crypto";
 import WebsocketMessageHandler from "./message";
 import * as schemas from "../schemas";
 import FeatureDaemon from "..";
+import { CronStatisticType } from "../../cron/types";
 
 class DaemonRequestStatsReplyMessageHandler extends WebsocketMessageHandler<schemas.WebsocketDaemonRequestStatsReplyMessageType> {
     constructor(parent: FeatureDaemon) {
@@ -19,6 +20,7 @@ class DaemonRequestStatsReplyMessageHandler extends WebsocketMessageHandler<sche
                 id: randomBytes(16).toString("hex"),
                 author: daemon.author,
                 server: daemon.id,
+                type: CronStatisticType.MINUTE,
                 timestamp: timestamp,
                 cpuSystem: message.cpu.system,
                 cpuUser: message.cpu.user,

@@ -64,6 +64,46 @@
             }
         },
         {
+            "path": "/v1/server/statistics/hour/fetch",
+            "type": "FETCH_MULTIPLE",
+            "table": "statistics",
+            "idField": "server",
+            "authorField": "author",
+            "select": { "type": "MINUTE" },
+            "sort": { "field": "timestamp", "order": "DESC" },
+            "limit": 60
+        },
+        {
+            "path": "/v1/server/statistics/day/fetch",
+            "type": "FETCH_MULTIPLE",
+            "table": "statistics",
+            "idField": "server",
+            "authorField": "author",
+            "select": { "type": "HOUR" },
+            "sort": { "field": "timestamp", "order": "DESC" },
+            "limit": 24
+        },
+        {
+            "path": "/v1/server/statistics/month/fetch",
+            "type": "FETCH_MULTIPLE",
+            "table": "statistics",
+            "idField": "server",
+            "authorField": "author",
+            "select": { "type": "DAY" },
+            "sort": { "field": "timestamp", "order": "DESC" },
+            "limit": 30
+        },
+        {
+            "path": "/v1/server/statistics/year/fetch",
+            "type": "FETCH_MULTIPLE",
+            "table": "statistics",
+            "idField": "server",
+            "authorField": "author",
+            "select": { "type": "MONTH" },
+            "sort": { "field": "timestamp", "order": "DESC" },
+            "limit": 12
+        },
+        {
             "path": "/v1/servers/all/structured/fetch",
             "type": "FETCH_STRUCTURED",
             "base": {

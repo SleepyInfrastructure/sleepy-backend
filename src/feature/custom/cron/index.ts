@@ -3,7 +3,7 @@ import Feature from "../..";
 import Instance from "../../../instance";
 import { Status } from "../../../ts/base";
 import { DatabaseType } from "../../../database/types";
-import { CronClean, CronCleanType, CronInterval, CronUpdate, CronUpdateResources, CronUpdateType, FeatureCronOptions } from "./types";
+import { CronClean, CronCleanType, CronInterval, CronStatisticNextMapping, CronStatisticPreviousMapping, CronStatisticTimeMapping, CronStatisticType, CronUpdate, CronUpdateResources, CronUpdateResourcesType, CronUpdateType, FeatureCronOptions } from "./types";
 import { DaemonWebsocketMessageType } from "../daemon/types";
 import FeatureDaemon from "../daemon";
 
@@ -69,8 +69,51 @@ class FeatureCron extends Feature {
                 break;
                 
             case CronUpdateType.STATISTICS:
-                for(const daemon of featureDaemon.getDaemons()) {
-                    daemon.send({ type: DaemonWebsocketMessageType.DAEMON_REQUEST_STATS });
+                switch(update.statistic) {
+                    case CronStatisticType.MINUTE:
+                        for(const daemon of featureDaemon.getDaemons()) {
+                            daemon.send({ type: DaemonWebsocketMessageType.DAEMON_REQUEST_STATS });
+                        }
+                        break;
+
+                    case CronStatisticType.HOUR:
+                    case CronStatisticType.DAY:
+                    case CronStatisticType.MONTH:
+                    case CronStatisticType.YEAR:
+                        const statistics = await database.fetchMultiple({ source: "statistics", selectors: { type: CronStatisticPreviousMapping[update.statistic], timestamp: { value: (Math.round(Date.now() / 1000) - CronStatisticTimeMapping[update.statistic]), comparison: ">" } } });
+                        const byUser = statistics.reduce((acc: Map<string, any[]>, curr) => {
+                            if(acc.has(curr.server)) {
+                                acc.get(curr.server)?.push(curr);
+                            } else {
+                                acc.set(curr.server, [curr])
+                            }
+                            return acc;
+                        }, new Map<string, any[]>());
+                        for(const [server, serverStatistics] of byUser) {
+                            const first = serverStatistics[0];
+                            const cpuSystem = statistics.reduce((acc, curr) => acc + curr.cpuSystem, 0) / Math.max(statistics.length, 1);
+                            const cpuUser = statistics.reduce((acc, curr) => acc + curr.cpuUser, 0) / Math.max(statistics.length, 1);
+                            const rx = statistics.reduce((acc, curr) => acc + curr.rx, 0) / Math.max(statistics.length, 1);
+                            const tx = statistics.reduce((acc, curr) => acc + curr.tx, 0) / Math.max(statistics.length, 1);
+                            const memory = statistics.reduce((acc, curr) => acc + curr.memory, 0) / Math.max(statistics.length, 1);
+                            const swap = statistics.reduce((acc, curr) => acc + curr.swap, 0) / Math.max(statistics.length, 1);
+                            console.log(`${green(">")} Creating a ${yellow(bold(update.statistic))} statistic! (server: ${yellow(bold(server))}, length: ${yellow(bold(serverStatistics.length))})`);
+                            
+                            database.add({ destination: "statistics", item: {
+                                id: randomBytes(16).toString("hex"),
+                                author: first.author,
+                                server: server,
+                                type: update.statistic,
+                                timestamp: Math.round(Date.now() / 1000),
+                                cpuSystem: cpuSystem,
+                                cpuUser: cpuUser,
+                                rx: rx,
+                                tx: tx,
+                                memory: memory,
+                                swap: swap
+                            }});
+                        }
+                        break;
                 }
                 break;
 
@@ -156,9 +199,10 @@ class FeatureCron extends Feature {
     async processClean(database: Database, clean: CronClean) {
         switch(clean.type) {
             case CronCleanType.STATISTICS: {
-                const deletedStats = await database.delete({ source: "statistics", selectors: { timestamp: { value: (Math.round(Date.now() / 1000) - clean.time), comparison: "<" } } });
-                const deletedDiskStats = await database.delete({ source: "diskstatistics", selectors: { timestamp: { value: (Math.round(Date.now() / 1000) - clean.time), comparison: "<" } } });
-                const deletedContainerStats = await database.delete({ source: "containerstatistics", selectors: { timestamp: { value: (Math.round(Date.now() / 1000) - clean.time), comparison: "<" } } });
+                const time = CronStatisticTimeMapping[CronStatisticNextMapping[clean.statistic]]
+                const deletedStats = await database.delete({ source: "statistics", selectors: { type: clean.statistic, timestamp: { value: (Math.round(Date.now() / 1000) - time), comparison: "<" } } });
+                const deletedDiskStats = await database.delete({ source: "diskstatistics", selectors: { timestamp: { value: (Math.round(Date.now() / 1000) - time), comparison: "<" } } });
+                const deletedContainerStats = await database.delete({ source: "containerstatistics", selectors: { timestamp: { value: (Math.round(Date.now() / 1000) - time), comparison: "<" } } });
                 console.log(`${gray("-")} Deleted ${bold(yellow((deletedStats + deletedDiskStats + deletedContainerStats)))} old statistics...`);
                 break;
             }

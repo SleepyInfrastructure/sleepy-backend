@@ -44,6 +44,7 @@ export type RouteFetchSingleOptions = {
     table: string;
     idField?: string;
     authorField?: string;
+    select?: Record<string, string>;
 };
 
 export type RouteFetchArrayOptions = RouteFetchSingleOptions & {

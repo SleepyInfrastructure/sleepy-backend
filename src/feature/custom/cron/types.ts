@@ -13,6 +13,36 @@ export type CronInterval = {
     cleans?: CronClean[];
 };
 
+export enum CronStatisticType {
+    MINUTE = "MINUTE",
+    HOUR = "HOUR",
+    DAY = "DAY",
+    MONTH = "MONTH",
+    YEAR = "YEAR"
+};
+export const CronStatisticPreviousMapping = {
+    [CronStatisticType.MINUTE]: CronStatisticType.MINUTE,
+    [CronStatisticType.HOUR]: CronStatisticType.MINUTE,
+    [CronStatisticType.DAY]: CronStatisticType.HOUR,
+    [CronStatisticType.MONTH]: CronStatisticType.DAY,
+    [CronStatisticType.YEAR]: CronStatisticType.MONTH
+};
+export const CronStatisticNextMapping = {
+    [CronStatisticType.MINUTE]: CronStatisticType.HOUR,
+    [CronStatisticType.HOUR]: CronStatisticType.DAY,
+    [CronStatisticType.DAY]: CronStatisticType.MONTH,
+    [CronStatisticType.MONTH]: CronStatisticType.YEAR,
+    [CronStatisticType.YEAR]: CronStatisticType.YEAR
+};
+export const CronStatisticTimeMapping = {
+    [CronStatisticType.MINUTE]: 60,
+    [CronStatisticType.HOUR]: 3600,
+    [CronStatisticType.DAY]: 86400,
+    [CronStatisticType.MONTH]: 2628000,
+    [CronStatisticType.YEAR]: 31536000
+};
+
+/* Update */
 export enum CronUpdateType {
     RESOURCES = "RESOURCES",
     STATISTICS = "STATISTICS",
@@ -27,12 +57,14 @@ export enum CronUpdateResourcesType {
 
 export type CronUpdate = {
     type: CronUpdateType;
+    statistic: CronStatisticType;
 };
 
 export type CronUpdateResources = CronUpdate & {
     resources: CronUpdateResourcesType[];
 };
 
+/* Clean */
 export enum CronCleanType {
     STATISTICS = "STATISTICS",
     UPTIME_STATISTICS = "UPTIME_STATISTICS",
@@ -42,4 +74,5 @@ export enum CronCleanType {
 export type CronClean = {
     type: CronCleanType;
     time: number;
+    statistic: CronStatisticType;
 };
