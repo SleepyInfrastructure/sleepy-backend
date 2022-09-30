@@ -36,6 +36,7 @@ class DaemonRequestStatsReplyMessageHandler extends WebsocketMessageHandler<sche
                     id: randomBytes(16).toString("hex"),
                     author: daemon.author,
                     parent: disk.parent,
+                    type: CronStatisticType.MINUTE,
                     timestamp: timestamp,
                     read: disk.read,
                     write: disk.write,

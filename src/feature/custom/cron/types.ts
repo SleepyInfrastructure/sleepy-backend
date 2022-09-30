@@ -57,9 +57,11 @@ export enum CronUpdateResourcesType {
 
 export type CronUpdate = {
     type: CronUpdateType;
+};
+export type CronUpdateStatistics = CronUpdate & {
+    resources: CronUpdateResourcesType[];
     statistic: CronStatisticType;
 };
-
 export type CronUpdateResources = CronUpdate & {
     resources: CronUpdateResourcesType[];
 };
@@ -74,5 +76,6 @@ export enum CronCleanType {
 export type CronClean = {
     type: CronCleanType;
     time: number;
+    resources: CronUpdateResourcesType[];
     statistic: CronStatisticType;
 };

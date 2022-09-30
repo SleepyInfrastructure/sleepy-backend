@@ -8,7 +8,7 @@
             "baseIdField": "id",
             "authorField": "author",
             "sort": { "field": "timestamp", "order": "DESC" },
-            "limit": 10
+            "limit": 60
         },
         "partitions": {
             "type": "ARRAY",

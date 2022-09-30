@@ -5,28 +5,28 @@
 	"intervals": [
 		{
 			"time": "*/1 * * * *",
-			"updates": [{ "type": "STATISTICS", "statistic": "MINUTE" }],
-			"cleans": [{ "type": "STATISTICS", "statistic": "MINUTE" }]
+			"updates": [{ "type": "STATISTICS", "statistic": "MINUTE", "resources": ["GENERAL", "DISKS"] }],
+			"cleans": [{ "type": "STATISTICS", "statistic": "MINUTE", "resources": ["GENERAL", "DISKS"] }]
 		},
 		{
 			"time": "0 */1 * * *",
-			"updates": [{ "type": "STATISTICS", "statistic": "HOUR" }],
-			"cleans": [{ "type": "STATISTICS", "statistic": "HOUR" }]
+			"updates": [{ "type": "STATISTICS", "statistic": "HOUR", "resources": ["GENERAL", "DISKS"] }],
+			"cleans": [{ "type": "STATISTICS", "statistic": "HOUR", "resources": ["GENERAL", "DISKS"] }]
 		},
 		{
 			"time": "0 0 */1 * *",
-			"updates": [{ "type": "STATISTICS", "statistic": "DAY" }],
-			"cleans": [{ "type": "STATISTICS", "statistic": "DAY" }]
+			"updates": [{ "type": "STATISTICS", "statistic": "DAY", "resources": ["GENERAL", "DISKS"] }],
+			"cleans": [{ "type": "STATISTICS", "statistic": "DAY", "resources": ["GENERAL", "DISKS"] }]
 		},
 		{
 			"time": "0 0 1 */1 *",
-			"updates": [{ "type": "STATISTICS", "statistic": "MONTH" }],
-			"cleans": [{ "type": "STATISTICS", "statistic": "MONTH" }]
+			"updates": [{ "type": "STATISTICS", "statistic": "MONTH", "resources": ["GENERAL", "DISKS"] }],
+			"cleans": [{ "type": "STATISTICS", "statistic": "MONTH", "resources": ["GENERAL", "DISKS"] }]
 		},
 		{
 			"time": "0 0 1 1 */1",
-			"updates": [{ "type": "STATISTICS", "statistic": "YEAR" }],
-			"cleans": [{ "type": "STATISTICS", "statistic": "YEAR" }]
+			"updates": [{ "type": "STATISTICS", "statistic": "YEAR", "resources": ["GENERAL", "DISKS"] }],
+			"cleans": [{ "type": "STATISTICS", "statistic": "YEAR", "resources": ["GENERAL", "DISKS"] }]
 		},
 		{
 			"time": "*/1 * * * *",

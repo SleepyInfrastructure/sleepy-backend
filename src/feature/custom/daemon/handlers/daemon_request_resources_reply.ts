@@ -37,6 +37,7 @@ class DaemonRequestResourcesReplyMessageHandler extends WebsocketMessageHandler<
             });
         }
         if(message.disks !== null && message.zfsPools !== null) {
+            // TODO: clear disk statistics
             await this.parent.database.delete({ source: "disks", selectors: { server: daemon.id } });
             await this.parent.database.delete({ source: "partitions", selectors: { server: daemon.id } });
             await this.parent.database.delete({ source: "zfspools", selectors: { server: daemon.id } });
@@ -105,6 +106,7 @@ class DaemonRequestResourcesReplyMessageHandler extends WebsocketMessageHandler<
             }
         }
         if(message.containers !== null && message.containerProjects !== null) {
+            // TODO: clear container statistics
             await this.parent.database.delete({ source: "containers", selectors: { server: daemon.id } });
             await this.parent.database.delete({ source: "containerprojects", selectors: { server: daemon.id } });
             for(const containerProject of message.containerProjects) {
