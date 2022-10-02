@@ -14,14 +14,8 @@ import FeatureAPI from "../..";
 import { getSession, validateSchemaQuery } from "../util";
 
 class RouteUserFileAccess extends APIRoute {
-    options: RouteUserFileAccessOptions;
-
-    constructor(feature: FeatureAPI, options: RouteUserFileAccessOptions) {
-        super(feature, options);
-        this.options = options;
-    }
-
     hook(feature: FeatureAPI): void {
+        const options = this.options as RouteUserFileAccessOptions;
         feature.instance.get(this.path,
             { config: { rateLimit: { timeWindow: 3000, max: 1 } } },
             async (req: RequestWithSchemaQuery<FileAccessSchemaType>, rep) => {
@@ -44,8 +38,8 @@ class RouteUserFileAccess extends APIRoute {
                 }
 
                 /* Get system file */
-                const filePath = path.join(this.options.root, file.path);
-                if(filePath.indexOf(this.options.root) !== 0) {
+                const filePath = path.join(options.root, file.path);
+                if(filePath.indexOf(options.root) !== 0) {
                     rep.code(418); rep.send();
                     return;
                 }

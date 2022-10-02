@@ -1,0 +1,19 @@
+{
+    "id": "smbInstance",
+    "structure": {
+        "shares": {
+            "type": "ARRAY",
+            "table": "smbshares",
+            "idField": "parent",
+            "baseIdField": "id",
+            "authorField": "author"
+        },
+        "users": {
+            "type": "ARRAY",
+            "table": "smbusers",
+            "idField": "parent",
+            "baseIdField": "id",
+            "authorField": "author"
+        }
+    }
+}

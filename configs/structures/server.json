@@ -57,6 +57,14 @@
             "idField": "server",
             "baseIdField": "id",
             "authorField": "author"
+        },
+        "smb": {
+            "type": "ARRAY",
+            "table": "smbinstances",
+            "idField": "server",
+            "baseIdField": "id",
+            "authorField": "author",
+            "structure": "smbInstance"
         }
     }
 }

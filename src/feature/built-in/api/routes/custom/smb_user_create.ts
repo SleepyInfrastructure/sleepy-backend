@@ -1,5 +1,5 @@
 /* Types */
-import { DatabaseCreateSchema, DatabaseCreateSchemaType } from "./_schemas";
+import { SMBUserCreateSchema, SMBUserCreateSchemaType } from "./_schemas";
 import { RequestWithSchema } from "../types";
 
 /* Node Imports */
@@ -10,13 +10,13 @@ import APIRoute from "..";
 import FeatureAPI from "../..";
 import { getSession, validateSchemaBody } from "../util";
 
-class RouteDatabaseCreate extends APIRoute {
+class RouteSMBUserCreate extends APIRoute {
     hook(feature: FeatureAPI): void {
         feature.instance.post(this.path,
             { config: { rateLimit: { timeWindow: 5000, max: 1 } } },
-            async (req: RequestWithSchema<DatabaseCreateSchemaType>, rep) => {
+            async (req: RequestWithSchema<SMBUserCreateSchemaType>, rep) => {
                 /* Validate schemas */
-                if(!validateSchemaBody(DatabaseCreateSchema, req, rep)) {
+                if(!validateSchemaBody(SMBUserCreateSchema, req, rep)) {
                     return;
                 }
 
@@ -26,28 +26,27 @@ class RouteDatabaseCreate extends APIRoute {
                     return;
                 }
 
-                /* Check server */
-                const server = await feature.database.fetch({ source: "servers", selectors: { id: req.body.server, author: session.user } })
-                if(server === undefined) {
+                /* Check instance */
+                const instance = await feature.database.fetch({ source: "smbinstances", selectors: { id: req.body.parent, author: session.user } })
+                if(instance === undefined) {
                     rep.code(404); rep.send();
                     return;
                 }
 
-                /* Create database */
-                const newServerDatabase = {
+                /* Create user */
+                const newSmbUser = {
                     id: randomBytes(16).toString("hex"),
                     author: session.user,
-                    server: req.body.server,
-                    name: req.body.name,
-                    credentials: 0
+                    parent: req.body.parent,
+                    name: req.body.name
                 };
-                feature.database.add({ destination: "databases", item: newServerDatabase });
+                feature.database.add({ destination: "smbusers", item: newSmbUser });
 
                 /* Send */
-                rep.send(newServerDatabase);
+                rep.send(newSmbUser);
             }
         );
     }
 }
 
-export default RouteDatabaseCreate;
+export default RouteSMBUserCreate;

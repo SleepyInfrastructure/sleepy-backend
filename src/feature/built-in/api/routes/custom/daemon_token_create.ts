@@ -1,6 +1,3 @@
-/* Types */
-import { RouteDaemonTokenCreateOptions } from "./index";
-
 /* Node Imports */
 import { randomBytes } from "crypto";
 
@@ -12,13 +9,6 @@ import { RequestWithSchema } from "../types";
 import { getSession, validateSchemaBody } from "../util";
 
 class RouteDaemonTokenCreate extends APIRoute {
-    options: RouteDaemonTokenCreateOptions;
-
-    constructor(feature: FeatureAPI, options: RouteDaemonTokenCreateOptions) {
-        super(feature, options);
-        this.options = options;
-    }
-
     hook(feature: FeatureAPI): void {
         feature.instance.post(this.path,
             { config: { rateLimit: { timeWindow: 5000, max: 1 } } },
@@ -56,6 +46,8 @@ class RouteDaemonTokenCreate extends APIRoute {
                     used: Math.round(Date.now() / 1000)
                 };
                 feature.database.add({ destination: "daemontokens", item: token });
+                
+                /* Send */
                 rep.send(token);
             }
         );

@@ -1,6 +1,5 @@
 /* Types */
 import { Status } from "../../../../../ts/base";
-import { RouteUserDeleteOptions } from "./index";
 import { UserDeleteSchema, UserDeleteSchemaType } from "./_schemas";
 import { RequestWithSchemaQuery } from "../types";
 
@@ -12,13 +11,6 @@ import FeatureDaemon from "../../../../custom/daemon";
 import { deleteServer, deleteUptimeEndpoint } from "./_util";
 
 class RouteUserDelete extends APIRoute {
-    options: RouteUserDeleteOptions;
-
-    constructor(feature: FeatureAPI, options: RouteUserDeleteOptions) {
-        super(feature, options);
-        this.options = options;
-    }
-
     hook(feature: FeatureAPI): void {
         const featureDaemon = feature.parent.featureContainer.get("daemon") as FeatureDaemon;
         if (featureDaemon === undefined) {

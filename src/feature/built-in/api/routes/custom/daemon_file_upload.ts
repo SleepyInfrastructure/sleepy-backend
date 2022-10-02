@@ -7,14 +7,8 @@ import FeatureAPI from "../..";
 import { processFile } from "./_file_util";
 
 class RouteDaemonFileUpload extends APIRoute {
-    options: RouteDaemonFileUploadOptions;
-
-    constructor(feature: FeatureAPI, options: RouteDaemonFileUploadOptions) {
-        super(feature, options);
-        this.options = options;
-    }
-
     hook(feature: FeatureAPI): void {
+        const options = this.options as RouteDaemonFileUploadOptions;
         feature.instance.post(this.path,
             { config: { rateLimit: { timeWindow: 10000, max: 4 } } },
             async (req, rep) => {
@@ -34,7 +28,7 @@ class RouteDaemonFileUpload extends APIRoute {
                 }
 
                 /* Process file */
-                const result = await processFile(feature.database, this.options, server, req, rep);
+                const result = await processFile(feature.database, options, server, req, rep);
                 if(result !== null) {
                     rep.code(400); rep.send(result.message);
                     return;

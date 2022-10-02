@@ -1,19 +1,20 @@
 /* Types */
-import { DatabaseDeleteSchema, DatabaseDeleteSchemaType } from "./_schemas";
+import { SMBInstanceDeleteSchema, SMBInstanceDeleteSchemaType } from "./_schemas";
 import { RequestWithSchemaQuery } from "../types";
 
 /* Local Imports */
 import APIRoute from "..";
 import FeatureAPI from "../..";
 import { getSession, validateSchemaQuery } from "../util";
+import { deleteSmbInstance } from "./_util";
 
-class RouteDatabaseDelete extends APIRoute {
+class RouteSMBInstanceDelete extends APIRoute {
     hook(feature: FeatureAPI): void {
         feature.instance.delete(this.path,
             { config: { rateLimit: { timeWindow: 5000, max: 3 } } },
-            async (req: RequestWithSchemaQuery<DatabaseDeleteSchemaType>, rep) => {
+            async (req: RequestWithSchemaQuery<SMBInstanceDeleteSchemaType>, rep) => {
                 /* Validate schemas */
-                if(!validateSchemaQuery(DatabaseDeleteSchema, req, rep)) {
+                if(!validateSchemaQuery(SMBInstanceDeleteSchema, req, rep)) {
                     return;
                 }
 
@@ -23,9 +24,9 @@ class RouteDatabaseDelete extends APIRoute {
                     return;
                 }
 
-                /* Delete database */
-                const serverDatabase = await feature.database.delete({ source: "databases", selectors: { id: req.query.id, author: session.user } });
-                if(serverDatabase < 1) {
+                /* Delete instance */
+                const success = await deleteSmbInstance(feature.database, req.query.id, session.user);
+                if(!success) {
                     rep.code(404); rep.send();
                     return;
                 }
@@ -37,4 +38,4 @@ class RouteDatabaseDelete extends APIRoute {
     }
 }
 
-export default RouteDatabaseDelete;
+export default RouteSMBInstanceDelete;

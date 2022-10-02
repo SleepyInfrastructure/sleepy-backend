@@ -1,5 +1,5 @@
 /* Types */
-import { DatabaseCreateSchema, DatabaseCreateSchemaType } from "./_schemas";
+import { SMBInstanceCreateSchema, SMBInstanceCreateSchemaType } from "./_schemas";
 import { RequestWithSchema } from "../types";
 
 /* Node Imports */
@@ -10,13 +10,13 @@ import APIRoute from "..";
 import FeatureAPI from "../..";
 import { getSession, validateSchemaBody } from "../util";
 
-class RouteDatabaseCreate extends APIRoute {
+class RouteSMBInstanceCreate extends APIRoute {
     hook(feature: FeatureAPI): void {
         feature.instance.post(this.path,
             { config: { rateLimit: { timeWindow: 5000, max: 1 } } },
-            async (req: RequestWithSchema<DatabaseCreateSchemaType>, rep) => {
+            async (req: RequestWithSchema<SMBInstanceCreateSchemaType>, rep) => {
                 /* Validate schemas */
-                if(!validateSchemaBody(DatabaseCreateSchema, req, rep)) {
+                if(!validateSchemaBody(SMBInstanceCreateSchema, req, rep)) {
                     return;
                 }
 
@@ -33,21 +33,20 @@ class RouteDatabaseCreate extends APIRoute {
                     return;
                 }
 
-                /* Create database */
-                const newServerDatabase = {
+                /* Create instance */
+                const newSmbInstance = {
                     id: randomBytes(16).toString("hex"),
                     author: session.user,
                     server: req.body.server,
-                    name: req.body.name,
-                    credentials: 0
+                    name: req.body.name
                 };
-                feature.database.add({ destination: "databases", item: newServerDatabase });
+                feature.database.add({ destination: "smbinstances", item: newSmbInstance });
 
                 /* Send */
-                rep.send(newServerDatabase);
+                rep.send(newSmbInstance);
             }
         );
     }
 }
 
-export default RouteDatabaseCreate;
+export default RouteSMBInstanceCreate;

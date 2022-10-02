@@ -17,6 +17,15 @@ import RouteUptimeEndpointDelete from "./uptime_endpoint_delete";
 import RouteDatabaseDelete from "./database_delete";
 import RouteUserDelete from "./user_delete";
 import RouteTaskDelete from "./task_delete";
+import RouteSMBInstanceCreate from "./smb_instance_create";
+import RouteSMBInstanceEdit from "./smb_instance_edit";
+import RouteSMBInstanceDelete from "./smb_instance_delete";
+import RouteSMBShareCreate from "./smb_share_create";
+import RouteSMBShareEdit from "./smb_share_edit";
+import RouteSMBShareDelete from "./smb_share_delete";
+import RouteSMBUserCreate from "./smb_user_create";
+import RouteSMBUserEdit from "./smb_user_edit";
+import RouteSMBConfig from "./smb_config";
 
 export enum CustomRouteType {
     DAEMON_TOKEN_CREATE = "DAEMON_TOKEN_CREATE",
@@ -33,84 +42,51 @@ export enum CustomRouteType {
     DATABASE_CREATE = "DATABASE_CREATE",
     DATABASE_EDIT = "DATABASE_EDIT",
     DATABASE_DELETE = "DATABASE_DELETE",
+    SMB_INSTANCE_CREATE = "SMB_INSTANCE_CREATE",
+    SMB_INSTANCE_EDIT = "SMB_INSTANCE_EDIT",
+    SMB_INSTANCE_DELETE = "SMB_INSTANCE_DELETE",
+    SMB_SHARE_CREATE = "SMB_SHARE_CREATE",
+    SMB_SHARE_EDIT = "SMB_SHARE_EDIT",
+    SMB_SHARE_DELETE = "SMB_SHARE_DELETE",
+    SMB_USER_CREATE = "SMB_USER_CREATE",
+    SMB_USER_EDIT = "SMB_USER_EDIT",
+    SMB_CONFIG = "SMB_CONFIG",
     TASK_DELETE = "TASK_DELETE",
     USER_FILE_ACCESS = "USER_FILE_ACCESS",
 };
 
-export type RouteDaemonTokenCreateOptions = RouteOptions & {
-    type: CustomRouteType.DAEMON_TOKEN_CREATE;
-};
 export type RouteDaemonFileUploadOptions = RouteOptions & {
-    type: CustomRouteType.DAEMON_FILE_UPLOAD;
     root: string;
 };
-
-export type RouteUserDeleteOptions = RouteOptions & {
-    type: CustomRouteType.USER_DELETE;
-};
-
-export type RouteServerCreateOptions = RouteOptions & {
-    type: CustomRouteType.SERVER_CREATE;
-};
-export type RouteServerEditOptions = RouteOptions & {
-    type: CustomRouteType.SERVER_EDIT;
-};
-export type RouteServerDeleteOptions = RouteOptions & {
-    type: CustomRouteType.SERVER_DELETE;
-};
-
-export type RouteUptimeEndpointCreateOptions = RouteOptions & {
-    type: CustomRouteType.UPTIME_ENDPOINT_CREATE;
-};
-export type RouteUptimeEndpointEditOptions = RouteOptions & {
-    type: CustomRouteType.UPTIME_ENDPOINT_EDIT;
-};
-export type RouteUptimeEndpointDeleteOptions = RouteOptions & {
-    type: CustomRouteType.UPTIME_ENDPOINT_DELETE;
-};
-
-export type RouteNetworkCreateOptions = RouteOptions & {
-    type: CustomRouteType.NETWORK_CREATE;
-};
-export type RouteNetworkEditOptions = RouteOptions & {
-    type: CustomRouteType.NETWORK_EDIT;
-};
-
-export type RouteDatabaseCreateOptions = RouteOptions & {
-    type: CustomRouteType.DATABASE_CREATE;
-};
-export type RouteDatabaseEditOptions = RouteOptions & {
-    type: CustomRouteType.DATABASE_EDIT;
-};
-export type RouteDatabaseDeleteOptions = RouteOptions & {
-    type: CustomRouteType.DATABASE_DELETE;
-};
-
 export type RouteUserFileAccessOptions = RouteOptions & {
-    type: CustomRouteType.USER_FILE_ACCESS;
     root: string;
-};
-
-export type RouteTaskDeleteOptions = RouteOptions & {
-    type: CustomRouteType.TASK_DELETE;
 };
 
 const routes: Record<CustomRouteType, (feature: FeatureAPI, options: RouteOptions) => APIRoute> = {
-    [CustomRouteType.DAEMON_TOKEN_CREATE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteDaemonTokenCreate(feature, options as RouteDaemonTokenCreateOptions);},
-    [CustomRouteType.DAEMON_FILE_UPLOAD]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteDaemonFileUpload(feature, options as RouteDaemonFileUploadOptions);},
-    [CustomRouteType.USER_DELETE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteUserDelete(feature, options as RouteUserDeleteOptions);},
-    [CustomRouteType.SERVER_CREATE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteServerCreate(feature, options as RouteServerCreateOptions);},
-    [CustomRouteType.SERVER_EDIT]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteServerEdit(feature, options as RouteServerEditOptions);},
-    [CustomRouteType.SERVER_DELETE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteServerDelete(feature, options as RouteServerDeleteOptions);},
-    [CustomRouteType.UPTIME_ENDPOINT_CREATE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteUptimeEndpointCreate(feature, options as RouteUptimeEndpointCreateOptions);},
-    [CustomRouteType.UPTIME_ENDPOINT_EDIT]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteUptimeEndpointEdit(feature, options as RouteUptimeEndpointEditOptions);},
-    [CustomRouteType.UPTIME_ENDPOINT_DELETE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteUptimeEndpointDelete(feature, options as RouteUptimeEndpointDeleteOptions);},
-    [CustomRouteType.NETWORK_CREATE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteNetworkCreate(feature, options as RouteNetworkCreateOptions);},
-    [CustomRouteType.NETWORK_EDIT]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteNetworkEdit(feature, options as RouteNetworkEditOptions);},
-    [CustomRouteType.DATABASE_CREATE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteDatabaseCreate(feature, options as RouteDatabaseCreateOptions);},
-    [CustomRouteType.DATABASE_EDIT]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteDatabaseEdit(feature, options as RouteDatabaseEditOptions);},
-    [CustomRouteType.DATABASE_DELETE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteDatabaseDelete(feature, options as RouteDatabaseDeleteOptions);},
-    [CustomRouteType.TASK_DELETE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteTaskDelete(feature, options as RouteTaskDeleteOptions);},
-    [CustomRouteType.USER_FILE_ACCESS]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteUserFileAccess(feature, options as RouteUserFileAccessOptions);},
+    [CustomRouteType.DAEMON_TOKEN_CREATE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteDaemonTokenCreate(feature, options);},
+    [CustomRouteType.DAEMON_FILE_UPLOAD]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteDaemonFileUpload(feature, options);},
+    [CustomRouteType.USER_DELETE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteUserDelete(feature, options);},
+    [CustomRouteType.SERVER_CREATE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteServerCreate(feature, options);},
+    [CustomRouteType.SERVER_EDIT]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteServerEdit(feature, options);},
+    [CustomRouteType.SERVER_DELETE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteServerDelete(feature, options);},
+    [CustomRouteType.UPTIME_ENDPOINT_CREATE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteUptimeEndpointCreate(feature, options);},
+    [CustomRouteType.UPTIME_ENDPOINT_EDIT]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteUptimeEndpointEdit(feature, options);},
+    [CustomRouteType.UPTIME_ENDPOINT_DELETE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteUptimeEndpointDelete(feature, options);},
+    [CustomRouteType.NETWORK_CREATE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteNetworkCreate(feature, options);},
+    [CustomRouteType.NETWORK_EDIT]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteNetworkEdit(feature, options);},
+    [CustomRouteType.DATABASE_CREATE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteDatabaseCreate(feature, options);},
+    [CustomRouteType.DATABASE_EDIT]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteDatabaseEdit(feature, options);},
+    [CustomRouteType.DATABASE_DELETE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteDatabaseDelete(feature, options);},
+    [CustomRouteType.SMB_INSTANCE_CREATE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteSMBInstanceCreate(feature, options);},
+    [CustomRouteType.SMB_INSTANCE_EDIT]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteSMBInstanceEdit(feature, options);},
+    [CustomRouteType.SMB_INSTANCE_DELETE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteSMBInstanceDelete(feature, options);},
+    [CustomRouteType.SMB_SHARE_CREATE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteSMBShareCreate(feature, options);},
+    [CustomRouteType.SMB_SHARE_EDIT]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteSMBShareEdit(feature, options);},
+    [CustomRouteType.SMB_SHARE_DELETE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteSMBShareDelete(feature, options);},
+    [CustomRouteType.SMB_USER_CREATE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteSMBUserCreate(feature, options);},
+    [CustomRouteType.SMB_USER_EDIT]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteSMBUserEdit(feature, options);},
+    [CustomRouteType.SMB_CONFIG]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteSMBConfig(feature, options);},
+    [CustomRouteType.TASK_DELETE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteTaskDelete(feature, options);},
+    [CustomRouteType.USER_FILE_ACCESS]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteUserFileAccess(feature, options);},
 }
 export default routes;

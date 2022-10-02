@@ -329,6 +329,62 @@
             "disableIdField": true
         },
         {
+            "path": "/v1/smbInstances/create",
+            "type": "SMB_INSTANCE_CREATE"
+        },
+        {
+            "path": "/v1/smbInstances/edit",
+            "type": "SMB_INSTANCE_EDIT"
+        },
+        {
+            "path": "/v1/smbInstances/delete",
+            "type": "SMB_INSTANCE_DELETE"
+        },
+        {
+            "path": "/v1/smbInstances/fetch",
+            "type": "FETCH",
+            "table": "smbinstances",
+            "authorField": "author"
+        },
+        {
+            "path": "/v1/smbShares/create",
+            "type": "SMB_SHARE_CREATE"
+        },
+        {
+            "path": "/v1/smbShares/edit",
+            "type": "SMB_SHARE_EDIT"
+        },
+        {
+            "path": "/v1/smbShares/delete",
+            "type": "SMB_SHARE_DELETE"
+        },
+        {
+            "path": "/v1/smbShares/fetch",
+            "type": "FETCH",
+            "table": "smbshares",
+            "authorField": "author"
+        },
+        {
+            "path": "/v1/smbUsers/create",
+            "type": "SMB_USER_CREATE"
+        },
+        {
+            "path": "/v1/smbUsers/edit",
+            "type": "SMB_USER_EDIT"
+        },
+        {
+            "path": "/v1/smbUsers/delete",
+            "type": "DELETE",
+            "table": "smbusers",
+            "authorField": "author"
+        },
+        {
+            "path": "/v1/smbUsers/fetch",
+            "type": "FETCH",
+            "table": "smbusers",
+            "authorField": "author"
+        },
+        {
             "path": "/v1/uptimeEndpoints/create",
             "type": "UPTIME_ENDPOINT_CREATE"
         },

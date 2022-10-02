@@ -1,5 +1,4 @@
 /* Types */
-import { RouteUptimeEndpointCreateOptions } from "./index";
 import { UptimeEndpointCreateSchema, UptimeEndpointCreateSchemaType } from "./_schemas";
 import { RequestWithSchema } from "../types";
 
@@ -12,13 +11,6 @@ import FeatureAPI from "../..";
 import { getSession, validateSchemaBody } from "../util";
 
 class RouteUptimeEndpointCreate extends APIRoute {
-    options: RouteUptimeEndpointCreateOptions;
-
-    constructor(feature: FeatureAPI, options: RouteUptimeEndpointCreateOptions) {
-        super(feature, options);
-        this.options = options;
-    }
-
     hook(feature: FeatureAPI): void {
         feature.instance.post(this.path,
             { config: { rateLimit: { timeWindow: 5000, max: 1 } } },
@@ -40,20 +32,14 @@ class RouteUptimeEndpointCreate extends APIRoute {
                     id: randomBytes(16).toString("hex"),
                     author: session.user,
                     name: req.body.name,
+                    interval: 10,
                     host: req.body.host ?? null,
                     requestEndpoint: req.body.requestEndpoint ?? null
                 };
                 feature.database.add({ destination: "uptimeendpoints", item: newEndpoint });
-                
-                /* Get endpoint */
-                const endpoint = await feature.database.fetch({ source: "uptimeendpoints", selectors: { "id": newEndpoint.id } });
-                if(endpoint === undefined) {
-                    rep.code(404); rep.send();
-                    return;
-                }
 
                 /* Send */
-                rep.send(endpoint);
+                rep.send(newEndpoint);
             }
         );
     }

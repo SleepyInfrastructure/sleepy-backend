@@ -1,6 +1,5 @@
 /* Types */
 import { Status } from "../../../../../ts/base";
-import { RouteServerDeleteOptions } from "./index";
 import { ServerDeleteSchema, ServerDeleteSchemaType } from "./_schemas";
 import { RequestWithSchemaQuery } from "../types";
 
@@ -12,13 +11,6 @@ import FeatureDaemon from "../../../../custom/daemon";
 import { deleteServer } from "./_util";
 
 class RouteServerDelete extends APIRoute {
-    options: RouteServerDeleteOptions;
-
-    constructor(feature: FeatureAPI, options: RouteServerDeleteOptions) {
-        super(feature, options);
-        this.options = options;
-    }
-
     hook(feature: FeatureAPI): void {
         const featureDaemon = feature.parent.featureContainer.get("daemon") as FeatureDaemon;
         if (featureDaemon === undefined) {

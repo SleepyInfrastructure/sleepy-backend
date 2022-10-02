@@ -1,5 +1,4 @@
 /* Types */
-import { RouteTaskDeleteOptions } from "./index";
 import { TaskDeleteSchema, TaskDeleteSchemaType } from "./_schemas";
 import { RequestWithSchemaQuery } from "../types";
 
@@ -10,13 +9,6 @@ import { getSession, validateSchemaQuery } from "../util";
 import { deleteTask } from "./_util";
 
 class RouteTaskDelete extends APIRoute {
-    options: RouteTaskDeleteOptions;
-
-    constructor(feature: FeatureAPI, options: RouteTaskDeleteOptions) {
-        super(feature, options);
-        this.options = options;
-    }
-
     hook(feature: FeatureAPI): void {
         feature.instance.delete(this.path,
             { config: { rateLimit: { timeWindow: 5000, max: 3 } } },

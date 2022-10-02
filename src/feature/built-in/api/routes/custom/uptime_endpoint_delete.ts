@@ -1,5 +1,4 @@
 /* Types */
-import { RouteUptimeEndpointDeleteOptions } from "./index";
 import { UptimeEndpointDeleteSchema, UptimeEndpointDeleteSchemaType } from "./_schemas";
 import { RequestWithSchemaQuery } from "../types";
 
@@ -10,13 +9,6 @@ import { getSession, validateSchemaQuery } from "../util";
 import { deleteUptimeEndpoint } from "./_util";
 
 class RouteUptimeEndpointDelete extends APIRoute {
-    options: RouteUptimeEndpointDeleteOptions;
-
-    constructor(feature: FeatureAPI, options: RouteUptimeEndpointDeleteOptions) {
-        super(feature, options);
-        this.options = options;
-    }
-
     hook(feature: FeatureAPI): void {
         feature.instance.delete(this.path,
             { config: { rateLimit: { timeWindow: 5000, max: 3 } } },

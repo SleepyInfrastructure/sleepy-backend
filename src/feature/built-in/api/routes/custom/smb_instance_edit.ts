@@ -1,6 +1,6 @@
 /* Types */
 import { DatabaseUnserializedItemValue } from "../../../../../database/types";
-import { NetworkEditSchema, NetworkEditSchemaType } from "./_schemas";
+import { SMBInstanceEditSchema, SMBInstanceEditSchemaType } from "./_schemas";
 import { RequestWithSchema } from "../types";
 
 /* Local Imports */
@@ -8,13 +8,13 @@ import APIRoute from "..";
 import FeatureAPI from "../..";
 import { getSession, validateSchemaBody } from "../util";
 
-class RouteNetworkEdit extends APIRoute {
+class RouteSMBInstanceEdit extends APIRoute {
     hook(feature: FeatureAPI): void {
         feature.instance.post(this.path,
             { config: { rateLimit: { timeWindow: 3000, max: 3 } } },
-            async (req: RequestWithSchema<NetworkEditSchemaType>, rep) => {
+            async (req: RequestWithSchema<SMBInstanceEditSchemaType>, rep) => {
                 /* Validate schemas */
-                if(!validateSchemaBody(NetworkEditSchema, req, rep)) {
+                if(!validateSchemaBody(SMBInstanceEditSchema, req, rep)) {
                     return;
                 }
 
@@ -29,23 +29,20 @@ class RouteNetworkEdit extends APIRoute {
                 if(req.body.name !== undefined) {
                     edit.name = req.body.name;
                 }
-                if(req.body.ipv4 !== undefined) {
-                    edit.ipv4 = req.body.ipv4;
-                }
-                await feature.database.edit({ destination: "networks", item: edit, selectors: { id: req.body.id, author: session.user }});
+                await feature.database.edit({ destination: "smbinstances", item: edit, selectors: { id: req.body.id, author: session.user }});
 
-                /* Get network */
-                const network = await feature.database.fetch({ source: "networks", selectors: { id: req.body.id, author: session.user } });
-                if(network === undefined) {
+                /* Get instance */
+                const instance = await feature.database.fetch({ source: "smbinstances", selectors: { id: req.body.id, author: session.user } });
+                if(instance === undefined) {
                     rep.code(404); rep.send();
                     return;
                 }
 
                 /* Send */
-                rep.send(network);
+                rep.send(instance);
             }
         );
     }
 }
 
-export default RouteNetworkEdit;
+export default RouteSMBInstanceEdit;

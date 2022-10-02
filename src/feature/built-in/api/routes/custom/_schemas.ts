@@ -56,6 +56,57 @@ export type DatabaseEditSchemaType = z.infer<typeof DatabaseEditSchema>;
 export const DatabaseDeleteSchema = IDSchema;
 export type DatabaseDeleteSchemaType = z.infer<typeof DatabaseDeleteSchema>;
 
+export const SMBInstanceCreateSchema = z.object({
+    server: z.string().min(32).max(32),
+    name: z.string().min(3).max(64)
+});
+export type SMBInstanceCreateSchemaType = z.infer<typeof SMBInstanceCreateSchema>;
+export const SMBInstanceEditSchema = z.intersection(z.object({
+    server: z.string().min(32).max(32).optional(),
+    name: z.string().min(3).max(64).optional()
+}), IDSchema);
+export type SMBInstanceEditSchemaType = z.infer<typeof SMBInstanceEditSchema>;
+export const SMBInstanceDeleteSchema = IDSchema;
+export type SMBInstanceDeleteSchemaType = z.infer<typeof SMBInstanceDeleteSchema>;
+export const SMBConfigSchema = IDSchema;
+export type SMBConfigSchemaType = z.infer<typeof SMBConfigSchema>;
+
+export const SMBShareCreateSchema = z.object({
+    parent: z.string().min(32).max(32),
+    name: z.string().min(3).max(64),
+    path: z.string().min(3).max(1024),
+    browsable: z.boolean(),
+    readonly: z.boolean(),
+    guest: z.boolean(),
+    users: z.array(z.string()),
+    admins: z.array(z.string())
+});
+export type SMBShareCreateSchemaType = z.infer<typeof SMBShareCreateSchema>;
+export const SMBShareEditSchema = z.intersection(z.object({
+    name: z.string().min(3).max(64).optional(),
+    path: z.string().min(3).max(1024).optional(),
+    browsable: z.boolean().optional(),
+    readonly: z.boolean().optional(),
+    guest: z.boolean().optional(),
+    users: z.array(z.string()).optional(),
+    admins: z.array(z.string()).optional()
+}), IDSchema);
+export type SMBShareEditSchemaType = z.infer<typeof SMBShareEditSchema>;
+export const SMBShareDeleteSchema = IDSchema;
+export type SMBShareDeleteSchemaType = z.infer<typeof SMBShareDeleteSchema>;
+
+export const SMBUserCreateSchema = z.object({
+    parent: z.string().min(32).max(32),
+    name: z.string().min(3).max(64)
+});
+export type SMBUserCreateSchemaType = z.infer<typeof SMBUserCreateSchema>;
+export const SMBUserEditSchema = z.intersection(z.object({
+    name: z.string().min(3).max(64).optional()
+}), IDSchema);
+export type SMBUserEditSchemaType = z.infer<typeof SMBUserEditSchema>;
+export const SMBUserDeleteSchema = IDSchema;
+export type SSMBUserDeleteSchemaType = z.infer<typeof SMBUserDeleteSchema>;
+
 export const TaskDeleteSchema = IDSchema;
 export type TaskDeleteSchemaType = z.infer<typeof TaskDeleteSchema>;
 

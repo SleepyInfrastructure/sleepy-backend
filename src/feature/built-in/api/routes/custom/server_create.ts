@@ -1,5 +1,4 @@
 /* Types */
-import { RouteServerCreateOptions } from "./index";
 import { ServerCreateSchema, ServerCreateSchemaType } from "./_schemas";
 import { RequestWithSchema } from "../types";
 
@@ -12,13 +11,6 @@ import FeatureAPI from "../..";
 import { getSession, validateSchemaBody } from "../util";
 
 class RouteServerCreate extends APIRoute {
-    options: RouteServerCreateOptions;
-
-    constructor(feature: FeatureAPI, options: RouteServerCreateOptions) {
-        super(feature, options);
-        this.options = options;
-    }
-
     hook(feature: FeatureAPI): void {
         feature.instance.post(this.path,
             { config: { rateLimit: { timeWindow: 5000, max: 1 } } },

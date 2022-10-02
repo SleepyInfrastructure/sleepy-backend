@@ -37,6 +37,35 @@ export async function deleteServer(feature: FeatureDaemon, database: Database, i
     return true;
 }
 
+export async function deleteSmbInstance(database: Database, id: string, author: string): Promise<boolean> {
+    /* Delete instance */
+    const instance = await database.delete({ source: "smbinstances", selectors: { id: id, author: author } });
+    if(instance < 1) {
+        return false;
+    }
+
+    /* Delete related objects */
+    const shares = await database.fetchMultiple({ source: "smbshares", selectors: { parent: id, author: author } });
+    for(const share of shares) {
+        deleteSmbShare(database, share.id, author);
+    }
+
+    return true;
+}
+
+export async function deleteSmbShare(database: Database, id: string, author: string): Promise<boolean> {
+    /* Delete server */
+    const share = await database.delete({ source: "smbshares", selectors: { id: id, author: author } });
+    if(share < 1) {
+        return false;
+    }
+
+    /* Delete related objects */
+    database.delete({ source: "smbusers", selectors: { parent: id, author: author } });
+
+    return true;
+}
+
 export async function deleteUptimeEndpoint(database: Database, id: string, author: string): Promise<boolean> {
     /* Delete server */
     const endpoint = await database.delete({ source: "uptimeendpoints", selectors: { id: id, author: author } });

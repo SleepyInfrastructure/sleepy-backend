@@ -1,6 +1,5 @@
 /* Types */
 import { DatabaseUnserializedItemValue } from "../../../../../database/types";
-import { RouteUptimeEndpointEditOptions } from "./index";
 import { UptimeEndpointEditSchema, UptimeEndpointEditSchemaType } from "./_schemas";
 import { RequestWithSchema } from "../types";
 
@@ -10,13 +9,6 @@ import FeatureAPI from "../..";
 import { getSession, validateSchemaBody } from "../util";
 
 class RouteUptimeEndpointEdit extends APIRoute {
-    options: RouteUptimeEndpointEditOptions;
-
-    constructor(feature: FeatureAPI, options: RouteUptimeEndpointEditOptions) {
-        super(feature, options);
-        this.options = options;
-    }
-
     hook(feature: FeatureAPI): void {
         feature.instance.post(this.path,
             { config: { rateLimit: { timeWindow: 3000, max: 3 } } },

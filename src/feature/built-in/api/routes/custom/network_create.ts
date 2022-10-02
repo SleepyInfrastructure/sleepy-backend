@@ -1,5 +1,4 @@
 /* Types */
-import { RouteNetworkCreateOptions } from "./index";
 import { NetworkCreateSchema, NetworkCreateSchemaType } from "./_schemas";
 import { RequestWithSchema } from "../types";
 
@@ -12,13 +11,6 @@ import FeatureAPI from "../..";
 import { getSession, validateSchemaBody } from "../util";
 
 class RouteNetworkCreate extends APIRoute {
-    options: RouteNetworkCreateOptions;
-
-    constructor(feature: FeatureAPI, options: RouteNetworkCreateOptions) {
-        super(feature, options);
-        this.options = options;
-    }
-
     hook(feature: FeatureAPI): void {
         feature.instance.post(this.path,
             { config: { rateLimit: { timeWindow: 5000, max: 1 } } },
@@ -42,16 +34,9 @@ class RouteNetworkCreate extends APIRoute {
                     ipv4: req.body.ipv4 ?? null
                 };
                 feature.database.add({ destination: "networks", item: newNetwork });
-                
-                /* Get network */
-                const network = await feature.database.fetch({ source: "networks", selectors: { "id": newNetwork.id } });
-                if(network === undefined) {
-                    rep.code(404); rep.send();
-                    return;
-                }
 
                 /* Send */
-                rep.send(network);
+                rep.send(newNetwork);
             }
         );
     }

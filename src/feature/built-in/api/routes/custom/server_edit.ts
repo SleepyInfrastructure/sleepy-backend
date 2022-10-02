@@ -1,6 +1,5 @@
 /* Types */
 import { DatabaseUnserializedItemValue } from "../../../../../database/types";
-import { RouteServerEditOptions } from "./index";
 import { ServerEditSchema, ServerEditSchemaType } from "./_schemas";
 import { RequestWithSchema } from "../types";
 
@@ -10,13 +9,6 @@ import FeatureAPI from "../..";
 import { getSession, validateSchemaBody } from "../util";
 
 class RouteServerEdit extends APIRoute {
-    options: RouteServerEditOptions;
-
-    constructor(feature: FeatureAPI, options: RouteServerEditOptions) {
-        super(feature, options);
-        this.options = options;
-    }
-
     hook(feature: FeatureAPI): void {
         feature.instance.post(this.path,
             { config: { rateLimit: { timeWindow: 3000, max: 3 } } },
