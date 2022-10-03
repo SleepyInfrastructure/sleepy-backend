@@ -15,20 +15,21 @@ class DaemonClientBuildSmbConfigMessageHandler extends WebsocketMessageHandler<s
     async handleClient(connection: Connection, message: schemas.WebsocketDaemonClientRequestResourcesMessageType, client: Client): Promise<void> {
         const requestedDaemon = this.parent.getDaemonForClient(client, message.id);
         if(requestedDaemon === null) {
-            console.log(`${red("X")} No daemon found to build smb config on! (id: ${message.id})`);
+            console.log(`${red("X")} No daemon found to build SMB config on! (id: ${message.id})`);
             return;
         }
 
         const instances = await this.parent.database.fetchMultiple({ source: "smbinstances", selectors: { server: message.id, author: client.id } });
         const config = [];
         config.push('version: "3"');
+        config.push('name: "sleepy-smb"');
         config.push("services:");
         for(const instance of instances) {
             const shares = await this.parent.database.fetchMultiple({ source: "smbshares", selectors: { parent: instance.id, author: client.id } });
             const users = await this.parent.database.fetchMultiple({ source: "smbusers", selectors: { parent: instance.id, author: client.id } });
 
-            config.push(`  sleepy-smb-${instance.name}`);
-            config.push(`    container_name: sleepy-smb-${instance.name}:`);
+            config.push(`  sleepy-smb-${instance.name}:`);
+            config.push(`    container_name: sleepy-smb-${instance.name}`);
             config.push('    network_mode: "host"');
             config.push("    restart: always");
             config.push("    image: dperson/samba");
@@ -54,6 +55,9 @@ class DaemonClientBuildSmbConfigMessageHandler extends WebsocketMessageHandler<s
             }
             command.push("-p");
             command.push("-n");
+            if(instance.recycle === false) {
+                command.push("-r");
+            }
             config.push(`    command: [${command.map(e => `"${e}"`).join(", ")}]`);
         }
 

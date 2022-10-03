@@ -58,12 +58,14 @@ export type DatabaseDeleteSchemaType = z.infer<typeof DatabaseDeleteSchema>;
 
 export const SMBInstanceCreateSchema = z.object({
     server: z.string().min(32).max(32),
-    name: z.string().min(3).max(64)
+    name: z.string().min(3).max(64),
+    recycle: z.boolean()
 });
 export type SMBInstanceCreateSchemaType = z.infer<typeof SMBInstanceCreateSchema>;
 export const SMBInstanceEditSchema = z.intersection(z.object({
     server: z.string().min(32).max(32).optional(),
-    name: z.string().min(3).max(64).optional()
+    name: z.string().min(3).max(64).optional(),
+    recycle: z.boolean().optional()
 }), IDSchema);
 export type SMBInstanceEditSchemaType = z.infer<typeof SMBInstanceEditSchema>;
 export const SMBInstanceDeleteSchema = IDSchema;

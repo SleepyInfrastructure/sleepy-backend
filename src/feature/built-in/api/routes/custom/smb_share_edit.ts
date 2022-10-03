@@ -29,6 +29,24 @@ class RouteSMBShareEdit extends APIRoute {
                 if(req.body.name !== undefined) {
                     edit.name = req.body.name;
                 }
+                if(req.body.path !== undefined) {
+                    edit.path = req.body.path;
+                }
+                if(req.body.browsable !== undefined) {
+                    edit.browsable = req.body.browsable ? 1 : 0;
+                }
+                if(req.body.readonly !== undefined) {
+                    edit.readonly = req.body.readonly ? 1 : 0;
+                }
+                if(req.body.guest !== undefined) {
+                    edit.guest = req.body.guest ? 1 : 0;
+                }
+                if(req.body.users !== undefined) {
+                    edit.users = req.body.users;
+                }
+                if(req.body.admins !== undefined) {
+                    edit.admins = req.body.admins;
+                }
                 await feature.database.edit({ destination: "smbshares", item: edit, selectors: { id: req.body.id, author: session.user }});
 
                 /* Get share */

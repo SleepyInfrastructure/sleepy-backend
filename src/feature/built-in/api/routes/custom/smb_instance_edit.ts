@@ -29,6 +29,9 @@ class RouteSMBInstanceEdit extends APIRoute {
                 if(req.body.name !== undefined) {
                     edit.name = req.body.name;
                 }
+                if(req.body.recycle !== undefined) {
+                    edit.recycle = req.body.recycle ? 1 : 0;
+                }
                 await feature.database.edit({ destination: "smbinstances", item: edit, selectors: { id: req.body.id, author: session.user }});
 
                 /* Get instance */

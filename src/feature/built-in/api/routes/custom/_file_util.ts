@@ -55,15 +55,18 @@ export async function processFileTask(database: Database, options: RouteDaemonFi
 
     /* Get data from file type */
     const fileType = taskToFileType[task.type as TaskType];
-    let filePath = "";
+    let fileName, filePath = "";
+    // TODO: improve file names
     switch(fileType) {
         case DaemonFileType.BACKUP_DATABASE:
             console.log(`${green("^")} Created a new database backup! (database: ${bold(yellow(fileData.database))})!`);
+            fileName = `db-${dateShort}`;
             filePath = path.join("databases", fileData.database, dateLong, `${dateShort}.sql`);
             break;
 
         case DaemonFileType.CONTAINER_LOG:
             console.log(`${green("^")} Created a new container log! (container: ${bold(yellow(fileData.container))})!`);
+            fileName = `log-${dateShort}`;
             filePath = path.join("containers", fileData.container, dateLong, `${dateShort}.json`);
             break;
     }
@@ -73,6 +76,7 @@ export async function processFileTask(database: Database, options: RouteDaemonFi
         database,
         data,
         fileType,
+        fileName,
         server.author,
         options.root,
         filePath
@@ -93,10 +97,11 @@ type UserFile = {
     id: string;
     author: string;
     type: DaemonFileType;
+    name: string;
     size: number;
     path: string;
 };
-export async function processFileInternal(database: Database, data: MultipartFile, type: DaemonFileType, author: string, root: string, filePath: string): Promise<Error | UserFile> {
+export async function processFileInternal(database: Database, data: MultipartFile, type: DaemonFileType, name: string, author: string, root: string, filePath: string): Promise<Error | UserFile> {
     const fullPath = path.join(root, filePath);
     const err = await new Promise<Error | null>((resolve) => {
         fs.mkdir(path.dirname(fullPath), { recursive: true }, async(e) => {
@@ -117,6 +122,7 @@ export async function processFileInternal(database: Database, data: MultipartFil
         id: randomBytes(16).toString("hex"),
         author: author,
         type: type,
+        name: name,
         size: statSync(fullPath).size,
         path: filePath
     };

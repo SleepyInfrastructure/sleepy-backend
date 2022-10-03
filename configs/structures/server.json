@@ -18,7 +18,8 @@
             "table": "serversoftware",
             "idField": "server",
             "baseIdField": "id",
-            "authorField": "author"
+            "authorField": "author",
+            "sort": { "field": "name" }
         },
         "disks": {
             "type": "ARRAY",
@@ -26,7 +27,8 @@
             "idField": "server",
             "baseIdField": "id",
             "authorField": "author",
-            "structure": "disk"
+            "structure": "disk",
+            "sort": { "field": "name" }
         },
         "zfsPools": {
             "type": "ARRAY",
@@ -34,7 +36,8 @@
             "idField": "server",
             "baseIdField": "id",
             "authorField": "author",
-            "structure": "zfsPool"
+            "structure": "zfsPool",
+            "sort": { "field": "name" }
         },
         "containers": {
             "type": "ARRAY",
@@ -42,21 +45,24 @@
             "idField": "server",
             "baseIdField": "id",
             "authorField": "author",
-            "structure": "container"
+            "structure": "container",
+            "sort": { "field": "names" }
         },
         "containerProjects": {
             "type": "ARRAY",
             "table": "containerprojects",
             "idField": "server",
             "baseIdField": "id",
-            "authorField": "author"
+            "authorField": "author",
+            "sort": { "field": "name" }
         },
         "databases": {
             "type": "ARRAY",
             "table": "databases",
             "idField": "server",
             "baseIdField": "id",
-            "authorField": "author"
+            "authorField": "author",
+            "sort": { "field": "name" }
         },
         "smb": {
             "type": "ARRAY",
@@ -64,7 +70,8 @@
             "idField": "server",
             "baseIdField": "id",
             "authorField": "author",
-            "structure": "smbInstance"
+            "structure": "smbInstance",
+            "sort": { "field": "name" }
         }
     }
 }

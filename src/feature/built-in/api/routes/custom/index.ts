@@ -25,7 +25,6 @@ import RouteSMBShareEdit from "./smb_share_edit";
 import RouteSMBShareDelete from "./smb_share_delete";
 import RouteSMBUserCreate from "./smb_user_create";
 import RouteSMBUserEdit from "./smb_user_edit";
-import RouteSMBConfig from "./smb_config";
 
 export enum CustomRouteType {
     DAEMON_TOKEN_CREATE = "DAEMON_TOKEN_CREATE",
@@ -50,7 +49,6 @@ export enum CustomRouteType {
     SMB_SHARE_DELETE = "SMB_SHARE_DELETE",
     SMB_USER_CREATE = "SMB_USER_CREATE",
     SMB_USER_EDIT = "SMB_USER_EDIT",
-    SMB_CONFIG = "SMB_CONFIG",
     TASK_DELETE = "TASK_DELETE",
     USER_FILE_ACCESS = "USER_FILE_ACCESS",
 };
@@ -85,7 +83,6 @@ const routes: Record<CustomRouteType, (feature: FeatureAPI, options: RouteOption
     [CustomRouteType.SMB_SHARE_DELETE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteSMBShareDelete(feature, options);},
     [CustomRouteType.SMB_USER_CREATE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteSMBUserCreate(feature, options);},
     [CustomRouteType.SMB_USER_EDIT]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteSMBUserEdit(feature, options);},
-    [CustomRouteType.SMB_CONFIG]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteSMBConfig(feature, options);},
     [CustomRouteType.TASK_DELETE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteTaskDelete(feature, options);},
     [CustomRouteType.USER_FILE_ACCESS]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteUserFileAccess(feature, options);},
 }

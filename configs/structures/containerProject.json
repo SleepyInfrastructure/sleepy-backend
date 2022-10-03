@@ -7,7 +7,8 @@
             "idField": "parent",
             "baseIdField": "id",
             "authorField": "author",
-            "structure": "container"
+            "structure": "container",
+            "sort": { "field": "names" }
         }
     }
 }

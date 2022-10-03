@@ -6,14 +6,16 @@
             "table": "smbshares",
             "idField": "parent",
             "baseIdField": "id",
-            "authorField": "author"
+            "authorField": "author",
+            "sort": { "field": "name" }
         },
         "users": {
             "type": "ARRAY",
             "table": "smbusers",
             "idField": "parent",
             "baseIdField": "id",
-            "authorField": "author"
+            "authorField": "author",
+            "sort": { "field": "name" }
         }
     }
 }

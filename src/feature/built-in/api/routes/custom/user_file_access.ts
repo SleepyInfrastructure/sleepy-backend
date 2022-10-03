@@ -45,10 +45,9 @@ class RouteUserFileAccess extends APIRoute {
                 }
 
                 /* Prepare response */
-                const fileName = `${path.basename(filePath, path.extname(filePath))}.zip`;
                 rep.raw.writeHead(200, {
                     "Content-Type": "application/zip",
-                    "Content-Disposition": `attachment; filename="${fileName}"`
+                    "Content-Disposition": `attachment; filename="${file.name}.zip"`
                 });
 
                 /* Prepare archive */
