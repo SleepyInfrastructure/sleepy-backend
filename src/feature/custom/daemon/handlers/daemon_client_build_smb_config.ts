@@ -22,7 +22,6 @@ class DaemonClientBuildSmbConfigMessageHandler extends WebsocketMessageHandler<s
         const instances = await this.parent.database.fetchMultiple({ source: "smbinstances", selectors: { server: message.id, author: client.id } });
         const config = [];
         config.push('version: "3"');
-        config.push('name: "sleepy-smb"');
         config.push("services:");
         for(const instance of instances) {
             const shares = await this.parent.database.fetchMultiple({ source: "smbshares", selectors: { parent: instance.id, author: client.id } });
