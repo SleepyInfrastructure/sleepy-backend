@@ -9,8 +9,11 @@
 	"roots": [
 		"/", "/login", "/register", "/tasks", "/tokens", "/settings",
 		"/create-server", "/edit-server/:id", "/server/:id", "/installing-daemon/:id",
-		"/container/:id",
+		"/container/:id", "/container-project/:id",
 		"/create-database", "/edit-database/:id", "/database/:id", 
-		"/create-uptime-endpoint", "/edit-uptime-endpoint"
+		"/create-uptime-endpoint", "/edit-uptime-endpoint",
+		"/create-smb-instance/:id", "/edit-smb-instance/:id", "/smb-instance/:id",
+		"/create-smb-share/:id", "/edit-smb-share/:id",
+		"/create-smb-user/:id", "/edit-smb-user/:id"
 	]
 }
