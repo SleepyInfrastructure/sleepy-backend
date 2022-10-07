@@ -72,6 +72,12 @@
             "authorField": "author",
             "structure": "smbInstance",
             "sort": { "field": "name" }
+        },
+        "public": {
+            "type": "SINGLE",
+            "table": "publicserverlistings",
+            "baseIdField": "id",
+            "authorField": "author"
         }
     }
 }

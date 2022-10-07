@@ -4,34 +4,33 @@ import { FeatureAPIOptions } from "./types";
 import { DatabaseType } from "../../../database/types";
 
 /* Node Imports */
-import * as fastify from "fastify";
 import { bold, green, yellow } from "nanocolors";
 
 /* Local Imports */
 import Feature from "../..";
 import Instance from "../../../instance";
 import APIRoute from "./routes";
-import { createFastifyInstance, startFastifyInstance } from "../../../util/fastify";
+import { createFastifyInstance, FoxxyFastifyInstance, startFastifyInstance } from "../../../util/fastify";
 import BuiltinRoutes, { BuiltinRouteType } from "./routes/built-in";
 import CustomRoutes, { CustomRouteType } from "./routes/custom";
 import Database from "../../../database";
 
 class FeatureAPI extends Feature {
     options: FeatureAPIOptions;
-    instance: fastify.FastifyInstance;
+    instance: FoxxyFastifyInstance;
     routeContainer: Map<string, APIRoute>;
     database: Database;
 
     constructor(parent: Instance, options: FeatureAPIOptions) {
         super(parent, options);
         this.options = options;
-        this.instance = null as unknown as fastify.FastifyInstance;
+        this.instance = null as unknown as FoxxyFastifyInstance;
         this.routeContainer = new Map();
         this.database = null as unknown as Database;
     }
 
     async start(): Promise<void> {
-        const instance = await createFastifyInstance(this.options, false);
+        const instance = await createFastifyInstance(this.options);
         if (instance instanceof Error) {
             this.state = { status: Status.ERROR, message: instance.message };
             return;

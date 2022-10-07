@@ -114,3 +114,6 @@ export type TaskDeleteSchemaType = z.infer<typeof TaskDeleteSchema>;
 
 export const FileAccessSchema = IDSchema;
 export type FileAccessSchemaType = z.infer<typeof FileAccessSchema>;
+
+export const ServerPublicFetchStructuredSchema = IDSchema;
+export type ServerPublicFetchStructuredSchemaType = z.infer<typeof ServerPublicFetchStructuredSchema>;

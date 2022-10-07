@@ -28,7 +28,7 @@ class Instance {
     constructor(id: string) {
         this.id = id;
         this.state = { status: Status.WAITING, message: "WAITING" };
-        this.options = JSON.parse(readFileSync(`configs/instances/${id}/options.json`, "utf-8"));
+        this.options = JSON.parse(readFileSync(`config/instances/${id}/options.json`, "utf-8"));
 
         this.databaseContainer = new Map();
         this.featureContainer = new Map();
@@ -37,7 +37,7 @@ class Instance {
 
     load(): void {
         for (const id of this.options.databases) {
-            const options = JSON.parse(readFileSync(`configs/databases/${id}/options.json`, "utf-8"));
+            const options = JSON.parse(readFileSync(`config/databases/${id}/options.json`, "utf-8"));
             let database: Database | undefined;
             switch (options.type) {
                 case DatabaseType.MYSQL:
@@ -52,7 +52,7 @@ class Instance {
         }
 
         for (const id of this.options.features) {
-            const options = JSON.parse(readFileSync(`configs/features/${id}/options.json`, "utf-8"));
+            const options = JSON.parse(readFileSync(`config/features/${id}/options.json`, "utf-8"));
             let feature: Feature | undefined;
             switch (options.type) {
                 case FeatureType.STATIC:
@@ -78,9 +78,9 @@ class Instance {
             this.featureContainer.set(feature.id, feature);
         }
 
-        const structurePaths = readdirSync("configs/structures");
+        const structurePaths = readdirSync("config/structures");
         for (const structurePath of structurePaths) {
-            const options = JSON.parse(readFileSync(`configs/structures/${structurePath}`, "utf-8"));
+            const options = JSON.parse(readFileSync(`config/structures/${structurePath}`, "utf-8"));
             this.structureContainer.set(options.id, options);
         }
     }

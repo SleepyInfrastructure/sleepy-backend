@@ -9,11 +9,11 @@ class Server {
     rootOptions: RootOptions;
 
     constructor() {
-        if (!existsSync("configs/root.json")) {
+        if (!existsSync("config/root.json")) {
             throw new Error("The root config file is missing!");
         }
 
-        this.rootOptions = JSON.parse(readFileSync("configs/root.json", "utf-8"));
+        this.rootOptions = JSON.parse(readFileSync("config/root.json", "utf-8"));
     }
 
     load() {

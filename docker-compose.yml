@@ -39,8 +39,8 @@ services:
     networks:
       - sleepy-backend
     volumes:
-      - ./configs:/usr/src/app/configs
-      - C:\Users\LamkasDev\Desktop\sleepy:/usr/src/sleepy
+      - ./config:/usr/src/app/config
+      - ${SLEEPY_DATA_PATH}:/usr/src/sleepy
     environment:
       SLEEPY_MYSQL_PASSWORD: "${SLEEPY_MYSQL_PASSWORD}"
     depends_on:

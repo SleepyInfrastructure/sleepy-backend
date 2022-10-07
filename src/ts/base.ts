@@ -29,7 +29,7 @@ export type FeatureOptions = {
 
 export type FeatureServerOptions = FeatureOptions & {
     port: number;
-    https: boolean;
+    https: string;
     cors?: {
         origins: string[];
     };

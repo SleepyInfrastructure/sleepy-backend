@@ -8,7 +8,7 @@ import { Client, Connection, FeatureDaemonOptions } from "./types";
 import * as fastify from "fastify";
 import { SocketStream } from "@fastify/websocket";
 /* Local Imports */
-import { createFastifyInstance, startFastifyInstance } from "../../../util/fastify";
+import { createFastifyPlainInstance, FoxxyFastifyPlainInstance, startFastifyInstance } from "../../../util/fastify";
 import { handleWebsocket } from "./ws";
 import Database from "../../../database";
 import FeatureDaemonAddon, { FeatureDaemonAddonType } from "./addons/addon";
@@ -16,7 +16,7 @@ import addons from "./addons";
 
 class FeatureDaemon extends Feature {
     options: FeatureDaemonOptions;
-    instance: fastify.FastifyInstance | null;
+    instance: FoxxyFastifyPlainInstance;
     database: Database;
     connections: Connection[];
     addons: Map<FeatureDaemonAddonType, FeatureDaemonAddon>;
@@ -24,7 +24,7 @@ class FeatureDaemon extends Feature {
     constructor(parent: Instance, options: FeatureDaemonOptions) {
         super(parent, options);
         this.options = options;
-        this.instance = null;
+        this.instance = null as unknown as FoxxyFastifyPlainInstance;
         this.database = null as unknown as Database;
         this.connections = [];
         this.addons = new Map();
@@ -42,7 +42,7 @@ class FeatureDaemon extends Feature {
     }
 
     async start(): Promise<void> {
-        const result = await createFastifyInstance(this.options, true);
+        const result = await createFastifyPlainInstance(this.options, true);
         if (result instanceof Error) {
             this.state = { status: Status.ERROR, message: result.message };
             return;

@@ -2,6 +2,7 @@
 import Database from "../../../../../database";
 import { DaemonFileType, TaskType } from "../../../../custom/daemon/types";
 import { RouteDaemonFileUploadOptions } from ".";
+import { FoxxyFastifyReply, FoxxyFastifyRequest } from "../../../../../util/fastify";
 
 /* Node Imports */
 import { randomBytes } from "crypto";
@@ -10,16 +11,19 @@ import util from "util";
 import { pipeline } from "stream";
 import path from "path";
 import { MultipartFile } from "@fastify/multipart";
-import { FastifyReply, FastifyRequest } from "fastify";
+import { RouteGenericInterface } from "fastify/types/route";
 import { bold, green, red, yellow } from "nanocolors";
 const pump = util.promisify(pipeline);
 
 /* Local Imports */
 import { pad } from "../../../../../util/general";
 
-export async function processFile(database: Database, options: RouteDaemonFileUploadOptions, server: any, req: FastifyRequest, rep: FastifyReply): Promise<Error | null> {
+export async function processFile(database: Database, options: RouteDaemonFileUploadOptions, server: any, req: FoxxyFastifyRequest<RouteGenericInterface>, rep: FoxxyFastifyReply): Promise<Error | null> {
     /* Get files */
     const data = await req.file();
+    if(data === undefined) {
+        return new Error("Failed to get request file!");
+    }
     const fileDataRaw: any = data.fields.data;
     const fileData = JSON.parse(fileDataRaw.value);
     
@@ -39,7 +43,7 @@ const taskToFileType: Record<TaskType, DaemonFileType> = {
     [TaskType.BACKUP_DATABASE_SCHEMA]: DaemonFileType.BACKUP_DATABASE,
     [TaskType.REQUEST_CONTAINER_LOG]: DaemonFileType.CONTAINER_LOG
 };
-export async function processFileTask(database: Database, options: RouteDaemonFileUploadOptions, server: any, data: MultipartFile, fileData: any, rep: FastifyReply): Promise<Error | null> {
+export async function processFileTask(database: Database, options: RouteDaemonFileUploadOptions, server: any, data: MultipartFile, fileData: any, rep: FoxxyFastifyReply): Promise<Error | null> {
     /* Get task */
     const task = await database.fetch({ source: "tasks", selectors: { id: fileData.task } });
     if(task === undefined) {

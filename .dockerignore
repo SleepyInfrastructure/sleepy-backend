@@ -3,5 +3,5 @@
 .husky
 .vscode
 build
-configs
+config
 node_modules

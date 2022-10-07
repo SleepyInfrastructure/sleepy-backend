@@ -74,7 +74,7 @@ class RouteSessionCreate extends APIRoute {
                             user: user.id
                         };
                         feature.database.add({ destination: "sessions", item: session });
-                        rep.cookie("Token", session.id, { path: "/", httpOnly: true, maxAge: 604800000 });
+                        rep.cookie("Token", session.id, { path: "/", httpOnly: true, sameSite: "none", secure: true, maxAge: 604800000 });
                         rep.send(session);
                         break;
                     }

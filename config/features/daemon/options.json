@@ -1,0 +1,10 @@
+{
+	"id": "daemon",
+	"name": "daemon",
+	"type": "DAEMON",
+
+	"port": 9002,
+	"https": "global",
+    "cors": { "origins": ["https://sleepy.lamkas.dev", "https://localhost:8080"] },
+	"version": "1.0.0"
+}

@@ -25,6 +25,7 @@ import RouteSMBShareEdit from "./smb_share_edit";
 import RouteSMBShareDelete from "./smb_share_delete";
 import RouteSMBUserCreate from "./smb_user_create";
 import RouteSMBUserEdit from "./smb_user_edit";
+import RouteServerPublicFetchStructured from "./server_public_fetch_structured";
 
 export enum CustomRouteType {
     DAEMON_TOKEN_CREATE = "DAEMON_TOKEN_CREATE",
@@ -51,6 +52,7 @@ export enum CustomRouteType {
     SMB_USER_EDIT = "SMB_USER_EDIT",
     TASK_DELETE = "TASK_DELETE",
     USER_FILE_ACCESS = "USER_FILE_ACCESS",
+    SERVER_PUBLIC_FETCH_STRUCTURED = "SERVER_PUBLIC_FETCH_STRUCTURED",
 };
 
 export type RouteDaemonFileUploadOptions = RouteOptions & {
@@ -85,5 +87,6 @@ const routes: Record<CustomRouteType, (feature: FeatureAPI, options: RouteOption
     [CustomRouteType.SMB_USER_EDIT]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteSMBUserEdit(feature, options);},
     [CustomRouteType.TASK_DELETE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteTaskDelete(feature, options);},
     [CustomRouteType.USER_FILE_ACCESS]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteUserFileAccess(feature, options);},
+    [CustomRouteType.SERVER_PUBLIC_FETCH_STRUCTURED]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteServerPublicFetchStructured(feature, options);},
 }
 export default routes;

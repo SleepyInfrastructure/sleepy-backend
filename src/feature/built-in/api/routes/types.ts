@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { FastifyRequest } from "fastify";
 import { BuiltinRouteType } from "./built-in";
 import { CustomRouteType } from "./custom";
+import { FoxxyFastifyRequest } from "../../../../util/fastify";
 
 export type RouteOptions = {
     path: string;
@@ -18,9 +18,9 @@ export const IDSchema = z.object({
 });
 export type IDSchemaType = z.infer<typeof IDSchema>;
 
-export type RequestWithSchema<T> = FastifyRequest<{
+export type RequestWithSchema<T> = FoxxyFastifyRequest<{
     Body: T;
 }>;
-export type RequestWithSchemaQuery<T> = FastifyRequest<{
+export type RequestWithSchemaQuery<T> = FoxxyFastifyRequest<{
     Querystring: T;
 }>;

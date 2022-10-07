@@ -4,8 +4,8 @@
 	"type": "API",
 
 	"port": 9001,
-	"https": false,
-    "cors": { "origins": ["https://sleepy.lamkas.dev", "http://localhost:8080"] },
+	"https": "global",
+    "cors": { "origins": ["https://sleepy.lamkas.dev", "https://localhost:8080"] },
     "routes": [
         {
             "path": "/v1/sessions/create",
@@ -45,6 +45,16 @@
             "type": "FETCH",
             "table": "servers",
             "authorField": "author"
+        },
+        {
+            "path": "/v1/servers/public/fetch",
+            "type": "FETCH_MULTIPLE",
+            "table": "publicserverlistings",
+            "disableIdField": true
+        },
+        {
+            "path": "/v1/servers/public/structured/fetch",
+            "type": "SERVER_PUBLIC_FETCH_STRUCTURED"
         },
         {
             "path": "/v1/servers/all/fetch",
