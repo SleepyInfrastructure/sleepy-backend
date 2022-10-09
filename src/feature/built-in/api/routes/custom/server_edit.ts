@@ -1,6 +1,6 @@
 /* Types */
 import { DatabaseUnserializedItemValue } from "../../../../../database/types";
-import { ServerEditSchema, ServerEditSchemaType } from "./_schemas";
+import { ServerEditSchema, ServerEditSchemaType } from "ts/common/zod/server";
 import { RequestWithSchema } from "../types";
 
 /* Local Imports */
@@ -25,18 +25,13 @@ class RouteServerEdit extends APIRoute {
                 }
 
                 /* Edit (author is checked in selectors) */
-                const edit: Record<string, DatabaseUnserializedItemValue> = {};
-                if(req.body.name !== undefined) {
-                    edit.name = req.body.name;
-                }
-                if(req.body.color !== undefined) {
-                    edit.color = req.body.color;
-                }
+                const edit: Record<string, DatabaseUnserializedItemValue> = req.body;
+                delete edit.id;
                 await feature.database.edit({ destination: "servers", item: edit, selectors: { id: req.body.id, author: session.user }});
 
                 /* Get server */
-                const server = await feature.database.fetch({ source: "servers", selectors: { id: req.body.id, author: session.user } });
-                if(server === undefined) {
+                const server = await feature.database.fetch<Server>({ source: "servers", selectors: { id: req.body.id, author: session.user } });
+                if(server === null) {
                     rep.code(404); rep.send();
                     return;
                 }

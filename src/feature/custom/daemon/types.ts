@@ -1,7 +1,7 @@
 /* Types */
 import { SocketStream } from "@fastify/websocket";
 import FeatureDaemon from ".";
-import { FeatureServerOptions, FeatureType } from "../../../ts/base";
+import { FeatureServerOptions, FeatureType } from "../../../ts/backend/base";
 
 /* Options */
 export type FeatureDaemonOptions = FeatureServerOptions & {
@@ -53,16 +53,6 @@ export enum DaemonWebsocketAuthFailure {
 export enum DaemonFileType {
     BACKUP_DATABASE = "BACKUP_DATABASE",
     CONTAINER_LOG = "CONTAINER_LOG"
-};
-export enum TaskType {
-    BACKUP_DATABASE = "BACKUP_DATABASE",
-    BACKUP_DATABASE_SCHEMA = "BACKUP_DATABASE_SCHEMA",
-    REQUEST_CONTAINER_LOG = "REQUEST_CONTAINER_LOG"
-};
-export enum TaskStatus {
-    RUNNING = "RUNNING",
-    FAILED = "FAILED",
-    FINISHED = "FINISHED"
 };
 
 export class Connection {

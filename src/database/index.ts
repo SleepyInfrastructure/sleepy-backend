@@ -1,5 +1,5 @@
 /* Types */
-import { StateDescriptor, Status } from "../ts/base";
+import { StateDescriptor, Status } from "../ts/backend/base";
 import { DatabaseAddOptions, DatabaseDeleteOptions, DatabaseEditOptions, DatabaseFetchMultipleOptions, DatabaseFetchOptions, DatabaseOptions } from "./types";
 
 /* Local Imports */
@@ -21,8 +21,8 @@ abstract class Database {
     }
 
     abstract start(): Promise<void>;
-    abstract fetch(options: DatabaseFetchOptions): Promise<any>;
-    abstract fetchMultiple(options: DatabaseFetchMultipleOptions): Promise<any[]>;
+    abstract fetch<T>(options: DatabaseFetchOptions): Promise<T | null>;
+    abstract fetchMultiple<T>(options: DatabaseFetchMultipleOptions): Promise<T[]>;
     abstract add(options: DatabaseAddOptions): Promise<void>;
     abstract edit(options: DatabaseEditOptions): Promise<void>;
     abstract delete(options: DatabaseDeleteOptions): Promise<number>;

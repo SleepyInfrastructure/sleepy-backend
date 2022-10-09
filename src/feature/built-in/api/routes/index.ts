@@ -1,5 +1,5 @@
 /* Types */
-import { StateDescriptor, Status } from "../../../../ts/base";
+import { StateDescriptor, Status } from "../../../../ts/backend/base";
 import { RouteOptions } from "./types";
 
 /* Local Imports */

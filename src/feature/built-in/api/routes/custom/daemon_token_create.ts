@@ -4,7 +4,7 @@ import { randomBytes } from "crypto";
 /* Local Imports */
 import APIRoute from "..";
 import FeatureAPI from "../..";
-import { DaemonTokenCreateSchema, DaemonTokenCreateSchemaType } from "./_schemas";
+import { IDSchema, IDSchemaType } from "ts/common/zod/base";
 import { RequestWithSchema } from "../types";
 import { getSession, validateSchemaBody } from "../util";
 
@@ -12,9 +12,9 @@ class RouteDaemonTokenCreate extends APIRoute {
     hook(feature: FeatureAPI): void {
         feature.instance.post(this.path,
             { config: { rateLimit: { timeWindow: 5000, max: 1 } } },
-            async (req: RequestWithSchema<DaemonTokenCreateSchemaType>, rep) => {
+            async (req: RequestWithSchema<IDSchemaType>, rep) => {
                 /* Validate schemas */
-                if(!validateSchemaBody(DaemonTokenCreateSchema, req, rep)) {
+                if(!validateSchemaBody(IDSchema, req, rep)) {
                     return;
                 }
 
@@ -25,8 +25,8 @@ class RouteDaemonTokenCreate extends APIRoute {
                 }
 
                 /* Get server */
-                const server = await feature.database.fetch({ source: "servers", selectors: { "id": req.body.id } });
-                if(server === undefined) {
+                const server = await feature.database.fetch<Server>({ source: "servers", selectors: { "id": req.body.id } });
+                if(server === null) {
                     rep.code(404); rep.send();
                     return;
                 }
@@ -38,7 +38,7 @@ class RouteDaemonTokenCreate extends APIRoute {
                 }
 
                 /* Create a new token */
-                const token = {
+                const token: DaemonToken = {
                     id: randomBytes(16).toString("hex"),
                     author: session.user,
                     server: req.body.id,

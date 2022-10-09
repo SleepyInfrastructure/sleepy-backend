@@ -1,5 +1,5 @@
 import { RouteOptions } from "../types";
-import { APIStructure, APIStructureImported } from "../../../../../ts/base";
+import { APIStructure, APIStructureImported } from "../../../../../ts/backend/base";
 import { DatabaseSort } from "../../../../../database/types";
 import APIRoute from "..";
 import RouteFetch from "./fetch";

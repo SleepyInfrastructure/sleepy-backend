@@ -1,5 +1,5 @@
 /* Types */
-import { Status } from "../../../ts/base";
+import { Status } from "../../../ts/backend/base";
 import { FeatureAPIOptions } from "./types";
 import { DatabaseType } from "../../../database/types";
 

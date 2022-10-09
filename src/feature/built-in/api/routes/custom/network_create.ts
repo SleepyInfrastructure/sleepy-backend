@@ -1,5 +1,5 @@
 /* Types */
-import { NetworkCreateSchema, NetworkCreateSchemaType } from "./_schemas";
+import { NetworkCreateSchema, NetworkCreateSchemaType } from "ts/common/zod/network";
 import { RequestWithSchema } from "../types";
 
 /* Node Imports */
@@ -27,16 +27,16 @@ class RouteNetworkCreate extends APIRoute {
                 }
 
                 /* Create network */
-                const newNetwork = {
+                const network: Network = {
                     id: randomBytes(16).toString("hex"),
                     author: session.user,
                     name: req.body.name,
                     ipv4: req.body.ipv4 ?? null
                 };
-                feature.database.add({ destination: "networks", item: newNetwork });
+                feature.database.add({ destination: "networks", item: network });
 
                 /* Send */
-                rep.send(newNetwork);
+                rep.send(network);
             }
         );
     }

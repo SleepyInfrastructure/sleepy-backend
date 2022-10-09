@@ -33,7 +33,7 @@ class RoutePushSend extends APIRoute {
                 /* Fetch eligble users */
                 const selectors = { "pushEnabled": "1" };
                 const options: DatabaseFetchOptions = { source: "users", selectors: selectors };
-                const users = await feature.database.fetchMultiple(options);
+                const users = await feature.database.fetchMultiple<any>(options);
 
                 /* Send push notification */
                 const publicKey = process.env.FOXXY_PUSH_PUBLIC_KEY;

@@ -1,5 +1,5 @@
 /* Types */
-import { Connection, Daemon, DaemonWebsocketMessageType, TaskStatus } from "../types";
+import { Connection, Daemon, DaemonWebsocketMessageType } from "../types";
 /* Node Imports */
 import { red } from "nanocolors";
 /* Local Imports */
@@ -13,13 +13,13 @@ class DaemonTaskProgressMessageHandler extends WebsocketMessageHandler<schemas.W
     }
 
     async handleDaemon(connection: Connection, message: schemas.WebsocketDaemonTaskProgressMessageType, daemon: Daemon): Promise<void> {
-        const task = await this.parent.database.fetch({ source: "tasks", selectors: { id: message.id, author: daemon.author } });
-        if(task === undefined) {
+        const task = await this.parent.database.fetch<Task>({ source: "tasks", selectors: { id: message.id, author: daemon.author } });
+        if(task === null) {
             console.log(`${red("X")} No task found to progress! (id: ${message.id})`);
             return;
         }
         const timestamp = Math.round(Date.now() / 1000);
-        task.status = message.status ?? task.status;
+        task.status = message.status as TaskStatus ?? task.status;
         task.progress = message.progress ?? task.progress;
         task.end = task.status !== TaskStatus.RUNNING ? timestamp : null;
         this.parent.database.edit({ destination: "tasks", item: { progress: task.progress, status: task.status, end: task.end }, selectors: { id: message.id, author: daemon.author }});

@@ -1,4 +1,4 @@
-import { RouteFetchStructuredItemImportedOptions, RouteFetchStructuredItemOptions } from "../feature/built-in/api/routes/built-in";
+import { RouteFetchStructuredItemImportedOptions, RouteFetchStructuredItemOptions } from "../../feature/built-in/api/routes/built-in";
 
 /* Root Options */
 export type RootOptions = {

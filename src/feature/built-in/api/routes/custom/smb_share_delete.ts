@@ -1,5 +1,5 @@
 /* Types */
-import { SMBShareDeleteSchema, SMBShareDeleteSchemaType } from "./_schemas";
+import { IDSchema, IDSchemaType } from "ts/common/zod/base";
 import { RequestWithSchemaQuery } from "../types";
 
 /* Local Imports */
@@ -12,9 +12,9 @@ class RouteSMBShareDelete extends APIRoute {
     hook(feature: FeatureAPI): void {
         feature.instance.delete(this.path,
             { config: { rateLimit: { timeWindow: 5000, max: 3 } } },
-            async (req: RequestWithSchemaQuery<SMBShareDeleteSchemaType>, rep) => {
+            async (req: RequestWithSchemaQuery<IDSchemaType>, rep) => {
                 /* Validate schemas */
-                if(!validateSchemaQuery(SMBShareDeleteSchema, req, rep)) {
+                if(!validateSchemaQuery(IDSchema, req, rep)) {
                     return;
                 }
 

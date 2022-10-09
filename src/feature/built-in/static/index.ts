@@ -1,5 +1,5 @@
 /* Types */
-import { Status } from "../../../ts/base";
+import { Status } from "../../../ts/backend/base";
 import { FeatureStaticOptions } from "./types";
 
 /* Node Imports */

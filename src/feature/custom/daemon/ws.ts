@@ -14,14 +14,14 @@ import WebsocketMessageHandler from "./handlers/message";
 export async function handleWebsocket(feature: FeatureDaemon, database: Database, connection: Connection, request: FastifyRequest) {
     console.log(`${green(">")} Socket connected!`);
     if(request.cookies.Token !== undefined) {
-        const session = await database.fetch({ source: "sessions", selectors: { "id": request.cookies.Token } });
-        if(session === undefined) {
+        const session = await database.fetch<Session>({ source: "sessions", selectors: { "id": request.cookies.Token } });
+        if(session === null) {
             console.log(`${red("X")} Socket failed to promote to client!`);
             connection.send({ type: DaemonWebsocketMessageType.AUTH_FAILURE, reason: DaemonWebsocketAuthFailure.WRONG_TOKEN });
             return;
         }
-        const user = await database.fetch({ source: "users", selectors: { "id": session.user } });
-        if(user === undefined) {
+        const user = await database.fetch<User>({ source: "users", selectors: { "id": session.user } });
+        if(user === null) {
             console.log(`${red("X")} Socket failed to promote to client! (user: ${bold(yellow(session.user))})`);
             connection.send({ type: DaemonWebsocketMessageType.AUTH_FAILURE, reason: DaemonWebsocketAuthFailure.WRONG_TOKEN });
             return;
@@ -40,7 +40,7 @@ export async function handleWebsocket(feature: FeatureDaemon, database: Database
     }
     
     const hideMessageTypes: string[] = [DaemonWebsocketMessageType.DAEMON_CONTAINER_LOG_MESSAGE];
-    connection.stream.socket.on("message", async(messageRaw) => {
+    connection.stream.socket.on("message", (messageRaw) => {
         const messageRawText = messageRaw.toString();
         let messageRawJson: any;
         try {

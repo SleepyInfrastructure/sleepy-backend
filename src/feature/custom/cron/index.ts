@@ -1,7 +1,7 @@
 /* Types */
 import Feature from "../..";
 import Instance from "../../../instance";
-import { Status } from "../../../ts/base";
+import { Status } from "../../../ts/backend/base";
 import { DatabaseType } from "../../../database/types";
 import { CronInterval, FeatureCronOptions } from "./types";
 import FeatureDaemon from "../daemon";
@@ -11,7 +11,7 @@ import * as cron from "node-cron";
 import { bold, gray, green, yellow } from "nanocolors";
 import Database from "../../../database";
 import processUpdate from "./handlers/update";
-import processClean from "./handlers/clean";
+import { processClean } from "./handlers/clean";
 
 class FeatureCron extends Feature {
     options: FeatureCronOptions;

@@ -1,6 +1,6 @@
 /* Types */
 import { DatabaseUnserializedItemValue } from "../../../../../database/types";
-import { NetworkEditSchema, NetworkEditSchemaType } from "./_schemas";
+import { NetworkEditSchema, NetworkEditSchemaType } from "ts/common/zod/network";
 import { RequestWithSchema } from "../types";
 
 /* Local Imports */
@@ -25,18 +25,13 @@ class RouteNetworkEdit extends APIRoute {
                 }
 
                 /* Edit (author is checked in selectors) */
-                const edit: Record<string, DatabaseUnserializedItemValue> = {};
-                if(req.body.name !== undefined) {
-                    edit.name = req.body.name;
-                }
-                if(req.body.ipv4 !== undefined) {
-                    edit.ipv4 = req.body.ipv4;
-                }
+                const edit: Record<string, DatabaseUnserializedItemValue> = req.body;
+                delete edit.id;
                 await feature.database.edit({ destination: "networks", item: edit, selectors: { id: req.body.id, author: session.user }});
 
                 /* Get network */
-                const network = await feature.database.fetch({ source: "networks", selectors: { id: req.body.id, author: session.user } });
-                if(network === undefined) {
+                const network = await feature.database.fetch<Network>({ source: "networks", selectors: { id: req.body.id, author: session.user } });
+                if(network === null) {
                     rep.code(404); rep.send();
                     return;
                 }

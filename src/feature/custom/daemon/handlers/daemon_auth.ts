@@ -23,14 +23,14 @@ class DaemonAuthMessageHandler extends WebsocketMessageHandler<schemas.Websocket
             return;
         }
 
-        const daemonToken = await this.parent.database.fetch({ source: "daemontokens", selectors: { id: message.token } });
-        if(daemonToken === undefined) {
+        const daemonToken = await this.parent.database.fetch<DaemonToken>({ source: "daemontokens", selectors: { id: message.token } });
+        if(daemonToken === null) {
             console.log(`${red("X")} Socket failed to promote to daemon!`);
             connection.send({ type: DaemonWebsocketMessageType.DAEMON_AUTH_FAILURE, reason: DaemonWebsocketAuthFailure.WRONG_TOKEN });
             return;
         }
-        const server = await this.parent.database.fetch({ source: "servers", selectors: { id: daemonToken.server } });
-        if(server === undefined) {
+        const server = await this.parent.database.fetch<Server>({ source: "servers", selectors: { id: daemonToken.server } });
+        if(server === null) {
             console.log(`${red("X")} Socket failed to promote to daemon! (server: ${bold(yellow(daemonToken.server))})`);
             connection.send({ type: DaemonWebsocketMessageType.DAEMON_AUTH_FAILURE, reason: DaemonWebsocketAuthFailure.WRONG_TOKEN });
             return;

@@ -1,6 +1,6 @@
 /* Types */
 import Database from "../../../../../database";
-import { DaemonFileType, TaskType } from "../../../../custom/daemon/types";
+import { DaemonFileType } from "../../../../custom/daemon/types";
 import { RouteDaemonFileUploadOptions } from ".";
 import { FoxxyFastifyReply, FoxxyFastifyRequest } from "../../../../../util/fastify";
 
@@ -18,7 +18,7 @@ const pump = util.promisify(pipeline);
 /* Local Imports */
 import { pad } from "../../../../../util/general";
 
-export async function processFile(database: Database, options: RouteDaemonFileUploadOptions, server: any, req: FoxxyFastifyRequest<RouteGenericInterface>, rep: FoxxyFastifyReply): Promise<Error | null> {
+export async function processFile(database: Database, options: RouteDaemonFileUploadOptions, server: Server, req: FoxxyFastifyRequest<RouteGenericInterface>, rep: FoxxyFastifyReply): Promise<Error | null> {
     /* Get files */
     const data = await req.file();
     if(data === undefined) {
@@ -43,10 +43,10 @@ const taskToFileType: Record<TaskType, DaemonFileType> = {
     [TaskType.BACKUP_DATABASE_SCHEMA]: DaemonFileType.BACKUP_DATABASE,
     [TaskType.REQUEST_CONTAINER_LOG]: DaemonFileType.CONTAINER_LOG
 };
-export async function processFileTask(database: Database, options: RouteDaemonFileUploadOptions, server: any, data: MultipartFile, fileData: any, rep: FoxxyFastifyReply): Promise<Error | null> {
+export async function processFileTask(database: Database, options: RouteDaemonFileUploadOptions, server: Server, data: MultipartFile, fileData: any, rep: FoxxyFastifyReply): Promise<Error | null> {
     /* Get task */
-    const task = await database.fetch({ source: "tasks", selectors: { id: fileData.task } });
-    if(task === undefined) {
+    const task = await database.fetch<Task>({ source: "tasks", selectors: { id: fileData.task } });
+    if(task === null) {
         rep.code(404); rep.send();
         console.log(`${red("X")} No task found! (id: ${fileData.task})`);
         return new Error("Task not found!");
@@ -58,7 +58,7 @@ export async function processFileTask(database: Database, options: RouteDaemonFi
     const dateShort = `${pad(date.getUTCHours())}-${pad(date.getUTCMinutes())}-${pad(date.getUTCSeconds())}`;
 
     /* Get data from file type */
-    const fileType = taskToFileType[task.type as TaskType];
+    const fileType = taskToFileType[task.type];
     let fileName, filePath = "";
     // TODO: improve file names
     switch(fileType) {

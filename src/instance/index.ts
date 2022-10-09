@@ -1,5 +1,5 @@
 /* Types */
-import { APIStructureOptions, FeatureType, InstanceOptions, StateDescriptor, Status } from "../ts/base";
+import { APIStructureOptions, FeatureType, InstanceOptions, StateDescriptor, Status } from "../ts/backend/base";
 import { DatabaseType } from "../database/types";
 
 /* Node Imports */
@@ -89,6 +89,7 @@ class Instance {
         console.log(`[  ${gray("WAITING")}  ] Instance ${bold(yellow(this.options.name))} starting...`);
 
         for (const database of Array.from(this.databaseContainer.values())) {
+            // eslint-disable-next-line no-await-in-loop
             await database.start();
             if (database.state.status === Status.WAITING) {
                 console.log(`${green(">")} Database ${bold(yellow(database.name))} started!`);
@@ -102,6 +103,7 @@ class Instance {
         }
 
         for (const feature of Array.from(this.featureContainer.values())) {
+            // eslint-disable-next-line no-await-in-loop
             await feature.start();
             if (feature.state.status === Status.WAITING) {
                 console.log(`${green(">")} Feature ${bold(yellow(feature.name))} started!`);

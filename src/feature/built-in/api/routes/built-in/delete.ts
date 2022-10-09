@@ -1,5 +1,5 @@
 /* Types */
-import { DatabaseDeleteOptions } from "../../../../../database/types";
+import { DatabaseDeleteOptions, DatabaseSelectorValue } from "../../../../../database/types";
 import { RouteDeleteOptions } from "./index";
 import { DeleteSchema, DeleteSchemaType } from "./_schemas";
 import { RequestWithSchemaQuery } from "../types";
@@ -27,11 +27,11 @@ class RouteDelete extends APIRoute {
                 }
 
                 /* Delete */
-                const selectors: any = { [this.options.idField === undefined ? "id": this.options.idField]: req.query.id };
+                const selectors: Record<string, DatabaseSelectorValue> = { [this.options.idField === undefined ? "id": this.options.idField]: req.query.id };
                 if(this.options.authorField !== undefined) {
                     if(req.cookies.Token === undefined) { rep.code(403); rep.send(); return; }
-                    const session = await feature.database.fetch({ source: "sessions", selectors: { "id": req.cookies.Token } });
-                    if(session === undefined) { rep.code(403); rep.send(); return; }
+                    const session = await feature.database.fetch<Session>({ source: "sessions", selectors: { "id": req.cookies.Token } });
+                    if(session === null) { rep.code(403); rep.send(); return; }
                     selectors[this.options.authorField] = session.user;
                 }
 

@@ -1,5 +1,5 @@
 /* Types */
-import { DatabaseCreateSchema, DatabaseCreateSchemaType } from "./_schemas";
+import { DatabaseCreateSchema, DatabaseCreateSchemaType } from "ts/common/zod/database";
 import { RequestWithSchema } from "../types";
 
 /* Node Imports */
@@ -27,24 +27,24 @@ class RouteDatabaseCreate extends APIRoute {
                 }
 
                 /* Check server */
-                const server = await feature.database.fetch({ source: "servers", selectors: { id: req.body.server, author: session.user } })
-                if(server === undefined) {
+                const server = await feature.database.fetch<Server>({ source: "servers", selectors: { id: req.body.server, author: session.user } })
+                if(server === null) {
                     rep.code(404); rep.send();
                     return;
                 }
 
                 /* Create database */
-                const newServerDatabase = {
+                const serverDatabase: Database = {
                     id: randomBytes(16).toString("hex"),
                     author: session.user,
                     server: req.body.server,
                     name: req.body.name,
-                    credentials: 0
+                    credentials: false
                 };
-                feature.database.add({ destination: "databases", item: newServerDatabase });
+                feature.database.add({ destination: "databases", item: serverDatabase });
 
                 /* Send */
-                rep.send(newServerDatabase);
+                rep.send(serverDatabase);
             }
         );
     }

@@ -27,7 +27,7 @@ class DaemonLogManager extends FeatureDaemonAddon {
         }
     }
 
-    connectClient(connection: Connection, client: Client, daemon: Connection, container: any, options: any) {
+    connectClient(connection: Connection, client: Client, daemon: Connection, container: Container | ContainerProject, options: ContainerConnectLogOptions) {
         let logItem = this.containers.get(container.id);
         if(logItem === undefined) {
             logItem = { daemon, users: [] };
@@ -35,9 +35,9 @@ class DaemonLogManager extends FeatureDaemonAddon {
 
             const message: any = { type: DaemonWebsocketMessageType.DAEMON_CONNECT_CONTAINER_LOG, options };
             if(options.project === true) {
-                message.container = { id: container.id, name: container.name, path: container.path };
+                message.container = { id: container.id, name: container.name, path: (container as ContainerProject).path };
             } else {
-                message.container = { id: container.id, name: container.names };
+                message.container = { id: container.id, name: container.name };
             }
             daemon.send(message);
         } else if(logItem.users.some(e => e.client?.id === client.id)) {

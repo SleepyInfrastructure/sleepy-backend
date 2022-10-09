@@ -1,5 +1,5 @@
 /* Types */
-import { UptimeEndpointCreateSchema, UptimeEndpointCreateSchemaType } from "./_schemas";
+import { UptimeEndpointCreateSchema, UptimeEndpointCreateSchemaType } from "ts/common/zod/uptime_endpoint";
 import { RequestWithSchema } from "../types";
 
 /* Node Imports */
@@ -28,7 +28,7 @@ class RouteUptimeEndpointCreate extends APIRoute {
                 }
 
                 /* Create endpoint */
-                const newEndpoint = {
+                const newEndpoint: UptimeEndpoint = {
                     id: randomBytes(16).toString("hex"),
                     author: session.user,
                     name: req.body.name,

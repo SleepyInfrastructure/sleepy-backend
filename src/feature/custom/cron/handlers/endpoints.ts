@@ -8,10 +8,11 @@ import { randomBytes } from "crypto";
 import ping from "pingman";
 import { lookup } from "dns";
 
-export async function processEndpointUptime(database: Database, endpoint: any) {
+export async function processEndpointUptime(database: Database, endpoint: UptimeEndpoint) {
     let pingTime: number | null = null;
     if(endpoint.host !== null) {
         pingTime = await new Promise((resolve) => {
+            if(endpoint.host === null) { return; }
             lookup(endpoint.host, async(e, address) => {
                 if(e !== null) {
                     console.error(e);
@@ -32,6 +33,7 @@ export async function processEndpointUptime(database: Database, endpoint: any) {
     let requestTime: number | null = null;
     if(endpoint.requestEndpoint !== null) {
         requestTime = await new Promise((resolve) => {
+            if(endpoint.requestEndpoint === null) { return; }
             const requestStart = Date.now();
             if(endpoint.requestEndpoint.startsWith("https://")) {
                 const req = httpsRequest(endpoint.requestEndpoint, () => {
@@ -64,16 +66,17 @@ export async function processEndpointUptime(database: Database, endpoint: any) {
     processEndpointUptimeResult(database, endpoint, pingTime, requestTime);
 }
 
-export function processEndpointUptimeResult(database: Database, endpoint: any, pingTime: number | null, requestTime: number | null) {
+export function processEndpointUptimeResult(database: Database, endpoint: UptimeEndpoint, pingTime: number | null, requestTime: number | null) {
+    const statistic: UptimeEndpointStatistic = {
+        id: randomBytes(16).toString("hex"),
+        author: endpoint.author,
+        parent: endpoint.id,
+        timestamp: Math.round(Date.now() / 1000),
+        pingTime: pingTime,
+        requestTime: requestTime
+    };
     database.add({
         destination: "uptimestatistics",
-        item: {
-            id: randomBytes(16).toString("hex"),
-            author: endpoint.author,
-            parent: endpoint.id,
-            timestamp: Math.round(Date.now() / 1000),
-            pingTime: pingTime,
-            requestTime: requestTime
-        }
+        item: statistic
     });
 }

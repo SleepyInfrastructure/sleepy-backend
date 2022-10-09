@@ -27,8 +27,8 @@ class RouteSessionDelete extends APIRoute {
 
                 /* Get session */
                 const options: DatabaseFetchOptions = { source: "sessions", selectors: { id: token } };
-                const session = await feature.database.fetch(options);
-                if (session === undefined) {
+                const session = await feature.database.fetch<Session>(options);
+                if (session === null) {
                     rep.code(404); rep.send();
                     return;
                 }

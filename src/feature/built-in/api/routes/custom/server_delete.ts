@@ -1,6 +1,6 @@
 /* Types */
-import { Status } from "../../../../../ts/base";
-import { ServerDeleteSchema, ServerDeleteSchemaType } from "./_schemas";
+import { Status } from "../../../../../ts/backend/base";
+import { IDSchema, IDSchemaType } from "ts/common/zod/base";
 import { RequestWithSchemaQuery } from "../types";
 
 /* Local Imports */
@@ -20,9 +20,9 @@ class RouteServerDelete extends APIRoute {
 
         feature.instance.delete(this.path,
             { config: { rateLimit: { timeWindow: 10000, max: 3 } } },
-            async (req: RequestWithSchemaQuery<ServerDeleteSchemaType>, rep) => {
+            async (req: RequestWithSchemaQuery<IDSchemaType>, rep) => {
                 /* Validate schemas */
-                if(!validateSchemaQuery(ServerDeleteSchema, req, rep)) {
+                if(!validateSchemaQuery(IDSchema, req, rep)) {
                     return;
                 }
 

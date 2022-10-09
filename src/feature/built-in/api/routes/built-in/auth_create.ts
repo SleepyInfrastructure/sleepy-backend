@@ -32,14 +32,14 @@ class RouteAuthCreate extends APIRoute {
 
                 /* Check if another user exists under this name */
                 const options: DatabaseFetchOptions = { source: "users", selectors: { username: req.body.username } };
-                const user = await feature.database.fetch(options);
-                if (user !== undefined) {
+                const user = await feature.database.fetch<User>(options);
+                if (user !== null) {
                     rep.code(403); rep.send();
                     return;
                 }
 
                 /* Create user */
-                const newUser: any = {
+                const newUser: User = {
                     id: randomBytes(16).toString("hex"),
                     username: req.body.username,
                     password: hashSync(req.body.password, 10),

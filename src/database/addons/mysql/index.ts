@@ -1,5 +1,5 @@
 /* Types */
-import { Status } from "../../../ts/base";
+import { Status } from "../../../ts/backend/base";
 import { DatabaseAddOptions, DatabaseDeleteOptions, DatabaseEditOptions, DatabaseFetchMultipleOptions, DatabaseFetchOptions, DatabaseFetchSelector, DatabaseItemValue, DatabaseMySQLFieldModifier, DatabaseMySQLOptions, DatabaseSelectorValue, DatabaseUnserializedItemValue } from "../../types";
 
 /* Node Imports */
@@ -41,10 +41,10 @@ class DatabaseMySQL extends Database {
         setInterval(() => { this.fetch({ source: "users", selectors: { id: "0" } }); }, 1000 * 60 * 5);
     }
 
-    async fetch(options: DatabaseFetchOptions): Promise<any> {
+    async fetch<T>(options: DatabaseFetchOptions): Promise<T | null> {
         try {
             if (this.connection === undefined) {
-                return;
+                return null;
             }
             let query = `SELECT * FROM \`${options.source}\` ${this.selectorsToSyntax(options.selectors)} LIMIT 1`;
             if(options.sort !== undefined) {
@@ -52,7 +52,7 @@ class DatabaseMySQL extends Database {
             }
 
             const items: [any, FieldPacket[]] = await this.connection.execute(query, this.selectorsToData(options.selectors));
-            return this.deserialize(options, items[0][0]);
+            return this.deserialize<T>(options, items[0][0]);
         } catch(e) {
             console.error("Error trying to fetch an item:");
             console.error(e);
@@ -61,7 +61,7 @@ class DatabaseMySQL extends Database {
         }
     }
 
-    async fetchMultiple(options: DatabaseFetchMultipleOptions): Promise<any[]> {
+    async fetchMultiple<T>(options: DatabaseFetchMultipleOptions): Promise<T[]> {
         try {
             if (this.connection === undefined) {
                 return [];
@@ -78,7 +78,7 @@ class DatabaseMySQL extends Database {
             }
 
             const items: [any, FieldPacket[]] = await this.connection.execute(query, this.selectorsToData(options.selectors));
-            return items[0].map((item: any) => this.deserialize(options, item));
+            return items[0].map((item: T) => this.deserialize<T>(options, item));
         } catch(e) {
             console.error("Error trying to fetch items:");
             console.error(e);
@@ -157,16 +157,25 @@ class DatabaseMySQL extends Database {
     }
 
     itemToValues(item: Record<string, DatabaseItemValue>): (string | null)[] {
-        return Object.values(item).map(e => e === null ? e : e.toString());
+        return Object.values(item).map(e => {
+            if(e === null) { return e; }
+            switch(typeof(e)) {
+                case "boolean":
+                    return e ? "1" : "0";
+
+                default:
+                    return e.toString();
+            }
+        });
     }
 
     itemToValuesWithQuestions(item: Record<string, DatabaseItemValue>): string {
         return Object.values(item).map(() => "?").join(", ");
     }
 
-    deserialize(options: DatabaseFetchOptions, item: any): Record<string, DatabaseUnserializedItemValue> {
+    deserialize<T>(options: DatabaseFetchOptions, item: any): T | null {
         if(item === undefined) {
-            return item;
+            return null;
         }
 
         const newItem: any = item;

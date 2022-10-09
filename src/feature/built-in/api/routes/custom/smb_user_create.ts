@@ -1,5 +1,5 @@
 /* Types */
-import { SMBUserCreateSchema, SMBUserCreateSchemaType } from "./_schemas";
+import { SMBUserCreateSchema, SMBUserCreateSchemaType } from "ts/common/zod/smb";
 import { RequestWithSchema } from "../types";
 
 /* Node Imports */
@@ -27,23 +27,23 @@ class RouteSMBUserCreate extends APIRoute {
                 }
 
                 /* Check instance */
-                const instance = await feature.database.fetch({ source: "smbinstances", selectors: { id: req.body.parent, author: session.user } })
-                if(instance === undefined) {
+                const smbInstance = await feature.database.fetch<SMBInstance>({ source: "smbinstances", selectors: { id: req.body.parent, author: session.user } })
+                if(smbInstance === null) {
                     rep.code(404); rep.send();
                     return;
                 }
 
                 /* Create user */
-                const newSmbUser = {
+                const smbUser: SMBUser = {
                     id: randomBytes(16).toString("hex"),
                     author: session.user,
                     parent: req.body.parent,
                     name: req.body.name
                 };
-                feature.database.add({ destination: "smbusers", item: newSmbUser });
+                feature.database.add({ destination: "smbusers", item: smbUser });
 
                 /* Send */
-                rep.send(newSmbUser);
+                rep.send(smbUser);
             }
         );
     }

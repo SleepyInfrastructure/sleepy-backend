@@ -28,14 +28,12 @@ export function validateSchemaQuery(schema: z.Schema, req: FoxxyFastifyRequest<R
 
 export async function getSession(database: Database, req: FoxxyFastifyRequest<RouteGenericInterface>, rep: FoxxyFastifyReply): Promise<Session | null> {
     if(req.cookies.Token === undefined) {
-        rep.code(403);
-        rep.send();
+        rep.code(403); rep.send();
         return null;
     }
-    const session = await database.fetch({ source: "sessions", selectors: { "id": req.cookies.Token } });
-    if(session === undefined) {
-        rep.code(403);
-        rep.send();
+    const session = await database.fetch<Session>({ source: "sessions", selectors: { "id": req.cookies.Token } });
+    if(session === null) {
+        rep.code(403); rep.send();
         return null;
     }
 

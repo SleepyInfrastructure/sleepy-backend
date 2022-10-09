@@ -16,15 +16,14 @@ class DaemonRequestResourcesReplyMessageHandler extends WebsocketMessageHandler<
         if(message.software !== null) {
             await this.parent.database.delete({ source: "serversoftware", selectors: { server: daemon.id } });
             for(const software of message.software) {
-                this.parent.database.add({ destination: "serversoftware",
-                    item: {
-                        id: randomBytes(16).toString("hex"),
-                        author: daemon.author,
-                        server: daemon.id,
-                        name: software.name,
-                        version: software.version
-                    }
-                });
+                const serverSoftware: ServerSoftware = {
+                    id: randomBytes(16).toString("hex"),
+                    author: daemon.author,
+                    server: daemon.id,
+                    name: software.name,
+                    version: software.version
+                }
+                this.parent.database.add({ destination: "serversoftware", item: serverSoftware });
             }
         }
         if(message.memory !== null) {
@@ -43,65 +42,61 @@ class DaemonRequestResourcesReplyMessageHandler extends WebsocketMessageHandler<
             await this.parent.database.delete({ source: "zfspools", selectors: { server: daemon.id } });
             await this.parent.database.delete({ source: "zfspartitions", selectors: { server: daemon.id } });
             for(const disk of message.disks) {
-                this.parent.database.add({ destination: "disks", item:
-                    {
-                        id: disk.id,
-                        ptuuid: disk.ptuuid,
-                        author: daemon.author,
-                        server: daemon.id,
-                        name: disk.name,
-                        ssd: disk.ssd === true ? 1 : 0,
-                        size: disk.size,
-                        model: disk.model
-                    }
-                });
+                const serverDisk: Disk = {
+                    id: disk.id,
+                    ptuuid: disk.ptuuid,
+                    author: daemon.author,
+                    server: daemon.id,
+                    name: disk.name,
+                    ssd: disk.ssd,
+                    size: disk.size,
+                    model: disk.model
+                };
+                this.parent.database.add({ destination: "disks", item: serverDisk });
                 for(const partition of disk.children) {
-                    this.parent.database.add({ destination: "partitions", item:
-                        {
-                            id: partition.id,
-                            uuid: partition.uuid,
-                            partuuid: partition.partuuid,
-                            author: daemon.author,
-                            parent: disk.id,
-                            server: daemon.id,
-                            name: partition.name,
-                            type: partition.type,
-                            size: partition.size,
-                            used: partition.used,
-                            mountpoint: partition.mountpoint
-                        }
-                    });
+                    const serverPartition: Partition = {
+                        id: partition.id,
+                        uuid: partition.uuid,
+                        partuuid: partition.partuuid,
+                        author: daemon.author,
+                        parent: disk.id,
+                        server: daemon.id,
+                        name: partition.name,
+                        type: partition.type,
+                        size: partition.size,
+                        used: partition.used,
+                        mountpoint: partition.mountpoint
+                    };
+                    this.parent.database.add({ destination: "partitions", item: serverPartition });
                 }
             }
             for(const pool of message.zfsPools) {
-                this.parent.database.add({ destination: "zfspools", item:
-                    {
-                        id: pool.id,
-                        author: daemon.author,
-                        server: daemon.id,
-                        name: pool.name,
-                        size: pool.size,
-                        used: pool.used,
-                        compression: pool.compression,
-                        compressRatio: pool.compressRatio,
-                        encryption: pool.encryption === true ? 1 : 0,
-                        atime: pool.atime === true ? 1 : 0,
-                        version: pool.version,
-                        deduplication: pool.deduplication === true ? 1 : 0,
-                        relatime: pool.relatime === true ? 1 : 0
-                    }
-                });
+                const serverPool: ZFSPool = {
+                    id: pool.id,
+                    author: daemon.author,
+                    server: daemon.id,
+                    name: pool.name,
+                    size: pool.size,
+                    used: pool.used,
+                    compression: pool.compression,
+                    compressRatio: pool.compressRatio,
+                    encryption: pool.encryption,
+                    atime: pool.atime,
+                    version: pool.version,
+                    deduplication: pool.deduplication,
+                    relatime: pool.relatime
+                };
+                this.parent.database.add({ destination: "zfspools", item: serverPool });
                 for(const partition of pool.children) {
-                    this.parent.database.add({ destination: "zfspartitions", item:
-                        {
-                            id: partition.id,
-                            author: daemon.author,
-                            parent: pool.id,
-                            server: daemon.id,
-                            size: partition.size,
-                            used: partition.used
-                        }
-                    });
+                    const serverPartition: ZFSPartition = {
+                        id: partition.id,
+                        author: daemon.author,
+                        parent: pool.id,
+                        server: daemon.id,
+                        size: partition.size,
+                        used: partition.used
+                    };
+                    this.parent.database.add({ destination: "zfspartitions", item: serverPartition });
                 }
             }
         }
@@ -110,33 +105,31 @@ class DaemonRequestResourcesReplyMessageHandler extends WebsocketMessageHandler<
             await this.parent.database.delete({ source: "containers", selectors: { server: daemon.id } });
             await this.parent.database.delete({ source: "containerprojects", selectors: { server: daemon.id } });
             for(const containerProject of message.containerProjects) {
-                this.parent.database.add({ destination: "containerprojects", item:
-                    {
-                        id: containerProject.id,
-                        author: daemon.author,
-                        server: daemon.id,
-                        name: containerProject.name,
-                        status: containerProject.status,
-                        path: containerProject.path
-                    }
-                });
+                const serverProject: ContainerProject = {
+                    id: containerProject.id,
+                    author: daemon.author,
+                    server: daemon.id,
+                    name: containerProject.name,
+                    status: containerProject.status,
+                    path: containerProject.path
+                };
+                this.parent.database.add({ destination: "containerprojects", item: serverProject });
             }
             for(const container of message.containers) {
-                this.parent.database.add({ destination: "containers", item:
-                    {
-                        id: container.id,
-                        author: daemon.author,
-                        server: daemon.id,
-                        parent: container.parent,
-                        image: container.image,
-                        creation: container.creation,
-                        ports: container.ports,
-                        status: container.status,
-                        names: container.names,
-                        mounts: container.mounts,
-                        networks: container.networks
-                    }
-                });
+                const serverContainer: Container = {
+                    id: container.id,
+                    author: daemon.author,
+                    server: daemon.id,
+                    parent: container.parent,
+                    image: container.image,
+                    creation: container.creation,
+                    ports: container.ports,
+                    status: container.status,
+                    name: container.name,
+                    mounts: container.mounts,
+                    networks: container.networks
+                };
+                this.parent.database.add({ destination: "containers", item: serverContainer });
             }
         }
 

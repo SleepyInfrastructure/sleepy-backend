@@ -40,7 +40,7 @@ class RouteFetch extends APIRoute {
 
                 /* Fetch */
                 const item = await feature.database.fetch({ source: this.options.table, selectors: selectors });
-                if (item === undefined) {
+                if (item === null) {
                     rep.code(404); rep.send();
                     return;
                 }

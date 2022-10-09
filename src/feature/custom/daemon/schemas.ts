@@ -1,5 +1,5 @@
 /* Types */
-import { DaemonWebsocketMessageType, TaskStatus } from "./types";
+import { DaemonWebsocketMessageType } from "./types";
 import { IDSchema } from "../../built-in/api/routes/types";
 /* Node Imports */
 import { z } from "zod";
@@ -53,7 +53,7 @@ export type WebsocketDaemonRequestStatsReplyMessageType = z.infer<typeof Websock
 
 export const WebsocketDaemonTaskProgressMessage = z.intersection(WebsocketMessage, z.intersection(IDSchema, z.object({
     progress: z.number().nonnegative().optional(),
-    status: z.nativeEnum(TaskStatus).optional()
+    status: z.enum(["RUNNING", "FAILED", "FINISHED"]).optional()
 })));
 export type WebsocketDaemonTaskProgressMessageType = z.infer<typeof WebsocketDaemonTaskProgressMessage>;
 

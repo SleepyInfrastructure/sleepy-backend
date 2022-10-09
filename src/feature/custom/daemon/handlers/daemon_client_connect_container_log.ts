@@ -22,11 +22,11 @@ class DaemonClientConnectContainerLogMessageHandler extends WebsocketMessageHand
         }
         let container;
         if(message.project === true) {
-            container = await this.parent.database.fetch({ source: "containerprojects", selectors: { id: message.id, author: client.id } });
+            container = await this.parent.database.fetch<Container>({ source: "containerprojects", selectors: { id: message.id, author: client.id } });
         } else {
-            container = await this.parent.database.fetch({ source: "containers", selectors: { id: message.id, author: client.id } });
+            container = await this.parent.database.fetch<ContainerProject>({ source: "containers", selectors: { id: message.id, author: client.id } });
         }
-        if(container === undefined) {
+        if(container === null) {
             console.log(`${red("X")} No container found to connect logger to! (id: ${message.id}, project: ${message.project})`);
             return;
         }

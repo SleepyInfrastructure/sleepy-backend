@@ -1,5 +1,5 @@
 /* Types */
-import { ServerPublicFetchStructuredSchema, ServerPublicFetchStructuredSchemaType } from "./_schemas";
+import { IDSchema, IDSchemaType } from "ts/common/zod/base";
 import { RequestWithSchemaQuery } from "../types";
 
 /* Local Imports */
@@ -11,26 +11,26 @@ class RouteServerPublicFetchStructured extends APIRoute {
     hook(feature: FeatureAPI): void {
         feature.instance.get(this.path,
             { config: { rateLimit: { timeWindow: 1000, max: 5 } } },
-            async (req: RequestWithSchemaQuery<ServerPublicFetchStructuredSchemaType>, rep) => {
+            async (req: RequestWithSchemaQuery<IDSchemaType>, rep) => {
                 /* Validate schemas */
-                if(!validateSchemaQuery(ServerPublicFetchStructuredSchema, req, rep)) {
+                if(!validateSchemaQuery(IDSchema, req, rep)) {
                     return;
                 }
 
                 /* Get server */
-                const serverListing = await feature.database.fetch({ source: "publicserverlistings", selectors: { id: req.query.id } });
-                if(serverListing === undefined) {
+                const serverListing = await feature.database.fetch<PublicServerListing>({ source: "publicserverlistings", selectors: { id: req.query.id } });
+                if(serverListing === null) {
                     rep.code(404); rep.send();
                     return;
                 }
-                const server = await feature.database.fetch({ source: "servers", selectors: { id: req.query.id } });
-                if(server === undefined) {
+                const server = await feature.database.fetch<Server>({ source: "servers", selectors: { id: req.query.id } });
+                if(server === null) {
                     rep.code(404); rep.send();
                     return;
                 }
 
                 /* Create public structured server */
-                const publicServerStructured: any = {
+                const publicServerStructured: PublicServerStructured = {
                     id: server.id,
                     author: server.author,
                     name: server.name,
@@ -39,7 +39,7 @@ class RouteServerPublicFetchStructured extends APIRoute {
                     statistics: []
                 };
                 if(serverListing.statistics) {
-                    publicServerStructured.statistics = await feature.database.fetchMultiple({ source: "statistics", selectors: { server: req.query.id, type: "MINUTE" }, sort: { field: "timestamp", order: "DESC" }, limit: 60 });
+                    publicServerStructured.statistics = await feature.database.fetchMultiple<Statistic>({ source: "statistics", selectors: { server: req.query.id, type: "MINUTE" }, sort: { field: "timestamp", order: "DESC" }, limit: 60 });
                 }
 
                 /* Send */

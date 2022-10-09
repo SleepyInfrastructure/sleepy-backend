@@ -1,7 +1,7 @@
 /* Types */
 import Feature from "../..";
 import Instance from "../../../instance";
-import { Status } from "../../../ts/base";
+import { Status } from "../../../ts/backend/base";
 import { DatabaseType } from "../../../database/types";
 import { Client, Connection, FeatureDaemonOptions } from "./types";
 /* Node Imports */
@@ -48,8 +48,8 @@ class FeatureDaemon extends Feature {
             return;
         }
         this.instance = result;
-        this.instance.register(async(instance: fastify.FastifyInstance) => {
-            instance.get('/socket', { websocket: true }, async(stream: SocketStream, request: fastify.FastifyRequest) => {
+        this.instance.register((instance: fastify.FastifyInstance) => {
+            instance.get("/socket", { websocket: true }, (stream: SocketStream, request: fastify.FastifyRequest) => {
                 const connection = new Connection(this, stream);
                 this.connect(connection);
                 handleWebsocket(this, this.database, connection, request);
@@ -60,7 +60,7 @@ class FeatureDaemon extends Feature {
     }
 
     connect(connection: Connection): void {
-        for(const [id, addon] of this.addons) {
+        for(const [, addon] of this.addons) {
             if(addon.connect !== undefined) {
                 addon.connect(connection);
             }
@@ -69,7 +69,7 @@ class FeatureDaemon extends Feature {
     }
 
     disconnect(connection: Connection): void {
-        for(const [id, addon] of this.addons) {
+        for(const [, addon] of this.addons) {
             if(addon.disconnect !== undefined) {
                 addon.disconnect(connection);
             }

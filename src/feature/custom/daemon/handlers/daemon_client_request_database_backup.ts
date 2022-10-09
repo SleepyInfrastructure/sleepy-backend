@@ -1,5 +1,5 @@
 /* Types */
-import { Client, Connection, DaemonWebsocketMessageType, TaskType } from "../types";
+import { Client, Connection, DaemonWebsocketMessageType } from "../types";
 /* Node Imports */
 import { red } from "nanocolors";
 import { randomBytes } from "crypto";
@@ -19,18 +19,22 @@ class DaemonClientRequestDatabaseBackupMessageHandler extends WebsocketMessageHa
             console.log(`${red("X")} No daemon found to request database backup from! (id: ${message.id})`);
             return;
         }
-        const serverDatabase = await this.parent.database.fetch({ source: "databases", selectors: { id: message.database, author: client.id } });
-        if(serverDatabase === undefined) {
+        const serverDatabase = await this.parent.database.fetch<Database>({ source: "databases", selectors: { id: message.database, author: client.id } });
+        if(serverDatabase === null) {
             console.log(`${red("X")} No database found to backup! (id: ${message.database})`);
             return;
         }
         const timestamp = Math.round(Date.now() / 1000);
-        const task = {
+        const task: Task = {
             id: randomBytes(16).toString("hex"),
             author: client.id,
             type: message.data ? TaskType.BACKUP_DATABASE : TaskType.BACKUP_DATABASE_SCHEMA,
             object: serverDatabase.id,
-            start: timestamp
+            start: timestamp,
+            status: TaskStatus.RUNNING,
+            progress: 0,
+            end: null,
+            result: null
         };
         this.parent.database.add({ destination: "tasks", item: task });
 

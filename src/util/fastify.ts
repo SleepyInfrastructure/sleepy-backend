@@ -1,5 +1,5 @@
 /* Types */
-import { FeatureServerOptions } from "../ts/base";
+import { FeatureServerOptions } from "../ts/backend/base";
 
 /* Node Imports */
 import { readFileSync } from "fs";

@@ -1,5 +1,5 @@
 /* Types */
-import { Client, Connection, DaemonWebsocketMessageType, TaskType } from "../types";
+import { Client, Connection, DaemonWebsocketMessageType } from "../types";
 /* Node Imports */
 import { red } from "nanocolors";
 import { randomBytes } from "crypto";
@@ -14,8 +14,8 @@ class DaemonClientRequestContainerLogMessageHandler extends WebsocketMessageHand
     }
 
     async handleClient(connection: Connection, message: schemas.WebsocketDaemonClientRequestContainerLogMessageType, client: Client): Promise<void> {
-        const container = await this.parent.database.fetch({ source: "containers", selectors: { id: message.id, author: client.id } });
-        if(container === undefined) {
+        const container = await this.parent.database.fetch<Container>({ source: "containers", selectors: { id: message.id, author: client.id } });
+        if(container === null) {
             console.log(`${red("X")} No container found to request logs from! (id: ${message.id})`);
             return;
         }
@@ -25,12 +25,16 @@ class DaemonClientRequestContainerLogMessageHandler extends WebsocketMessageHand
             return;
         }
         const timestamp = Math.round(Date.now() / 1000);
-        const task = {
+        const task: Task = {
             id: randomBytes(16).toString("hex"),
             author: client.id,
             type: TaskType.REQUEST_CONTAINER_LOG,
             object: message.id,
-            start: timestamp
+            start: timestamp,
+            status: TaskStatus.RUNNING,
+            progress: 0,
+            end: null,
+            result: null
         };
         this.parent.database.add({ destination: "tasks", item: task });
 

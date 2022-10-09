@@ -1,6 +1,5 @@
 /* Types */
-import { Status } from "../../../../../ts/base";
-import { DatabaseFetchOptions, DatabaseType } from "../../../../../database/types";
+import { DatabaseFetchOptions } from "../../../../../database/types";
 import { RouteSessionCreateOptions } from "./index";
 import { SessionCreateSchema, SessionCreateSchemaType } from "./_schemas";
 import { RequestWithSchema } from "../types";
@@ -38,8 +37,8 @@ class RouteSessionCreate extends APIRoute {
 
                         /* Get session */
                         const options: DatabaseFetchOptions = { source: "sessions", selectors: { id: req.cookies.Token } };
-                        const session = await feature.database.fetch(options);
-                        if (session === undefined) {
+                        const session = await feature.database.fetch<Session>(options);
+                        if (session === null) {
                             rep.code(404); rep.send();
                             return;
                         }
@@ -55,8 +54,8 @@ class RouteSessionCreate extends APIRoute {
                         
                         /* Get user */
                         const options: DatabaseFetchOptions = { source: "users", selectors: { username: req.body.username }, ignoreSensitive: true };
-                        const user = await feature.database.fetch(options);
-                        if (user === undefined) {
+                        const user = await feature.database.fetch<User>(options);
+                        if (user === null || user.password === undefined) {
                             rep.code(404); rep.send();
                             return;
                         }
@@ -69,7 +68,7 @@ class RouteSessionCreate extends APIRoute {
                         }
 
                         /* Create session */
-                        const session = {
+                        const session: Session = {
                             id: randomBytes(16).toString("hex"),
                             user: user.id
                         };

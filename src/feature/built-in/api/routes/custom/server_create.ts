@@ -1,5 +1,5 @@
 /* Types */
-import { ServerCreateSchema, ServerCreateSchemaType } from "./_schemas";
+import { ServerCreateSchema, ServerCreateSchemaType } from "ts/common/zod/server";
 import { RequestWithSchema } from "../types";
 
 /* Node Imports */
@@ -27,43 +27,38 @@ class RouteServerCreate extends APIRoute {
                 }
 
                 /* Create config */
-                const serverConfig = {
+                const config: ServerConfig = {
                     id: randomBytes(16).toString("hex"),
                     author: session.user,
                     statsInterval: 60,
                     statsCleanAge: 600,
                     databaseBackupInterval: null
                 };
-                feature.database.add({ destination: "serverconfigs", item: serverConfig });
+                feature.database.add({ destination: "serverconfigs", item: config });
 
                 /* Create network */
-                const serverNetwork = {
+                const network: Network = {
                     id: randomBytes(16).toString("hex"),
                     author: session.user,
                     name: `${req.body.name}-network`,
                     ipv4: null
                 };
-                feature.database.add({ destination: "networks", item: serverNetwork });
+                feature.database.add({ destination: "networks", item: network });
 
                 /* Create server */
-                const newServer = {
+                const server: Server = {
                     id: randomBytes(16).toString("hex"),
                     author: session.user,
                     timestamp: Math.round(Date.now() / 1000),
-                    network: serverNetwork.id,
-                    config: serverConfig.id,
+                    network: network.id,
+                    config: config.id,
                     name: req.body.name,
                     color: req.body.color ?? "ff3645",
+                    memory: 0,
+                    swap: 0,
                     netInterfaces: ["eth0"]
                 };
-                feature.database.add({ destination: "servers", item: newServer });
-                
-                /* Get server */
-                const server = await feature.database.fetch({ source: "servers", selectors: { "id": newServer.id } });
-                if(server === undefined) {
-                    rep.code(404); rep.send();
-                    return;
-                }
+                feature.database.add({ destination: "servers", item: server });
 
                 /* Send */
                 rep.send(server);

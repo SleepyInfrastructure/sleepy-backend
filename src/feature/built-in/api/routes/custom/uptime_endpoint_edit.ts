@@ -1,6 +1,6 @@
 /* Types */
 import { DatabaseUnserializedItemValue } from "../../../../../database/types";
-import { UptimeEndpointEditSchema, UptimeEndpointEditSchemaType } from "./_schemas";
+import { UptimeEndpointEditSchema, UptimeEndpointEditSchemaType } from "ts/common/zod/uptime_endpoint";
 import { RequestWithSchema } from "../types";
 
 /* Local Imports */
@@ -26,21 +26,13 @@ class RouteUptimeEndpointEdit extends APIRoute {
                 }
 
                 /* Edit (author is checked in selectors) */
-                const edit: Record<string, DatabaseUnserializedItemValue> = {};
-                if(req.body.name !== undefined) {
-                    edit.name = req.body.name;
-                }
-                if(req.body.host !== undefined) {
-                    edit.host = req.body.host;
-                }
-                if(req.body.requestEndpoint !== undefined) {
-                    edit.requestEndpoint = req.body.requestEndpoint;
-                }
+                const edit: Record<string, DatabaseUnserializedItemValue> = req.body;
+                delete edit.id;
                 await feature.database.edit({ destination: "uptimeendpoints", item: edit, selectors: { id: req.body.id, author: session.user }});
 
                 /* Get endpoint */
-                const endpoint = await feature.database.fetch({ source: "uptimeendpoints", selectors: { id: req.body.id, author: session.user } });
-                if(endpoint === undefined) { rep.code(404); rep.send(); return; }
+                const endpoint = await feature.database.fetch<UptimeEndpoint>({ source: "uptimeendpoints", selectors: { id: req.body.id, author: session.user } });
+                if(endpoint === null) { rep.code(404); rep.send(); return; }
 
                 /* Send */
                 rep.send(endpoint);

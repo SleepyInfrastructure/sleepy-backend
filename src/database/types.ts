@@ -11,7 +11,7 @@ export type DatabaseOptions = {
 };
 
 export type DatabaseSelectorValue = string | number | DatabaseFetchSelector;
-export type DatabaseItemValue = string | number | null;
+export type DatabaseItemValue = string | number | boolean | null;
 export type DatabaseUnserializedItemValue = DatabaseItemValue | string[];
 
 export type DatabaseFetchOptions = {

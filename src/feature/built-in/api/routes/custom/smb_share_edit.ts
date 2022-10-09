@@ -1,6 +1,6 @@
 /* Types */
 import { DatabaseUnserializedItemValue } from "../../../../../database/types";
-import { SMBShareEditSchema, SMBShareEditSchemaType } from "./_schemas";
+import { SMBShareEditSchema, SMBShareEditSchemaType } from "ts/common/zod/smb";
 import { RequestWithSchema } from "../types";
 
 /* Local Imports */
@@ -25,39 +25,19 @@ class RouteSMBShareEdit extends APIRoute {
                 }
 
                 /* Edit (author is checked in selectors) */
-                const edit: Record<string, DatabaseUnserializedItemValue> = {};
-                if(req.body.name !== undefined) {
-                    edit.name = req.body.name;
-                }
-                if(req.body.path !== undefined) {
-                    edit.path = req.body.path;
-                }
-                if(req.body.browsable !== undefined) {
-                    edit.browsable = req.body.browsable ? 1 : 0;
-                }
-                if(req.body.readonly !== undefined) {
-                    edit.readonly = req.body.readonly ? 1 : 0;
-                }
-                if(req.body.guest !== undefined) {
-                    edit.guest = req.body.guest ? 1 : 0;
-                }
-                if(req.body.users !== undefined) {
-                    edit.users = req.body.users;
-                }
-                if(req.body.admins !== undefined) {
-                    edit.admins = req.body.admins;
-                }
+                const edit: Record<string, DatabaseUnserializedItemValue> = req.body;
+                delete edit.id;
                 await feature.database.edit({ destination: "smbshares", item: edit, selectors: { id: req.body.id, author: session.user }});
 
                 /* Get share */
-                const share = await feature.database.fetch({ source: "smbshares", selectors: { id: req.body.id, author: session.user } });
-                if(share === undefined) {
+                const smbShare = await feature.database.fetch<SMBShare>({ source: "smbshares", selectors: { id: req.body.id, author: session.user } });
+                if(smbShare === null) {
                     rep.code(404); rep.send();
                     return;
                 }
 
                 /* Send */
-                rep.send(share);
+                rep.send(smbShare);
             }
         );
     }

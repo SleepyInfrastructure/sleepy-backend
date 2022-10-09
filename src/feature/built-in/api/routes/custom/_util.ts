@@ -1,6 +1,5 @@
 import Database from "../../../../../database";
 import FeatureDaemon from "../../../../custom/daemon";
-import { TaskType } from "../../../../custom/daemon/types";
 /* Node Imports */
 import path from "path";
 import { rm } from "fs";
@@ -45,7 +44,7 @@ export async function deleteSmbInstance(database: Database, id: string, author: 
     }
 
     /* Delete related objects */
-    const shares = await database.fetchMultiple({ source: "smbshares", selectors: { parent: id, author: author } });
+    const shares = await database.fetchMultiple<SMBShare>({ source: "smbshares", selectors: { parent: id, author: author } });
     for(const share of shares) {
         deleteSmbShare(database, share.id, author);
     }
@@ -81,8 +80,8 @@ export async function deleteUptimeEndpoint(database: Database, id: string, autho
 
 export async function deleteTask(database: Database, id: string, author: string): Promise<boolean> {
     /* Get task */
-    const task = await database.fetch({ source: "tasks", selectors: { id: id, author: author } });
-    if(task === undefined) {
+    const task = await database.fetch<Task>({ source: "tasks", selectors: { id: id, author: author } });
+    if(task === null) {
         return false;
     }
 
@@ -94,8 +93,8 @@ export async function deleteTask(database: Database, id: string, author: string)
     switch(task.type) {
         case TaskType.BACKUP_DATABASE:
             if(task.result !== null) {
-                const file = await database.fetch({ source: "userfiles", selectors: { id: task.result, author: author }, ignoreSensitive: true });
-                if(file === undefined) {
+                const file = await database.fetch<UserFile>({ source: "userfiles", selectors: { id: task.result, author: author }, ignoreSensitive: true });
+                if(file === null || file.path === undefined) {
                     break;
                 }
                 database.delete({ source: "userfiles", selectors: { id: task.result, author: author } });

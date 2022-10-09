@@ -11,8 +11,8 @@
         "dev": "tsc && node build/index.js --dev",
         "build": "tsc",
         "serve": "node build/index.js",
-        "lint": "eslint 'src/**/*.{ts,tsx}'",
-        "linty": "eslint 'src/**/*.{ts,tsx}' --fix",
+        "lint": "eslint src/**/*.{ts,tsx}",
+        "linty": "eslint src/**/*.{ts,tsx} --fix",
         "pretty": "prettier --write 'src/**/*.{ts,tsx}'",
         "typecheck": "tsc --noEmit",
         "finstall:static": "yarn add fastify@^4.5.2 @fastify/cors@^8.1.0 @fastify/static@^6.5.0",
@@ -62,6 +62,6 @@
         "pingman": "^1.1.5",
         "utf-8-validate": "^5.0.9",
         "web-push": "^3.5.0",
-        "zod": "^3.19.0"
+        "zod": "^3.19.1"
     }
 }

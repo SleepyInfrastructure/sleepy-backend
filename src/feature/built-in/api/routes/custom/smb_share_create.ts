@@ -1,5 +1,5 @@
 /* Types */
-import { SMBShareCreateSchema, SMBShareCreateSchemaType } from "./_schemas";
+import { SMBShareCreateSchema, SMBShareCreateSchemaType } from "ts/common/zod/smb";
 import { RequestWithSchema } from "../types";
 
 /* Node Imports */
@@ -27,29 +27,29 @@ class RouteSMBShareCreate extends APIRoute {
                 }
 
                 /* Check instance */
-                const instance = await feature.database.fetch({ source: "smbinstances", selectors: { id: req.body.parent, author: session.user } })
-                if(instance === undefined) {
+                const smbInstance = await feature.database.fetch<SMBInstance>({ source: "smbinstances", selectors: { id: req.body.parent, author: session.user } })
+                if(smbInstance === undefined) {
                     rep.code(404); rep.send();
                     return;
                 }
 
                 /* Create share */
-                const newSmbShare = {
+                const smbShare: SMBShare = {
                     id: randomBytes(16).toString("hex"),
                     author: session.user,
                     parent: req.body.parent,
                     name: req.body.name,
                     path: req.body.path,
-                    browsable: req.body.browsable ? 1 : 0,
-                    readonly: req.body.readonly ? 1 : 0,
-                    guest: req.body.guest ? 1 : 0,
+                    browsable: req.body.browsable,
+                    readonly: req.body.readonly,
+                    guest: req.body.guest,
                     users: [],
                     admins: []
                 };
-                feature.database.add({ destination: "smbshares", item: newSmbShare });
+                feature.database.add({ destination: "smbshares", item: smbShare });
 
                 /* Send */
-                rep.send(newSmbShare);
+                rep.send(smbShare);
             }
         );
     }

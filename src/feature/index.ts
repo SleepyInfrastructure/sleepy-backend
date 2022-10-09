@@ -1,5 +1,5 @@
 /* Types */
-import { FeatureOptions, StateDescriptor, Status } from "../ts/base";
+import { FeatureOptions, StateDescriptor, Status } from "../ts/backend/base";
 
 /* Local Imports */
 import Instance from "../instance";

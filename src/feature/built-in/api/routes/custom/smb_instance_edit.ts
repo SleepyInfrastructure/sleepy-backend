@@ -1,6 +1,6 @@
 /* Types */
 import { DatabaseUnserializedItemValue } from "../../../../../database/types";
-import { SMBInstanceEditSchema, SMBInstanceEditSchemaType } from "./_schemas";
+import { SMBInstanceEditSchema, SMBInstanceEditSchemaType } from "ts/common/zod/smb";
 import { RequestWithSchema } from "../types";
 
 /* Local Imports */
@@ -25,24 +25,19 @@ class RouteSMBInstanceEdit extends APIRoute {
                 }
 
                 /* Edit (author is checked in selectors) */
-                const edit: Record<string, DatabaseUnserializedItemValue> = {};
-                if(req.body.name !== undefined) {
-                    edit.name = req.body.name;
-                }
-                if(req.body.recycle !== undefined) {
-                    edit.recycle = req.body.recycle ? 1 : 0;
-                }
+                const edit: Record<string, DatabaseUnserializedItemValue> = req.body;
+                delete edit.id;
                 await feature.database.edit({ destination: "smbinstances", item: edit, selectors: { id: req.body.id, author: session.user }});
 
                 /* Get instance */
-                const instance = await feature.database.fetch({ source: "smbinstances", selectors: { id: req.body.id, author: session.user } });
-                if(instance === undefined) {
+                const smbInstance = await feature.database.fetch<SMBInstance>({ source: "smbinstances", selectors: { id: req.body.id, author: session.user } });
+                if(smbInstance === undefined) {
                     rep.code(404); rep.send();
                     return;
                 }
 
                 /* Send */
-                rep.send(instance);
+                rep.send(smbInstance);
             }
         );
     }

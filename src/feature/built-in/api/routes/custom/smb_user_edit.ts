@@ -1,6 +1,6 @@
 /* Types */
 import { DatabaseUnserializedItemValue } from "../../../../../database/types";
-import { SMBUserEditSchema, SMBUserEditSchemaType } from "./_schemas";
+import { SMBUserEditSchema, SMBUserEditSchemaType } from "ts/common/zod/smb";
 import { RequestWithSchema } from "../types";
 
 /* Local Imports */
@@ -25,21 +25,19 @@ class RouteSMBUserEdit extends APIRoute {
                 }
 
                 /* Edit (author is checked in selectors) */
-                const edit: Record<string, DatabaseUnserializedItemValue> = {};
-                if(req.body.name !== undefined) {
-                    edit.name = req.body.name;
-                }
+                const edit: Record<string, DatabaseUnserializedItemValue> = req.body;
+                delete edit.id;
                 await feature.database.edit({ destination: "smbusers", item: edit, selectors: { id: req.body.id, author: session.user }});
 
                 /* Get share */
-                const user = await feature.database.fetch({ source: "smbusers", selectors: { id: req.body.id, author: session.user } });
-                if(user === undefined) {
+                const smbUser = await feature.database.fetch<SMBUser>({ source: "smbusers", selectors: { id: req.body.id, author: session.user } });
+                if(smbUser === null) {
                     rep.code(404); rep.send();
                     return;
                 }
 
                 /* Send */
-                rep.send(user);
+                rep.send(smbUser);
             }
         );
     }

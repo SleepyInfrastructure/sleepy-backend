@@ -16,13 +16,13 @@ class RouteDaemonFileUpload extends APIRoute {
                 if(req.cookies.Token === undefined) { rep.code(403); rep.send(); return; }
 
                 /* Get server */
-                const daemonToken = await feature.database.fetch({ source: "daemontokens", selectors: { id: req.cookies.Token } });
-                if(daemonToken === undefined) {
+                const daemonToken = await feature.database.fetch<DaemonToken>({ source: "daemontokens", selectors: { id: req.cookies.Token } });
+                if(daemonToken === null) {
                     rep.code(403); rep.send();
                     return;
                 }
-                const server = await feature.database.fetch({ source: "servers", selectors: { id: daemonToken.server } });
-                if(server === undefined) {
+                const server = await feature.database.fetch<Server>({ source: "servers", selectors: { id: daemonToken.server } });
+                if(server === null) {
                     rep.code(404); rep.send();
                     return;
                 }

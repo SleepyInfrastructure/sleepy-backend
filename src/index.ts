@@ -1,5 +1,5 @@
 /* Types */
-import { RootOptions } from "./ts/base";
+import { RootOptions } from "./ts/backend/base";
 
 /* Node Imports */
 import { Worker } from "worker_threads";

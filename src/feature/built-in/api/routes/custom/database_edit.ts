@@ -1,6 +1,6 @@
 /* Types */
 import { DatabaseUnserializedItemValue } from "../../../../../database/types";
-import { DatabaseEditSchema, DatabaseEditSchemaType } from "./_schemas";
+import { DatabaseEditSchema, DatabaseEditSchemaType } from "ts/common/zod/database";
 import { RequestWithSchema } from "../types";
 
 /* Local Imports */
@@ -26,26 +26,21 @@ class RouteDatabaseEdit extends APIRoute {
 
                 /* Check server */
                 if(req.body.server !== undefined) {
-                    const server = await feature.database.fetch({ source: "servers", selectors: { id: req.body.server, author: session.user } })
-                    if(server === undefined) {
+                    const server = await feature.database.fetch<Server>({ source: "servers", selectors: { id: req.body.server, author: session.user } })
+                    if(server === null) {
                         rep.code(404); rep.send();
                         return;
                     }
                 }
 
                 /* Edit (author is checked in selectors) */
-                const edit: Record<string, DatabaseUnserializedItemValue> = {};
-                if(req.body.name !== undefined) {
-                    edit.name = req.body.name;
-                }
-                if(req.body.server !== undefined) {
-                    edit.server = req.body.server;
-                }
+                const edit: Record<string, DatabaseUnserializedItemValue> = req.body;
+                delete edit.id;
                 await feature.database.edit({ destination: "databases", item: edit, selectors: { id: req.body.id, author: session.user }});
 
                 /* Get database */
-                const serverDatabase = await feature.database.fetch({ source: "databases", selectors: { id: req.body.id, author: session.user } });
-                if(serverDatabase === undefined) { rep.code(404); rep.send(); return; }
+                const serverDatabase = await feature.database.fetch<Database>({ source: "databases", selectors: { id: req.body.id, author: session.user } });
+                if(serverDatabase === null) { rep.code(404); rep.send(); return; }
 
                 /* Send */
                 rep.send(serverDatabase);

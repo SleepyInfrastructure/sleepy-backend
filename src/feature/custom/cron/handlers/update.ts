@@ -23,7 +23,7 @@ export default async function processUpdate(feature: FeatureDaemon, database: Da
             break;
 
         case CronUpdateType.UPTIME_ENDPOINTS:
-            const endpoints = await database.fetchMultiple({ source: "uptimeendpoints", selectors: {} });
+            const endpoints = await database.fetchMultiple<UptimeEndpoint>({ source: "uptimeendpoints", selectors: {} });
             for(const endpoint of endpoints) {
                 processEndpointUptime(database, endpoint);
             }

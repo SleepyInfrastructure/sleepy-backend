@@ -1,0 +1,3 @@
+[submodule "src/ts/common"]
+	path = src/ts/common
+	url = https://github.com/SleepyInfrastructure/sleepy-common

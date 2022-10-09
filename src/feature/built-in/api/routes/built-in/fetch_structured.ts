@@ -1,5 +1,5 @@
 /* Types */
-import { APIStructure, APIStructureImported, APIStructureImportedDetails, Status } from "../../../../../ts/base";
+import { APIStructure, APIStructureImported, APIStructureImportedDetails, Status } from "../../../../../ts/backend/base";
 import { RouteFetchStructuredOptions } from "./index";
 import { FetchStructuredSchema, FetchStructuredSchemaType } from "./_schemas";
 import { RequestWithSchemaQuery } from "../types";
@@ -78,7 +78,7 @@ class RouteFetchStructured extends APIRoute {
                 }
                 
                 /* If needed fetch session */
-                let session: any;
+                let session: any
                 if(this.options.base !== undefined && this.details.hasAuthorField) {
                     session = await getSession(feature.database, req, rep);
                     if(session === null) {
@@ -106,7 +106,7 @@ class RouteFetchStructured extends APIRoute {
                     switch(this.options.base.type) {
                         case "SINGLE":
                             base = await feature.database.fetch({ source: this.options.base.table, selectors: selectors });
-                            if (base === undefined) {
+                            if (base === null) {
                                 rep.code(404); rep.send();
                                 return;
                             }
@@ -131,7 +131,7 @@ class RouteFetchStructured extends APIRoute {
         );
     }
 
-    async decorateBase(database: Database, req: RequestWithSchemaQuery<FetchStructuredSchemaType>, session: any, base: any, structure: APIStructureImported): Promise<any> {
+    async decorateBase(database: Database, req: RequestWithSchemaQuery<FetchStructuredSchemaType>, session: Session, base: any, structure: APIStructureImported): Promise<any> {
         const decoratorPromises: Promise<{ key: string, value: any }>[] = [];
         for (const [key, value] of Object.entries(structure)) {
             decoratorPromises.push(new Promise(async(resolve) => {

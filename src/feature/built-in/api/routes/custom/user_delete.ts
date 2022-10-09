@@ -1,6 +1,6 @@
 /* Types */
-import { Status } from "../../../../../ts/base";
-import { UserDeleteSchema, UserDeleteSchemaType } from "./_schemas";
+import { Status } from "../../../../../ts/backend/base";
+import { IDSchema, IDSchemaType } from "ts/common/zod/base";
 import { RequestWithSchemaQuery } from "../types";
 
 /* Local Imports */
@@ -20,9 +20,9 @@ class RouteUserDelete extends APIRoute {
 
         feature.instance.delete(this.path,
             { config: { rateLimit: { timeWindow: 10000, max: 1 } } },
-            async (req: RequestWithSchemaQuery<UserDeleteSchemaType>, rep) => {
+            async (req: RequestWithSchemaQuery<IDSchemaType>, rep) => {
                 /* Validate schemas */
-                if(!validateSchemaQuery(UserDeleteSchema, req, rep)) {
+                if(!validateSchemaQuery(IDSchema, req, rep)) {
                     return;
                 }
 
@@ -44,13 +44,13 @@ class RouteUserDelete extends APIRoute {
                 }
 
                 /* Delete servers */
-                const servers = await feature.database.fetchMultiple({ source: "servers", selectors: { author: req.query.id } });
+                const servers = await feature.database.fetchMultiple<Server>({ source: "servers", selectors: { author: req.query.id } });
                 for(const server of servers) {
                     deleteServer(featureDaemon, feature.database, server.id, session.user);
                 }
 
                 /* Delete uptime endpoints */
-                const endpoints = await feature.database.fetchMultiple({ source: "uptimeendpoints", selectors: { author: req.query.id } });
+                const endpoints = await feature.database.fetchMultiple<UptimeEndpoint>({ source: "uptimeendpoints", selectors: { author: req.query.id } });
                 for(const endpoint of endpoints) {
                     deleteUptimeEndpoint(feature.database, endpoint.id, session.user);
                 }

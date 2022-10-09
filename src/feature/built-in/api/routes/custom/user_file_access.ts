@@ -1,6 +1,6 @@
 /* Types */
 import { RouteUserFileAccessOptions } from "./index";
-import { FileAccessSchema, FileAccessSchemaType } from "./_schemas";
+import { IDSchema, IDSchemaType } from "ts/common/zod/base";
 import { RequestWithSchemaQuery } from "../types";
 
 /* Node Imports */
@@ -18,9 +18,9 @@ class RouteUserFileAccess extends APIRoute {
         const options = this.options as RouteUserFileAccessOptions;
         feature.instance.get(this.path,
             { config: { rateLimit: { timeWindow: 3000, max: 1 } } },
-            async (req: RequestWithSchemaQuery<FileAccessSchemaType>, rep) => {
+            async (req: RequestWithSchemaQuery<IDSchemaType>, rep) => {
                 /* Validate schemas */
-                if(!validateSchemaQuery(FileAccessSchema, req, rep)) {
+                if(!validateSchemaQuery(IDSchema, req, rep)) {
                     return;
                 }
 
@@ -31,8 +31,8 @@ class RouteUserFileAccess extends APIRoute {
                 }
 
                 /* Get file */
-                const file = await feature.database.fetch({ source: "userfiles", selectors: { id: req.query.id, author: session.user }, ignoreSensitive: true })
-                if(file === undefined) {
+                const file = await feature.database.fetch<UserFile>({ source: "userfiles", selectors: { id: req.query.id, author: session.user }, ignoreSensitive: true })
+                if(file === null || file.path === undefined) {
                     rep.code(404); rep.send();
                     return;
                 }
@@ -53,6 +53,7 @@ class RouteUserFileAccess extends APIRoute {
                 /* Prepare archive */
                 const fileStream = createReadStream(filePath);
                 fileStream.on("open", () => {
+                    if(file.path === undefined) { return; }
                     const archive = archiver("zip", {
                         zlib: { level: 9 }
                     });
