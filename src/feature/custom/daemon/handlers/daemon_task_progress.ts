@@ -21,7 +21,7 @@ class DaemonTaskProgressMessageHandler extends WebsocketMessageHandler<schemas.W
         const timestamp = Math.round(Date.now() / 1000);
         task.status = message.status as TaskStatus ?? task.status;
         task.progress = message.progress ?? task.progress;
-        task.end = task.status !== TaskStatus.RUNNING ? timestamp : null;
+        task.end = task.status !== "RUNNING" ? timestamp : null;
         this.parent.database.edit({ destination: "tasks", item: { progress: task.progress, status: task.status, end: task.end }, selectors: { id: message.id, author: daemon.author }});
 
         for(const client of this.parent.getClientsForId(daemon.author)) {

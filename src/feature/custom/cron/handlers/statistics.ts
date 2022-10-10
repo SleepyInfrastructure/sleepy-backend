@@ -1,4 +1,5 @@
 /* Types */
+import { StatisticTimeMapping, StatisticTypePreviousMapping } from "ts/common/const";
 import { CronUpdateResourcesType, CronUpdateStatistics } from "../types";
 import { DaemonWebsocketMessageType } from "../../daemon/types";
 import Database from "../../../../database";
@@ -11,16 +12,16 @@ import { bold, green, yellow } from "nanocolors";
 export function processStatisticUpdates(feature: FeatureDaemon, database: Database, update: CronUpdateStatistics) {
     for(const resource of update.resources) {
         switch(update.statistic) {
-            case StatisticType.MINUTE:
+            case "MINUTE":
                 for(const daemon of feature.getDaemons()) {
                     daemon.send({ type: DaemonWebsocketMessageType.DAEMON_REQUEST_STATS });
                 }
                 break;
 
-            case StatisticType.HOUR:
-            case StatisticType.DAY:
-            case StatisticType.MONTH:
-            case StatisticType.YEAR:
+            case "HOUR":
+            case "DAY":
+            case "MONTH":
+            case "YEAR":
                 switch(resource) {
                     case CronUpdateResourcesType.GENERAL:
                         processStatisticUpdateGeneral(database, update);

@@ -39,9 +39,9 @@ export async function processFile(database: Database, options: RouteDaemonFileUp
 }
 
 const taskToFileType: Record<TaskType, DaemonFileType> = {
-    [TaskType.BACKUP_DATABASE]: DaemonFileType.BACKUP_DATABASE,
-    [TaskType.BACKUP_DATABASE_SCHEMA]: DaemonFileType.BACKUP_DATABASE,
-    [TaskType.REQUEST_CONTAINER_LOG]: DaemonFileType.CONTAINER_LOG
+    "BACKUP_DATABASE": DaemonFileType.BACKUP_DATABASE,
+    "BACKUP_DATABASE_SCHEMA": DaemonFileType.BACKUP_DATABASE,
+    "REQUEST_CONTAINER_LOG": DaemonFileType.CONTAINER_LOG
 };
 export async function processFileTask(database: Database, options: RouteDaemonFileUploadOptions, server: Server, data: MultipartFile, fileData: any, rep: FoxxyFastifyReply): Promise<Error | null> {
     /* Get task */

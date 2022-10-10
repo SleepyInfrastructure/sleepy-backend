@@ -48,7 +48,7 @@ class FeatureDaemon extends Feature {
             return;
         }
         this.instance = result;
-        this.instance.register((instance: fastify.FastifyInstance) => {
+        this.instance.register(async(instance: fastify.FastifyInstance) => {
             instance.get("/socket", { websocket: true }, (stream: SocketStream, request: fastify.FastifyRequest) => {
                 const connection = new Connection(this, stream);
                 this.connect(connection);

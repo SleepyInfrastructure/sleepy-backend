@@ -28,10 +28,10 @@ class DaemonClientRequestDatabaseBackupMessageHandler extends WebsocketMessageHa
         const task: Task = {
             id: randomBytes(16).toString("hex"),
             author: client.id,
-            type: message.data ? TaskType.BACKUP_DATABASE : TaskType.BACKUP_DATABASE_SCHEMA,
+            type: message.data ? "BACKUP_DATABASE" : "BACKUP_DATABASE_SCHEMA",
             object: serverDatabase.id,
             start: timestamp,
-            status: TaskStatus.RUNNING,
+            status: "RUNNING",
             progress: 0,
             end: null,
             result: null

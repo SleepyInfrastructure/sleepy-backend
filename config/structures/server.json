@@ -46,7 +46,7 @@
             "baseIdField": "id",
             "authorField": "author",
             "structure": "container",
-            "sort": { "field": "names" }
+            "sort": { "field": "name" }
         },
         "containerProjects": {
             "type": "ARRAY",

@@ -91,7 +91,7 @@ export async function deleteTask(database: Database, id: string, author: string)
     /* Delete related objects */
     const root = "/usr/src/sleepy/data/user";
     switch(task.type) {
-        case TaskType.BACKUP_DATABASE:
+        case "BACKUP_DATABASE":
             if(task.result !== null) {
                 const file = await database.fetch<UserFile>({ source: "userfiles", selectors: { id: task.result, author: author }, ignoreSensitive: true });
                 if(file === null || file.path === undefined) {

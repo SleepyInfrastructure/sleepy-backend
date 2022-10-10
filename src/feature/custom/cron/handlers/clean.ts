@@ -1,4 +1,5 @@
 /* Types */
+import { StatisticTimeMapping, StatisticTypeNextMapping } from "ts/common/const";
 import { CronClean, CronCleanType, CronUpdateResourcesType } from "../types";
 
 /* Node Imports */

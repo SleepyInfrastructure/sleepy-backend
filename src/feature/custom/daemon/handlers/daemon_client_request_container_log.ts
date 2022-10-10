@@ -28,10 +28,10 @@ class DaemonClientRequestContainerLogMessageHandler extends WebsocketMessageHand
         const task: Task = {
             id: randomBytes(16).toString("hex"),
             author: client.id,
-            type: TaskType.REQUEST_CONTAINER_LOG,
+            type: "REQUEST_CONTAINER_LOG",
             object: message.id,
             start: timestamp,
-            status: TaskStatus.RUNNING,
+            status: "RUNNING",
             progress: 0,
             end: null,
             result: null
