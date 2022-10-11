@@ -1,7 +1,7 @@
 /* Types */ 
 import FeatureDaemon from ".";
 import { Client, Connection, DaemonWebsocketAuthFailure, DaemonWebsocketMessageType } from "./types";
-import Database from "../../../database";
+import Database from "database";
 /* Node Imports */
 import { bold, gray, green, red, yellow } from "nanocolors";
 import { FastifyRequest } from "fastify";

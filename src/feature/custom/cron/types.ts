@@ -1,5 +1,5 @@
 /* Types */
-import { FeatureOptions, FeatureType } from "../../../ts/backend/base";
+import { FeatureOptions, FeatureType } from "ts/backend/base";
 
 /* Options */
 export type FeatureCronOptions = FeatureOptions & {

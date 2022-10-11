@@ -22,10 +22,10 @@ class DaemonRequestStatsReplyMessageHandler extends WebsocketMessageHandler<sche
             timestamp: timestamp,
             cpuSystem: message.cpu.system,
             cpuUser: message.cpu.user,
+            memory: message.memory.used,
+            swap: message.memory.swapUsed,
             rx: message.network.rx,
             tx: message.network.tx,
-            memory: message.memory.used,
-            swap: message.memory.swapUsed
         };
         this.parent.database.add({ destination: "statistics", item: statistic });
         for (const disk of message.disks) {
@@ -48,10 +48,11 @@ class DaemonRequestStatsReplyMessageHandler extends WebsocketMessageHandler<sche
                 author: daemon.author,
                 parent: container.parent,
                 timestamp: timestamp,
-                rx: container.rx,
-                tx: container.tx,
+                type: "MINUTE",
                 cpu: container.cpu,
                 memory: container.memory,
+                rx: container.rx,
+                tx: container.tx,
                 read: container.read,
                 write: container.write,
             };

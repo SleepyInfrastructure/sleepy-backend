@@ -1,11 +1,11 @@
 /* Types */
 import { RoutePushSubscribeOptions } from "./index";
-import { PushSubscribeSchema, PushSubscribeSchemaType } from "./_schemas";
-import { RequestWithSchema } from "../types";
+import * as schemas from "./schemas";
+import { RequestWithSchema } from "feature/built-in/api/routes/types";
 
 /* Local Imports */
-import APIRoute from "..";
-import FeatureAPI from "../..";
+import APIRoute from "feature/built-in/api/routes";
+import FeatureAPI from "feature/built-in/api";
 import { getSession, validateSchemaBody } from "../util";
 
 class RoutePushSubscribe extends APIRoute {
@@ -19,9 +19,9 @@ class RoutePushSubscribe extends APIRoute {
     hook(feature: FeatureAPI): void {
         feature.instance.post(this.path,
             { config: { rateLimit: { timeWindow: 1000, max: 4 } } },
-            async (req: RequestWithSchema<PushSubscribeSchemaType>, rep) => {
+            async (req: RequestWithSchema<schemas.PushSubscribeSchemaType>, rep) => {
                 /* Validate schemas */
-                if(!validateSchemaBody(PushSubscribeSchema, req, rep)) {
+                if(!validateSchemaBody(schemas.PushSubscribeSchema, req, rep)) {
                     return;
                 }
 

@@ -4,7 +4,7 @@ import { CronClean, CronCleanType, CronUpdateResourcesType } from "../types";
 
 /* Node Imports */
 import { bold, gray, yellow } from "nanocolors";
-import Database from "../../../../database";
+import Database from "database";
 
 export async function processClean(database: Database, clean: CronClean) {
     switch(clean.type) {
@@ -31,15 +31,22 @@ export async function processClean(database: Database, clean: CronClean) {
 export async function processCleanStatistic(database: Database, clean: CronClean, resource: CronUpdateResourcesType) {
     const time = StatisticTimeMapping[StatisticTypeNextMapping[clean.statistic]]
     switch(resource) {
-        case CronUpdateResourcesType.GENERAL:
+        case CronUpdateResourcesType.GENERAL: {
             const deletedStats = await database.delete({ source: "statistics", selectors: { type: clean.statistic, timestamp: { value: (Math.round(Date.now() / 1000) - time), comparison: "<" } } });
-            const deletedContainerStats = await database.delete({ source: "containerstatistics", selectors: { timestamp: { value: (Math.round(Date.now() / 1000) - time), comparison: "<" } } });
-            console.log(`${gray("-")} Deleted ${bold(yellow(deletedStats + deletedContainerStats))} old statistics...`);
+            console.log(`${gray("-")} Deleted ${bold(yellow(deletedStats))} old statistics...`);
             break;
+        }
             
-        case CronUpdateResourcesType.DISKS:
-            const deletedDiskStats = await database.delete({ source: "diskstatistics", selectors: { timestamp: { value: (Math.round(Date.now() / 1000) - time), comparison: "<" } } });
-            console.log(`${gray("-")} Deleted ${bold(yellow(deletedDiskStats))} old disk statistics...`);
+        case CronUpdateResourcesType.DISKS: {
+            const deletedStats = await database.delete({ source: "diskstatistics", selectors: { type: clean.statistic, timestamp: { value: (Math.round(Date.now() / 1000) - time), comparison: "<" } } });
+            console.log(`${gray("-")} Deleted ${bold(yellow(deletedStats))} old disk statistics...`);
             break;
+        }
+            
+        case CronUpdateResourcesType.CONTAINERS: {
+            const deletedStats = await database.delete({ source: "containerstatistics", selectors: { type: clean.statistic, timestamp: { value: (Math.round(Date.now() / 1000) - time), comparison: "<" } } });
+            console.log(`${gray("-")} Deleted ${bold(yellow(deletedStats))} old container statistics...`);
+            break;
+        }
     }
 }

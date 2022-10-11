@@ -2,8 +2,8 @@
 import { RoutePushUnsubscribeOptions } from "./index";
 
 /* Local Imports */
-import APIRoute from "..";
-import FeatureAPI from "../..";
+import APIRoute from "feature/built-in/api/routes";
+import FeatureAPI from "feature/built-in/api";
 import { getSession } from "../util";
 
 class RoutePushUnsubscribe extends APIRoute {

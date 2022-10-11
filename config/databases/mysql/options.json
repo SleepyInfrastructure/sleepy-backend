@@ -30,6 +30,17 @@
             "admins": {
                 "modifier": "ARRAY"
             }
+        },
+        "containers": {
+            "ports": {
+                "modifier": "ARRAY"
+            },
+            "mounts": {
+                "modifier": "ARRAY"
+            },
+            "networks": {
+                "modifier": "ARRAY"
+            }
         }
     }
 }

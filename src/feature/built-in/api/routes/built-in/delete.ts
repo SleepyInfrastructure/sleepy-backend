@@ -1,12 +1,11 @@
 /* Types */
-import { DatabaseDeleteOptions, DatabaseSelectorValue } from "../../../../../database/types";
+import { DatabaseDeleteOptions, DatabaseSelectorValue } from "database/types";
 import { RouteDeleteOptions } from "./index";
-import { DeleteSchema, DeleteSchemaType } from "./_schemas";
-import { RequestWithSchemaQuery } from "../types";
-
+import * as schemas from "./schemas";
+import { RequestWithSchemaQuery } from "feature/built-in/api/routes/types";
 /* Local Imports */
-import APIRoute from "..";
-import FeatureAPI from "../..";
+import APIRoute from "feature/built-in/api/routes";
+import FeatureAPI from "feature/built-in/api";
 import { validateSchemaQuery } from "../util";
 
 class RouteDelete extends APIRoute {
@@ -20,9 +19,9 @@ class RouteDelete extends APIRoute {
     hook(feature: FeatureAPI): void {
         feature.instance.delete(this.path,
             { config: { rateLimit: { timeWindow: 1000, max: 10 } } },
-            async (req: RequestWithSchemaQuery<DeleteSchemaType>, rep) => {
+            async (req: RequestWithSchemaQuery<schemas.DeleteSchemaType>, rep) => {
                 /* Validate schemas */
-                if(!validateSchemaQuery(DeleteSchema, req, rep)) {
+                if(!validateSchemaQuery(schemas.DeleteSchema, req, rep)) {
                     return;
                 }
 

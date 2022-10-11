@@ -1,15 +1,15 @@
 /* Types */
-import { DatabaseFetchOptions } from "../../../../../database/types";
+import { DatabaseFetchOptions } from "database/types";
 import { RoutePushSendOptions } from "./index";
-import { PushSendSchema, PushSendSchemaType } from "./_schemas";
-import { RequestWithSchema } from "../types";
+import * as schemas from "./schemas";
+import { RequestWithSchema } from "feature/built-in/api/routes/types";
 
 /* Node Imports */
 import * as webPush from "web-push";
 
 /* Local Imports */
-import APIRoute from "..";
-import FeatureAPI from "../..";
+import APIRoute from "feature/built-in/api/routes";
+import FeatureAPI from "feature/built-in/api";
 import { validateSchemaBody } from "../util";
 
 class RoutePushSend extends APIRoute {
@@ -23,9 +23,9 @@ class RoutePushSend extends APIRoute {
     hook(feature: FeatureAPI): void {
         feature.instance.post(this.path,
             { config: { rateLimit: { timeWindow: 1000, max: 4 } } },
-            async (req: RequestWithSchema<PushSendSchemaType>, rep) => {
+            async (req: RequestWithSchema<schemas.PushSendSchemaType>, rep) => {
                 /* Validate schemas */
-                if(!validateSchemaBody(PushSendSchema, req, rep)) {
+                if(!validateSchemaBody(schemas.PushSendSchema, req, rep)) {
                     return;
                 }
                 if(req.body.adminKey !== process.env.FOXXY_ADMIN_KEY) { rep.code(403); rep.send(); return; }

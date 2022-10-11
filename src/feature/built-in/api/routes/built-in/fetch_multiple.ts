@@ -1,11 +1,11 @@
 /* Types */
 import { RouteFetchMultipleOptions } from "./index";
-import { FetchMultipleSchema, FetchMultipleSchemaType } from "./_schemas";
-import { RequestWithSchemaQuery } from "../types";
+import * as schemas from "./schemas";
+import { RequestWithSchemaQuery } from "feature/built-in/api/routes/types";
 
 /* Local Imports */
-import APIRoute from "..";
-import FeatureAPI from "../..";
+import APIRoute from "feature/built-in/api/routes";
+import FeatureAPI from "feature/built-in/api";
 import { getSession, validateSchemaQuery } from "../util";
 
 class RouteFetchMultiple extends APIRoute {
@@ -19,9 +19,9 @@ class RouteFetchMultiple extends APIRoute {
     hook(feature: FeatureAPI): void {
         feature.instance.get(this.path,
             { config: { rateLimit: { timeWindow: 1000, max: 10 } } },
-            async (req: RequestWithSchemaQuery<FetchMultipleSchemaType>, rep) => {
+            async (req: RequestWithSchemaQuery<schemas.FetchMultipleSchemaType>, rep) => {
                 /* Validate schemas */
-                if(!validateSchemaQuery(FetchMultipleSchema, req, rep)) {
+                if(!validateSchemaQuery(schemas.FetchMultipleSchema, req, rep)) {
                     return;
                 }
 

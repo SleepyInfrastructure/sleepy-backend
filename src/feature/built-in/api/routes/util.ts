@@ -1,12 +1,12 @@
 /* Types */
 import { Session } from "./types";
-import { FoxxyFastifyReply, FoxxyFastifyRequest } from "../../../../util/fastify";
+import { FoxxyFastifyReply, FoxxyFastifyRequest } from "util/fastify";
 
 /* Node Imports */
 import { z } from "zod";
 
 /* Local Imports */
-import Database from "../../../../database";
+import Database from "database";
 import { RouteGenericInterface } from "fastify/types/route";
 
 export function validateSchema(schema: z.Schema, data: any, rep: FoxxyFastifyReply): boolean {

@@ -1,11 +1,11 @@
 /* Types */
 import { RouteFetchOptions } from "./index";
-import { FetchSchema, FetchSchemaType } from "./_schemas";
-import { RequestWithSchemaQuery } from "../types";
+import * as schemas from "./schemas";
+import { RequestWithSchemaQuery } from "feature/built-in/api/routes/types";
 
 /* Local Imports */
-import APIRoute from "..";
-import FeatureAPI from "../..";
+import APIRoute from "feature/built-in/api/routes";
+import FeatureAPI from "feature/built-in/api";
 import { getSession, validateSchemaQuery } from "../util";
 
 class RouteFetch extends APIRoute {
@@ -19,9 +19,9 @@ class RouteFetch extends APIRoute {
     hook(feature: FeatureAPI): void {
         feature.instance.get(this.path,
             { config: { rateLimit: { timeWindow: 1000, max: 10 } } },
-            async (req: RequestWithSchemaQuery<FetchSchemaType>, rep) => {
+            async (req: RequestWithSchemaQuery<schemas.FetchSchemaType>, rep) => {
                 /* Validate schemas */
-                if(!validateSchemaQuery(FetchSchema, req, rep)) {
+                if(!validateSchemaQuery(schemas.FetchSchema, req, rep)) {
                     return;
                 }
 

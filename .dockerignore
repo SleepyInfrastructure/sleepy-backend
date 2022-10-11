@@ -1,5 +1,4 @@
 .docker
-!.docker/extra
 .husky
 .vscode
 build

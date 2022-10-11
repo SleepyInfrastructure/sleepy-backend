@@ -1,5 +1,5 @@
 /* Types */
-import { Status } from "../../../ts/backend/base";
+import { Status } from "ts/backend/base";
 import { FeatureStaticOptions } from "./types";
 
 /* Node Imports */
@@ -10,8 +10,8 @@ import { RouteGenericInterface } from "fastify/types/route";
 
 /* Local Imports */
 import Feature from "../..";
-import Instance from "../../../instance";
-import { createFastifyInstance, FoxxyFastifyInstance, FoxxyFastifyReply, FoxxyFastifyRequest, startFastifyInstance } from "../../../util/fastify";
+import Instance from "instance";
+import { createFastifyInstance, FoxxyFastifyInstance, FoxxyFastifyReply, FoxxyFastifyRequest, startFastifyInstance } from "util/fastify";
 
 class FeatureStatic extends Feature {
     options: FeatureStaticOptions;

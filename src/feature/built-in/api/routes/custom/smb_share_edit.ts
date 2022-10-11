@@ -1,5 +1,5 @@
 /* Types */
-import { DatabaseUnserializedItemValue } from "../../../../../database/types";
+import { DatabaseUnserializedItemValue } from "database/types";
 import { SMBShareEditSchema, SMBShareEditSchemaType } from "ts/common/zod/smb";
 import { RequestWithSchema } from "../types";
 

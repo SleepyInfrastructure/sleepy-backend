@@ -1,13 +1,13 @@
 /* Types */
-import { APIStructure, APIStructureImported, APIStructureImportedDetails, Status } from "../../../../../ts/backend/base";
+import { APIStructure, APIStructureImported, APIStructureImportedDetails, Status } from "ts/backend/base";
 import { RouteFetchStructuredOptions } from "./index";
-import { FetchStructuredSchema, FetchStructuredSchemaType } from "./_schemas";
-import { RequestWithSchemaQuery } from "../types";
+import * as schemas from "./schemas";
+import { RequestWithSchemaQuery } from "feature/built-in/api/routes/types";
 
 /* Local Imports */
-import APIRoute from "..";
-import FeatureAPI from "../..";
-import Database from "../../../../../database";
+import APIRoute from "feature/built-in/api/routes";
+import FeatureAPI from "feature/built-in/api";
+import Database from "database";
 import { getSession, validateSchemaQuery } from "../util";
 
 class RouteFetchStructured extends APIRoute {
@@ -71,9 +71,9 @@ class RouteFetchStructured extends APIRoute {
     hook(feature: FeatureAPI): void {
         feature.instance.get(this.path,
             { config: { rateLimit: { timeWindow: 1000, max: 10 } } },
-            async (req: RequestWithSchemaQuery<FetchStructuredSchemaType>, rep) => {
+            async (req: RequestWithSchemaQuery<schemas.FetchStructuredSchemaType>, rep) => {
                 /* Validate schemas */
-                if(!validateSchemaQuery(FetchStructuredSchema, req, rep)) {
+                if(!validateSchemaQuery(schemas.FetchStructuredSchema, req, rep)) {
                     return;
                 }
                 
@@ -131,7 +131,7 @@ class RouteFetchStructured extends APIRoute {
         );
     }
 
-    async decorateBase(database: Database, req: RequestWithSchemaQuery<FetchStructuredSchemaType>, session: Session, base: any, structure: APIStructureImported): Promise<any> {
+    async decorateBase(database: Database, req: RequestWithSchemaQuery<schemas.FetchStructuredSchemaType>, session: Session, base: any, structure: APIStructureImported): Promise<any> {
         const decoratorPromises: Promise<{ key: string, value: any }>[] = [];
         for (const [key, value] of Object.entries(structure)) {
             decoratorPromises.push(new Promise(async(resolve) => {

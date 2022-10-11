@@ -1,5 +1,5 @@
 /* Types */
-import Database from "../../../../database";
+import Database from "database";
 
 /* Node Imports */
 import { request as httpRequest } from "http";

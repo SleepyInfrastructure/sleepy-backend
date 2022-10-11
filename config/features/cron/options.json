@@ -5,28 +5,28 @@
 	"intervals": [
 		{
 			"time": "*/1 * * * *",
-			"updates": [{ "type": "STATISTICS", "statistic": "MINUTE", "resources": ["GENERAL", "DISKS"] }],
-			"cleans": [{ "type": "STATISTICS", "statistic": "MINUTE", "resources": ["GENERAL", "DISKS"] }]
+			"updates": [{ "type": "STATISTICS", "statistic": "MINUTE", "resources": ["GENERAL", "DISKS", "CONTAINERS"] }],
+			"cleans": [{ "type": "STATISTICS", "statistic": "MINUTE", "resources": ["GENERAL", "DISKS", "CONTAINERS"] }]
 		},
 		{
 			"time": "0 */1 * * *",
-			"updates": [{ "type": "STATISTICS", "statistic": "HOUR", "resources": ["GENERAL", "DISKS"] }],
-			"cleans": [{ "type": "STATISTICS", "statistic": "HOUR", "resources": ["GENERAL", "DISKS"] }]
+			"updates": [{ "type": "STATISTICS", "statistic": "HOUR", "resources": ["GENERAL", "DISKS", "CONTAINERS"] }],
+			"cleans": [{ "type": "STATISTICS", "statistic": "HOUR", "resources": ["GENERAL", "DISKS", "CONTAINERS"] }]
 		},
 		{
 			"time": "0 0 */1 * *",
-			"updates": [{ "type": "STATISTICS", "statistic": "DAY", "resources": ["GENERAL", "DISKS"] }],
-			"cleans": [{ "type": "STATISTICS", "statistic": "DAY", "resources": ["GENERAL", "DISKS"] }]
+			"updates": [{ "type": "STATISTICS", "statistic": "DAY", "resources": ["GENERAL", "DISKS", "CONTAINERS"] }],
+			"cleans": [{ "type": "STATISTICS", "statistic": "DAY", "resources": ["GENERAL", "DISKS", "CONTAINERS"] }]
 		},
 		{
 			"time": "0 0 1 */1 *",
-			"updates": [{ "type": "STATISTICS", "statistic": "MONTH", "resources": ["GENERAL", "DISKS"] }],
-			"cleans": [{ "type": "STATISTICS", "statistic": "MONTH", "resources": ["GENERAL", "DISKS"] }]
+			"updates": [{ "type": "STATISTICS", "statistic": "MONTH", "resources": ["GENERAL", "DISKS", "CONTAINERS"] }],
+			"cleans": [{ "type": "STATISTICS", "statistic": "MONTH", "resources": ["GENERAL", "DISKS", "CONTAINERS"] }]
 		},
 		{
 			"time": "0 0 1 1 */1",
-			"updates": [{ "type": "STATISTICS", "statistic": "YEAR", "resources": ["GENERAL", "DISKS"] }],
-			"cleans": [{ "type": "STATISTICS", "statistic": "YEAR", "resources": ["GENERAL", "DISKS"] }]
+			"updates": [{ "type": "STATISTICS", "statistic": "YEAR", "resources": ["GENERAL", "DISKS", "CONTAINERS"] }],
+			"cleans": [{ "type": "STATISTICS", "statistic": "YEAR", "resources": ["GENERAL", "DISKS", "CONTAINERS"] }]
 		},
 		{
 			"time": "*/1 * * * *",

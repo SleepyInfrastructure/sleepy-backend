@@ -1,10 +1,10 @@
 /* Types */
-import { DatabaseFetchOptions } from "../../../../../database/types";
+import { DatabaseFetchOptions } from "database/types";
 import { RouteSessionDeleteOptions } from "./index";
 
 /* Local Imports */
-import APIRoute from "..";
-import FeatureAPI from "../..";
+import APIRoute from "feature/built-in/api/routes";
+import FeatureAPI from "feature/built-in/api";
 
 class RouteSessionDelete extends APIRoute {
     options: RouteSessionDeleteOptions;

@@ -1,5 +1,5 @@
 /* Types */
-import { FeatureServerOptions, FeatureType } from "../../../ts/backend/base";
+import { FeatureServerOptions, FeatureType } from "ts/backend/base";
 import { RouteOptions } from "./routes/types";
 
 /* Options */

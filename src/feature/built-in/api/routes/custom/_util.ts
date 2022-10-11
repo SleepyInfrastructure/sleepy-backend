@@ -1,5 +1,5 @@
-import Database from "../../../../../database";
-import FeatureDaemon from "../../../../custom/daemon";
+import Database from "database";
+import FeatureDaemon from "feature/custom/daemon";
 /* Node Imports */
 import path from "path";
 import { rm } from "fs";

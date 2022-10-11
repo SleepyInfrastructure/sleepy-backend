@@ -1,16 +1,16 @@
 /* Types */
 import Feature from "../..";
-import Instance from "../../../instance";
-import { Status } from "../../../ts/backend/base";
-import { DatabaseType } from "../../../database/types";
+import Instance from "instance";
+import { Status } from "ts/backend/base";
+import { DatabaseType } from "database/types";
 import { Client, Connection, FeatureDaemonOptions } from "./types";
 /* Node Imports */
 import * as fastify from "fastify";
 import { SocketStream } from "@fastify/websocket";
 /* Local Imports */
-import { createFastifyPlainInstance, FoxxyFastifyPlainInstance, startFastifyInstance } from "../../../util/fastify";
+import { createFastifyPlainInstance, FoxxyFastifyPlainInstance, startFastifyInstance } from "util/fastify";
 import { handleWebsocket } from "./ws";
-import Database from "../../../database";
+import Database from "database";
 import FeatureDaemonAddon, { FeatureDaemonAddonType } from "./addons/addon";
 import addons from "./addons";
 

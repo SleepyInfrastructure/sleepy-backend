@@ -1,19 +1,18 @@
 /* Types */
-import { Status } from "../../../ts/backend/base";
-import { DatabaseAddOptions, DatabaseDeleteOptions, DatabaseEditOptions, DatabaseFetchMultipleOptions, DatabaseFetchOptions, DatabaseFetchSelector, DatabaseItemValue, DatabaseMySQLFieldModifier, DatabaseMySQLOptions, DatabaseSelectorValue, DatabaseUnserializedItemValue } from "../../types";
-
+import { Status } from "ts/backend/base";
+import * as types from "database/types";
 /* Node Imports */
 import { createConnection, Connection, FieldPacket } from "mysql2/promise";
-
 /* Local Imports */
-import Database from "../..";
-import Instance from "../../../instance";
+import { stringToArray } from "util/general";
+import Database from "database";
+import Instance from "instance";
 
 class DatabaseMySQL extends Database {
-    options: DatabaseMySQLOptions;
+    options: types.DatabaseMySQLOptions;
     connection: void | Connection | undefined;
 
-    constructor(parent: Instance, options: DatabaseMySQLOptions) {
+    constructor(parent: Instance, options: types.DatabaseMySQLOptions) {
         super(parent, options);
         this.options = options;
     }
@@ -41,7 +40,7 @@ class DatabaseMySQL extends Database {
         setInterval(() => { this.fetch({ source: "users", selectors: { id: "0" } }); }, 1000 * 60 * 5);
     }
 
-    async fetch<T>(options: DatabaseFetchOptions): Promise<T | null> {
+    async fetch<T>(options: types.DatabaseFetchOptions): Promise<T | null> {
         try {
             if (this.connection === undefined) {
                 return null;
@@ -61,7 +60,7 @@ class DatabaseMySQL extends Database {
         }
     }
 
-    async fetchMultiple<T>(options: DatabaseFetchMultipleOptions): Promise<T[]> {
+    async fetchMultiple<T>(options: types.DatabaseFetchMultipleOptions): Promise<T[]> {
         try {
             if (this.connection === undefined) {
                 return [];
@@ -87,7 +86,7 @@ class DatabaseMySQL extends Database {
         }
     }
 
-    async add(options: DatabaseAddOptions): Promise<void> {
+    async add(options: types.DatabaseAddOptions): Promise<void> {
         try {
             if (this.connection === undefined) {
                 return;
@@ -103,7 +102,7 @@ class DatabaseMySQL extends Database {
         }
     }
 
-    async edit(options: DatabaseEditOptions): Promise<void> {
+    async edit(options: types.DatabaseEditOptions): Promise<void> {
         try {
             if (this.connection === undefined) {
                 return;
@@ -119,7 +118,7 @@ class DatabaseMySQL extends Database {
         }
     }
 
-    async delete(options: DatabaseDeleteOptions): Promise<number> {
+    async delete(options: types.DatabaseDeleteOptions): Promise<number> {
         try {
             if (this.connection === undefined) {
                 return -1;
@@ -135,28 +134,28 @@ class DatabaseMySQL extends Database {
         }
     }
 
-    selectorsToSyntax(selectors: Record<string, DatabaseSelectorValue>): string {
+    selectorsToSyntax(selectors: Record<string, types.DatabaseSelectorValue>): string {
         const list = Object.keys(selectors);
         if (list.length > 0) {
-            return `WHERE ${list.map((e) => `\`${e}\` ${(typeof(selectors[e]) !== "object" ? "=" : (selectors[e] as DatabaseFetchSelector).comparison)} ?`).join(" AND ")}`;
+            return `WHERE ${list.map((e) => `\`${e}\` ${(typeof(selectors[e]) !== "object" ? "=" : (selectors[e] as types.DatabaseFetchSelector).comparison)} ?`).join(" AND ")}`;
         }
 
         return "";
     }
 
-    selectorsToData(selectors: Record<string, DatabaseSelectorValue>): string[] {
+    selectorsToData(selectors: Record<string, types.DatabaseSelectorValue>): string[] {
         return Object.values(selectors).map(e => typeof(e) !== "object" ? e.toString() : e.value.toString());
     }
 
-    itemToKeys(item: Record<string, DatabaseItemValue>): string {
+    itemToKeys(item: Record<string, types.DatabaseItemValue>): string {
         return Object.keys(item).map(e => `\`${e}\``).join(", ");
     }
 
-    itemToKeysWithQuestions(item: Record<string, DatabaseItemValue>): string {
+    itemToKeysWithQuestions(item: Record<string, types.DatabaseItemValue>): string {
         return Object.keys(item).map(e => `\`${e}\` = ?`).join(", ");
     }
 
-    itemToValues(item: Record<string, DatabaseItemValue>): (string | null)[] {
+    itemToValues(item: Record<string, types.DatabaseItemValue>): (string | null)[] {
         return Object.values(item).map(e => {
             if(e === null) { return e; }
             switch(typeof(e)) {
@@ -169,11 +168,11 @@ class DatabaseMySQL extends Database {
         });
     }
 
-    itemToValuesWithQuestions(item: Record<string, DatabaseItemValue>): string {
+    itemToValuesWithQuestions(item: Record<string, types.DatabaseItemValue>): string {
         return Object.values(item).map(() => "?").join(", ");
     }
 
-    deserialize<T>(options: DatabaseFetchOptions, item: any): T | null {
+    deserialize<T>(options: types.DatabaseFetchOptions, item: any): T | null {
         if(item === undefined) {
             return null;
         }
@@ -185,8 +184,8 @@ class DatabaseMySQL extends Database {
                 /* Apply modifiers */
                 const fieldOptions = this.options.structure[options.source][field];
                 switch(fieldOptions.modifier) {
-                    case DatabaseMySQLFieldModifier.ARRAY:
-                        newItem[field] = newItem[field].split(",").filter((e: string) => e !== "");
+                    case types.DatabaseMySQLFieldModifier.ARRAY:
+                        newItem[field] = stringToArray(newItem[field]);
                         break;
                 }
 
@@ -200,7 +199,7 @@ class DatabaseMySQL extends Database {
         return newItem;
     }
 
-    serialize(table: string, item: Record<string, DatabaseUnserializedItemValue>): Record<string, DatabaseItemValue> {
+    serialize(table: string, item: Record<string, types.DatabaseUnserializedItemValue>): Record<string, types.DatabaseItemValue> {
         const newItem: any = item;
         if(this.options.structure !== undefined && this.options.structure[table] !== undefined) {
             const fields = Object.keys(this.options.structure[table]).filter(e => newItem[e] !== undefined);
@@ -208,7 +207,7 @@ class DatabaseMySQL extends Database {
                 /* Apply modifiers */
                 const fieldOptions = this.options.structure[table][field];
                 switch(fieldOptions.modifier) {
-                    case DatabaseMySQLFieldModifier.ARRAY:
+                    case types.DatabaseMySQLFieldModifier.ARRAY:
                         const fieldArray = newItem[field] as string[];
                         newItem[field] = fieldArray.join(",");
                         break;

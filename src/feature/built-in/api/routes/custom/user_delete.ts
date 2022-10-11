@@ -1,5 +1,5 @@
 /* Types */
-import { Status } from "../../../../../ts/backend/base";
+import { Status } from "ts/backend/base";
 import { IDSchema, IDSchemaType } from "ts/common/zod/base";
 import { RequestWithSchemaQuery } from "../types";
 
@@ -7,7 +7,7 @@ import { RequestWithSchemaQuery } from "../types";
 import APIRoute from "..";
 import FeatureAPI from "../..";
 import { getSession, validateSchemaQuery } from "../util";
-import FeatureDaemon from "../../../../custom/daemon";
+import FeatureDaemon from "feature/custom/daemon";
 import { deleteServer, deleteUptimeEndpoint } from "./_util";
 
 class RouteUserDelete extends APIRoute {

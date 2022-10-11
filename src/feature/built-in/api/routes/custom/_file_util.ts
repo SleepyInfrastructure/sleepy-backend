@@ -1,8 +1,8 @@
 /* Types */
-import Database from "../../../../../database";
-import { DaemonFileType } from "../../../../custom/daemon/types";
+import Database from "database";
+import { DaemonFileType } from "feature/custom/daemon/types";
 import { RouteDaemonFileUploadOptions } from ".";
-import { FoxxyFastifyReply, FoxxyFastifyRequest } from "../../../../../util/fastify";
+import { FoxxyFastifyReply, FoxxyFastifyRequest } from "util/fastify";
 
 /* Node Imports */
 import { randomBytes } from "crypto";
@@ -16,7 +16,7 @@ import { bold, green, red, yellow } from "nanocolors";
 const pump = util.promisify(pipeline);
 
 /* Local Imports */
-import { pad } from "../../../../../util/general";
+import { pad } from "util/general";
 
 export async function processFile(database: Database, options: RouteDaemonFileUploadOptions, server: Server, req: FoxxyFastifyRequest<RouteGenericInterface>, rep: FoxxyFastifyReply): Promise<Error | null> {
     /* Get files */

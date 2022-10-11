@@ -1,19 +1,19 @@
 /* Types */
-import { Status } from "../../../ts/backend/base";
+import { Status } from "ts/backend/base";
 import { FeatureAPIOptions } from "./types";
-import { DatabaseType } from "../../../database/types";
+import { DatabaseType } from "database/types";
 
 /* Node Imports */
 import { bold, green, yellow } from "nanocolors";
 
 /* Local Imports */
 import Feature from "../..";
-import Instance from "../../../instance";
+import Instance from "instance";
 import APIRoute from "./routes";
-import { createFastifyInstance, FoxxyFastifyInstance, startFastifyInstance } from "../../../util/fastify";
+import { createFastifyInstance, FoxxyFastifyInstance, startFastifyInstance } from "util/fastify";
 import BuiltinRoutes, { BuiltinRouteType } from "./routes/built-in";
 import CustomRoutes, { CustomRouteType } from "./routes/custom";
-import Database from "../../../database";
+import Database from "database";
 
 class FeatureAPI extends Feature {
     options: FeatureAPIOptions;

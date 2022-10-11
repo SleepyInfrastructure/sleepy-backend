@@ -1,16 +1,16 @@
 /* Types */
-import { DatabaseFetchOptions } from "../../../../../database/types";
+import { DatabaseFetchOptions } from "database/types";
 import { RouteSessionCreateOptions } from "./index";
-import { SessionCreateSchema, SessionCreateSchemaType } from "./_schemas";
-import { RequestWithSchema } from "../types";
+import * as schemas from "./schemas";
+import { RequestWithSchema } from "feature/built-in/api/routes/types";
 
 /* Node Imports */
 import { compare } from "bcrypt";
 import { randomBytes } from "crypto";
 
 /* Local Imports */
-import APIRoute from "..";
-import FeatureAPI from "../..";
+import APIRoute from "feature/built-in/api/routes";
+import FeatureAPI from "feature/built-in/api";
 import { validateSchemaBody } from "../util";
 
 class RouteSessionCreate extends APIRoute {
@@ -24,9 +24,9 @@ class RouteSessionCreate extends APIRoute {
     hook(feature: FeatureAPI): void {
         feature.instance.post(this.path,
             { config: { rateLimit: { timeWindow: 1000, max: 4 } } },
-            async (req: RequestWithSchema<SessionCreateSchemaType>, rep) => {
+            async (req: RequestWithSchema<schemas.SessionCreateSchemaType>, rep) => {
                 /* Validate schemas */
-                if(!validateSchemaBody(SessionCreateSchema, req, rep)) {
+                if(!validateSchemaBody(schemas.SessionCreateSchema, req, rep)) {
                     return;
                 }
                 

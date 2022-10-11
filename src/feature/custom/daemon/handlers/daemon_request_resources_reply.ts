@@ -6,6 +6,7 @@ import { randomBytes } from "crypto";
 import WebsocketMessageHandler from "./message";
 import * as schemas from "../schemas";
 import FeatureDaemon from "..";
+import { stringToArray } from "util/general";
 
 class DaemonRequestResourcesReplyMessageHandler extends WebsocketMessageHandler<schemas.WebsocketDaemonRequestResourcesReplyMessageType> {
     constructor(parent: FeatureDaemon) {
@@ -118,16 +119,17 @@ class DaemonRequestResourcesReplyMessageHandler extends WebsocketMessageHandler<
             for(const container of message.containers) {
                 const serverContainer: Container = {
                     id: container.id,
+                    rawId: container.rawId,
                     author: daemon.author,
                     server: daemon.id,
                     parent: container.parent,
                     image: container.image,
                     creation: container.creation,
-                    ports: container.ports,
+                    ports: stringToArray(container.ports),
                     status: container.status,
                     name: container.name,
-                    mounts: container.mounts,
-                    networks: container.networks
+                    mounts: stringToArray(container.mounts),
+                    networks: stringToArray(container.networks)
                 };
                 this.parent.database.add({ destination: "containers", item: serverContainer });
             }

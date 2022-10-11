@@ -2,7 +2,7 @@
 import { CronUpdate, CronUpdateResources, CronUpdateStatistics, CronUpdateType } from "../types";
 import { DaemonWebsocketMessageType } from "../../daemon/types";
 import FeatureDaemon from "../../daemon";
-import Database from "../../../../database";
+import Database from "database";
 
 /* Node Imports */
 import { processEndpointUptime } from "./endpoints";

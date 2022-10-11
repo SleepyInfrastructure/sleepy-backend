@@ -1,5 +1,5 @@
 /* Types */
-import { DatabaseUnserializedItemValue } from "../../../../../database/types";
+import { DatabaseUnserializedItemValue } from "database/types";
 import { UptimeEndpointEditSchema, UptimeEndpointEditSchemaType } from "ts/common/zod/uptime_endpoint";
 import { RequestWithSchema } from "../types";
 
