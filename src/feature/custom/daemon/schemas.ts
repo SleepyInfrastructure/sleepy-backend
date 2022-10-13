@@ -25,7 +25,7 @@ export const WebsocketDaemonRequestResourcesReplyMessage = z.intersection(Websoc
     memory: z.any().nullable(),
     software: z.any().nullable(),
     disks: z.array(z.any()).nullable(),
-    zfsPools: z.array(z.any()).nullable(),
+    zfs: z.array(z.any()).nullable(),
     containers: z.array(z.any()).nullable(),
     containerProjects: z.array(z.any()).nullable()
 }));

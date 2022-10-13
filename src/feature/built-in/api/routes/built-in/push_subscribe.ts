@@ -2,11 +2,10 @@
 import { RoutePushSubscribeOptions } from "./index";
 import * as schemas from "./schemas";
 import { RequestWithSchema } from "feature/built-in/api/routes/types";
-
 /* Local Imports */
 import APIRoute from "feature/built-in/api/routes";
 import FeatureAPI from "feature/built-in/api";
-import { getSession, validateSchemaBody } from "../util";
+import { getSession, validateSchemaBody } from "feature/built-in/api/routes/util"
 
 class RoutePushSubscribe extends APIRoute {
     options: RoutePushSubscribeOptions;

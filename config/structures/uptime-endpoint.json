@@ -1,5 +1,5 @@
 {
-    "id": "uptimeEndpoint",
+    "id": "uptime-endpoint",
     "structure": {
         "statistics": {
             "type": "ARRAY",

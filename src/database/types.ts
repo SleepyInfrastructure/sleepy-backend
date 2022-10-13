@@ -54,7 +54,8 @@ export type DatabaseDeleteOptions = {
 
 /* MySQL */
 export enum DatabaseMySQLFieldModifier {
-    ARRAY = "ARRAY"
+    ARRAY = "ARRAY",
+    BOOLEAN = "BOOLEAN"
 }
 
 export type DatabaseMySQLOptions = DatabaseOptions & {

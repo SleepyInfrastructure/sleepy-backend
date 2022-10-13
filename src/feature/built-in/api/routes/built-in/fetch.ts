@@ -2,11 +2,10 @@
 import { RouteFetchOptions } from "./index";
 import * as schemas from "./schemas";
 import { RequestWithSchemaQuery } from "feature/built-in/api/routes/types";
-
 /* Local Imports */
 import APIRoute from "feature/built-in/api/routes";
 import FeatureAPI from "feature/built-in/api";
-import { getSession, validateSchemaQuery } from "../util";
+import { getSession, validateSchemaQuery } from "feature/built-in/api/routes/util";
 
 class RouteFetch extends APIRoute {
     options: RouteFetchOptions;

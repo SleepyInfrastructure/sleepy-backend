@@ -17,10 +17,10 @@ export const FetchMultipleSchema = z.object({
 });
 export type FetchMultipleSchemaType = z.infer<typeof FetchMultipleSchema>;
 
-export const FetchStructuredSchema = z.object({
+export const FetchStructuredArraySchema = z.object({
     id: z.string().min(32).max(32).optional()
 });
-export type FetchStructuredSchemaType = z.infer<typeof FetchStructuredSchema>;
+export type FetchStructuredArraySchemaType = z.infer<typeof FetchStructuredArraySchema>;
 
 export const FetchSchema = IDSchema;
 export type FetchSchemaType = z.infer<typeof FetchSchema>;

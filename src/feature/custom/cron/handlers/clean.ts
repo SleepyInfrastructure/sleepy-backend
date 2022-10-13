@@ -1,9 +1,9 @@
 /* Types */
 import { StatisticTimeMapping, StatisticTypeNextMapping } from "ts/common/const";
 import { CronClean, CronCleanType, CronUpdateResourcesType } from "../types";
-
 /* Node Imports */
 import { bold, gray, yellow } from "nanocolors";
+/* Local Imports */
 import Database from "database";
 
 export async function processClean(database: Database, clean: CronClean) {

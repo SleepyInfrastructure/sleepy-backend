@@ -1,6 +1,5 @@
 /* Types */
 import { RoutePushUnsubscribeOptions } from "./index";
-
 /* Local Imports */
 import APIRoute from "feature/built-in/api/routes";
 import FeatureAPI from "feature/built-in/api";

@@ -8,39 +8,41 @@
     "passwordEnv": "SLEEPY_MYSQL_PASSWORD",
     "database": "sleepy-db",
     "structure": {
-        "users": {
-            "password": {
-                "sensitive": true
-            }
+        "containers": {
+            "ports": { "modifier": "ARRAY" },
+            "mounts": { "modifier": "ARRAY" },
+            "networks": { "modifier": "ARRAY" }
+        },
+        "databases": {
+            "credentials": { "modifier": "BOOLEAN" }
+        },
+        "disks": {
+            "ssd": { "modifier": "BOOLEAN" }
+        },
+        "publicserverlistings": {
+            "statistics": { "modifier": "BOOLEAN" }
         },
         "servers": {
-            "netInterfaces": {
-                "modifier": "ARRAY"
-            }
-        },
-        "userfiles": {
-            "path": {
-                "sensitive": true
-            }
+            "netInterfaces": { "modifier": "ARRAY" }
         },
         "smbshares": {
-            "users": {
-                "modifier": "ARRAY"
-            },
-            "admins": {
-                "modifier": "ARRAY"
-            }
+            "browsable": { "modifier": "BOOLEAN" },
+            "readonly": { "modifier": "BOOLEAN" },
+            "guest": { "modifier": "BOOLEAN" },
+            "users": { "modifier": "ARRAY" },
+            "admins": { "modifier": "ARRAY" }
         },
-        "containers": {
-            "ports": {
-                "modifier": "ARRAY"
-            },
-            "mounts": {
-                "modifier": "ARRAY"
-            },
-            "networks": {
-                "modifier": "ARRAY"
-            }
+        "userfiles": {
+            "path": { "sensitive": true }
+        },
+        "users": {
+            "password": {"sensitive": true }
+        },
+        "zfspools": {
+            "encryption": { "modifier": "BOOLEAN" },
+            "atime": { "modifier": "BOOLEAN" },
+            "deduplication": { "modifier": "BOOLEAN" },
+            "relatime": { "modifier": "BOOLEAN" }
         }
     }
 }

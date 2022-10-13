@@ -1,13 +1,13 @@
 /* Types */
 import { StatisticTimeMapping, StatisticTypePreviousMapping } from "ts/common/const";
-import { CronUpdateResourcesType, CronUpdateStatistics } from "../types";
-import { DaemonWebsocketMessageType } from "../../daemon/types";
-import Database from "database";
-import FeatureDaemon from "../../daemon";
-
+import { CronUpdateResourcesType, CronUpdateStatistics } from "feature/custom/cron/types";
+import { DaemonWebsocketMessageType } from "feature/custom/daemon/types";
 /* Node Imports */
 import { randomBytes } from "crypto";
 import { bold, green, yellow } from "nanocolors";
+/* Local Imports */
+import Database from "database";
+import FeatureDaemon from "feature/custom/daemon";
 
 export function processStatisticUpdates(feature: FeatureDaemon, database: Database, update: CronUpdateStatistics) {
     for(const resource of update.resources) {

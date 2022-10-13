@@ -3,11 +3,9 @@ import { DatabaseFetchOptions } from "database/types";
 import { RouteSessionCreateOptions } from "./index";
 import * as schemas from "./schemas";
 import { RequestWithSchema } from "feature/built-in/api/routes/types";
-
 /* Node Imports */
 import { compare } from "bcrypt";
 import { randomBytes } from "crypto";
-
 /* Local Imports */
 import APIRoute from "feature/built-in/api/routes";
 import FeatureAPI from "feature/built-in/api";

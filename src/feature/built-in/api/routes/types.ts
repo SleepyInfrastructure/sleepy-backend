@@ -1,7 +1,9 @@
-import { z } from "zod";
+/* Types */
 import { BuiltinRouteType } from "./built-in";
 import { CustomRouteType } from "./custom";
 import { FoxxyFastifyRequest } from "util/fastify";
+/* Node Imports */
+import { z } from "zod";
 
 export type RouteOptions = {
     path: string;

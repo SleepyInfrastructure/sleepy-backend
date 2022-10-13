@@ -2,16 +2,14 @@
 import { RouteUserFileAccessOptions } from "./index";
 import { IDSchema, IDSchemaType } from "ts/common/zod/base";
 import { RequestWithSchemaQuery } from "../types";
-
 /* Node Imports */
 import { createReadStream } from "fs";
 import path from "path";
 import archiver from "archiver";
-
 /* Local Imports */
-import APIRoute from "..";
-import FeatureAPI from "../..";
-import { getSession, validateSchemaQuery } from "../util";
+import APIRoute from "feature/built-in/api/routes";
+import FeatureAPI from "feature/built-in/api";
+import { getSession, validateSchemaQuery } from "feature/built-in/api/routes/util";
 
 class RouteUserFileAccess extends APIRoute {
     hook(feature: FeatureAPI): void {

@@ -1,15 +1,13 @@
 /* Types */
 import { Status } from "ts/backend/base";
 import { FeatureStaticOptions } from "./types";
-
 /* Node Imports */
 import fastifyStatic from "@fastify/static";
 import { existsSync, createReadStream } from "fs";
 import { join } from "path";
 import { RouteGenericInterface } from "fastify/types/route";
-
 /* Local Imports */
-import Feature from "../..";
+import Feature from "feature";
 import Instance from "instance";
 import { createFastifyInstance, FoxxyFastifyInstance, FoxxyFastifyReply, FoxxyFastifyRequest, startFastifyInstance } from "util/fastify";
 

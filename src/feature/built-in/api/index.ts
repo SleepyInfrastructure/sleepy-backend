@@ -2,12 +2,10 @@
 import { Status } from "ts/backend/base";
 import { FeatureAPIOptions } from "./types";
 import { DatabaseType } from "database/types";
-
 /* Node Imports */
 import { bold, green, yellow } from "nanocolors";
-
 /* Local Imports */
-import Feature from "../..";
+import Feature from "feature";
 import Instance from "instance";
 import APIRoute from "./routes";
 import { createFastifyInstance, FoxxyFastifyInstance, startFastifyInstance } from "util/fastify";

@@ -2,6 +2,7 @@
 	"id": "cron",
 	"name": "cron",
 	"type": "CRON",
+	
 	"intervals": [
 		{
 			"time": "*/1 * * * *",

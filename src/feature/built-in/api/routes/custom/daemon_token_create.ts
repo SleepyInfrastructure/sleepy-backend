@@ -2,11 +2,11 @@
 import { randomBytes } from "crypto";
 
 /* Local Imports */
-import APIRoute from "..";
-import FeatureAPI from "../..";
+import APIRoute from "feature/built-in/api/routes";
+import FeatureAPI from "feature/built-in/api";
 import { IDSchema, IDSchemaType } from "ts/common/zod/base";
-import { RequestWithSchema } from "../types";
-import { getSession, validateSchemaBody } from "../util";
+import { RequestWithSchema } from "feature/built-in/api/routes/types";
+import { getSession, validateSchemaBody } from "feature/built-in/api/routes/util"
 
 class RouteDaemonTokenCreate extends APIRoute {
     hook(feature: FeatureAPI): void {

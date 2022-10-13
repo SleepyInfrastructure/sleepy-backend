@@ -1,9 +1,8 @@
 /* Types */
 import { RouteDaemonFileUploadOptions } from "./index";
-
 /* Local Imports */
-import APIRoute from "..";
-import FeatureAPI from "../..";
+import APIRoute from "feature/built-in/api/routes";
+import FeatureAPI from "feature/built-in/api";
 import { processFile } from "./_file_util";
 
 class RouteDaemonFileUpload extends APIRoute {

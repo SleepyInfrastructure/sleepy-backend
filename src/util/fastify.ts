@@ -1,6 +1,5 @@
 /* Types */
-import { FeatureServerOptions } from "../ts/backend/base";
-
+import { FeatureServerOptions } from "ts/backend/base";
 /* Node Imports */
 import { readFileSync } from "fs";
 import * as fastify from "fastify";

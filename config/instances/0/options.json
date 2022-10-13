@@ -1,6 +1,0 @@
-{
-    "id": "0",
-    "name": "0",
-    "features": ["static", "data", "api", "daemon", "cron"],
-    "databases": ["mysql"]
-}

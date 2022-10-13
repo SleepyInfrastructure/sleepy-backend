@@ -3,10 +3,8 @@ import { DatabaseFetchOptions } from "database/types";
 import { RoutePushSendOptions } from "./index";
 import * as schemas from "./schemas";
 import { RequestWithSchema } from "feature/built-in/api/routes/types";
-
 /* Node Imports */
 import * as webPush from "web-push";
-
 /* Local Imports */
 import APIRoute from "feature/built-in/api/routes";
 import FeatureAPI from "feature/built-in/api";

@@ -1,10 +1,9 @@
 /* Types */
 import { IDSchema, IDSchemaType } from "ts/common/zod/base";
 import { RequestWithSchemaQuery } from "../types";
-
 /* Local Imports */
-import APIRoute from "..";
-import FeatureAPI from "../..";
+import APIRoute from "feature/built-in/api/routes";
+import FeatureAPI from "feature/built-in/api";
 import { validateSchemaQuery } from "../util";
 
 class RouteServerPublicFetchStructured extends APIRoute {

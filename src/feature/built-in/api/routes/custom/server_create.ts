@@ -1,14 +1,12 @@
 /* Types */
 import { ServerCreateSchema, ServerCreateSchemaType } from "ts/common/zod/server";
-import { RequestWithSchema } from "../types";
-
+import { RequestWithSchema } from "feature/built-in/api/routes/types";
 /* Node Imports */
 import { randomBytes } from "crypto";
-
 /* Local Imports */
-import APIRoute from "..";
-import FeatureAPI from "../..";
-import { getSession, validateSchemaBody } from "../util";
+import APIRoute from "feature/built-in/api/routes";
+import FeatureAPI from "feature/built-in/api";
+import { getSession, validateSchemaBody } from "feature/built-in/api/routes/util"
 
 class RouteServerCreate extends APIRoute {
     hook(feature: FeatureAPI): void {

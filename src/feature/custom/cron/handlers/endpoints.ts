@@ -1,12 +1,11 @@
-/* Types */
-import Database from "database";
-
 /* Node Imports */
 import { request as httpRequest } from "http";
 import { request as httpsRequest } from "https";
 import { randomBytes } from "crypto";
 import ping from "pingman";
 import { lookup } from "dns";
+/* Local Imports */
+import Database from "database";
 
 export async function processEndpointUptime(database: Database, endpoint: UptimeEndpoint) {
     let pingTime: number | null = null;

@@ -1,9 +1,8 @@
 /* Types */
 import { StateDescriptor, Status } from "ts/backend/base";
 import { RouteOptions } from "./types";
-
 /* Local Imports */
-import FeatureAPI from "..";
+import FeatureAPI from "feature/built-in/api";
 
 abstract class APIRoute {
     path: string;

@@ -11,11 +11,15 @@
 		"/", "/public-dashboards", "/login", "/register", "/tasks", "/tokens", "/settings",
 		"/overview",
 		"/create-server", "/edit-server/:id", "/server/:id", "/server/:id/map", "/installing-daemon/:id",
+		"/create-network", "/edit-network/:id", "/network/:id", 
 		"/container/:id", "/container-project/:id",
 		"/create-database", "/edit-database/:id", "/database/:id", 
 		"/create-uptime-endpoint", "/edit-uptime-endpoint",
 		"/create-smb-instance/:id", "/edit-smb-instance/:id", "/smb-instance/:id",
 		"/create-smb-share/:id", "/edit-smb-share/:id",
-		"/create-smb-user/:id", "/edit-smb-user/:id"
+		"/create-smb-user/:id", "/edit-smb-user/:id",
+		"/create-nfs-instance/:id", "/edit-nfs-instance/:id", "/nfs-instance/:id",
+		"/create-nfs-export/:id", "/edit-nfs-export/:id",
+		"/create-nfs-machine/:id", "/edit-nfs-machine/:id"
 	]
 }

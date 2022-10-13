@@ -41,6 +41,7 @@ export type APIStructure = Record<string, RouteFetchStructuredItemOptions>;
 export type APIStructureImported = Record<string, RouteFetchStructuredItemImportedOptions>;
 export type APIStructureImportedDetails = {
     hasAuthorField: boolean;
+    needsQueryId: boolean;
 };
 
 export type APIStructureOptions = {

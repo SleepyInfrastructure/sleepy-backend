@@ -1,11 +1,10 @@
 /* Types */
 import { IDSchema, IDSchemaType } from "ts/common/zod/base";
 import { RequestWithSchemaQuery } from "../types";
-
 /* Local Imports */
-import APIRoute from "..";
-import FeatureAPI from "../..";
-import { getSession, validateSchemaQuery } from "../util";
+import APIRoute from "feature/built-in/api/routes";
+import FeatureAPI from "feature/built-in/api";
+import { getSession, validateSchemaQuery } from "feature/built-in/api/routes/util";
 import { deleteSmbInstance } from "./_util";
 
 class RouteSMBInstanceDelete extends APIRoute {

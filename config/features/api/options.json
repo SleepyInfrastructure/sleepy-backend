@@ -7,74 +7,33 @@
 	"https": "global",
     "cors": { "origins": ["https://sleepy.lamkas.dev", "https://localhost:8080"] },
     "routes": [
-        {
-            "path": "/v1/sessions/create",
-            "type": "SESSION_CREATE"
-        },
-        {
-            "path": "/v1/sessions/delete",
-            "type": "SESSION_DELETE"
-        },
-        {
-            "path": "/v1/users/create",
-            "type": "AUTH_CREATE"
-        },
-        {
-            "path": "/v1/users/delete",
-            "type": "USER_DELETE"
-        },
+        { "path": "/v1/sessions/create", "type": "SESSION_CREATE" },
+        { "path": "/v1/sessions/delete", "type": "SESSION_DELETE" },
+        { "path": "/v1/users/create", "type": "AUTH_CREATE" },
+        { "path": "/v1/users/delete", "type": "USER_DELETE" },
         {
             "path": "/v1/users/fetch",
             "type": "FETCH",
             "table": "users"
         },
+        { "path": "/v1/servers/create", "type": "SERVER_CREATE" },
+        { "path": "/v1/servers/edit", "type": "SERVER_EDIT" },
+        { "path": "/v1/servers/delete", "type": "SERVER_DELETE" },
         {
-            "path": "/v1/servers/create",
-            "type": "SERVER_CREATE"
-        },
-        {
-            "path": "/v1/servers/edit",
-            "type": "SERVER_EDIT"
-        },
-        {
-            "path": "/v1/servers/delete",
-            "type": "SERVER_DELETE"
-        },
-        {
-            "path": "/v1/servers/fetch",
-            "type": "FETCH",
-            "table": "servers",
-            "authorField": "author"
-        },
-        {
-            "path": "/v1/servers/public/fetch",
-            "type": "FETCH_MULTIPLE",
-            "table": "publicserverlistings",
-            "disableIdField": true
-        },
-        {
-            "path": "/v1/servers/public/structured/fetch",
-            "type": "SERVER_PUBLIC_FETCH_STRUCTURED"
-        },
-        {
-            "path": "/v1/servers/all/fetch",
-            "type": "FETCH_MULTIPLE",
-            "table": "servers",
-            "authorField": "author",
-            "disableIdField": true
-        },
-        {
-            "path": "/v1/server/structured/fetch",
+            "path": "/v1/servers/structured/fetch",
+            "paths": {
+                "BASE": "/v1/servers/fetch", "BASE_ARRAY": "/v1/servers/all/fetch",
+                "SINGLE": "/v1/servers/structured/fetch", "ARRAY": "/v1/servers/all/structured/fetch"
+            },
             "type": "FETCH_STRUCTURED",
             "base": {
-                "type": "SINGLE",
                 "table": "servers",
                 "authorField": "author",
                 "structure": "server"
             }
         },
         {
-            "path": "/v1/server/statistics/hour/fetch",
+            "path": "/v1/servers/statistics/hour/fetch",
             "type": "FETCH_MULTIPLE",
             "table": "statistics",
             "idField": "server",
@@ -84,7 +43,7 @@
             "limit": 60
         },
         {
-            "path": "/v1/server/statistics/day/fetch",
+            "path": "/v1/servers/statistics/day/fetch",
             "type": "FETCH_MULTIPLE",
             "table": "statistics",
             "idField": "server",
@@ -94,7 +53,7 @@
             "limit": 24
         },
         {
-            "path": "/v1/server/statistics/month/fetch",
+            "path": "/v1/servers/statistics/month/fetch",
             "type": "FETCH_MULTIPLE",
             "table": "statistics",
             "idField": "server",
@@ -104,7 +63,7 @@
             "limit": 30
         },
         {
-            "path": "/v1/server/statistics/year/fetch",
+            "path": "/v1/servers/statistics/year/fetch",
             "type": "FETCH_MULTIPLE",
             "table": "statistics",
             "idField": "server",
@@ -114,242 +73,139 @@
             "limit": 12
         },
         {
-            "path": "/v1/servers/all/structured/fetch",
-            "type": "FETCH_STRUCTURED",
-            "base": {
-                "type": "ARRAY",
-                "table": "servers",
-                "authorField": "author",
-                "disableIdField": true,
-                "structure": "server"
-            }
-        },
-        {
             "path": "/v1/serverconfigs/fetch",
             "type": "FETCH",
             "table": "serverconfigs",
             "authorField": "author"
         },
         {
+            "path": "/v1/servers/public/fetch",
+            "type": "FETCH_MULTIPLE",
+            "table": "publicserverlistings"
+        },
+        { "path": "/v1/servers/public/structured/fetch", "type": "SERVER_PUBLIC_FETCH_STRUCTURED" },
+        {
             "path": "/v1/networks/create",
-            "type": "NETWORK_CREATE"
+            "type": "CREATE",
+            "table": "networks",
+            "schema": "NETWORK_CREATE"
         },
         {
             "path": "/v1/networks/edit",
-            "type": "NETWORK_EDIT"
-        },
-        {
-            "path": "/v1/networks/fetch",
-            "type": "FETCH",
+            "type": "EDIT",
             "table": "networks",
-            "authorField": "author"
+            "schema": "NETWORK_EDIT"
         },
         {
             "path": "/v1/networks/all/fetch",
             "type": "FETCH_MULTIPLE",
+            "singlePath": "/v1/networks/fetch",
             "table": "networks",
-            "authorField": "author",
-            "disableIdField": true
-        },
-        {
-            "path": "/v1/disks/fetch",
-            "type": "FETCH",
-            "table": "disks",
             "authorField": "author"
-        },
-        {
-            "path": "/v1/disks/all/fetch",
-            "type": "FETCH_MULTIPLE",
-            "table": "disks",
-            "authorField": "author",
-            "disableIdField": true
         },
         {
             "path": "/v1/disks/structured/fetch",
+            "paths": {
+                "BASE": "/v1/disks/fetch", "BASE_ARRAY": "/v1/disks/all/fetch",
+                "SINGLE": "/v1/disks/structured/fetch", "ARRAY": "/v1/disks/all/structured/fetch"
+            },
             "type": "FETCH_STRUCTURED",
             "base": {
-                "type": "SINGLE",
                 "table": "disks",
                 "authorField": "author",
                 "structure": "disk"
             }
-        },
-        {
-            "path": "/v1/disks/all/structured/fetch",
-            "type": "FETCH_STRUCTURED",
-            "base": {
-                "type": "ARRAY",
-                "table": "disks",
-                "authorField": "author",
-                "disableIdField": true,
-                "structure": "disk"
-            }
-        },
-        {
-            "path": "/v1/partitions/fetch",
-            "type": "FETCH",
-            "table": "partitions",
-            "authorField": "author"
         },
         {
             "path": "/v1/partitions/all/fetch",
             "type": "FETCH_MULTIPLE",
+            "singlePath": "/v1/partitions/fetch",
             "table": "partitions",
-            "authorField": "author",
-            "disableIdField": true
-        },
-        {
-            "path": "/v1/zfsPools/fetch",
-            "type": "FETCH",
-            "table": "zfspools",
             "authorField": "author"
-        },
-        {
-            "path": "/v1/zfsPools/all/fetch",
-            "type": "FETCH_MULTIPLE",
-            "table": "zfspools",
-            "authorField": "author",
-            "disableIdField": true
         },
         {
             "path": "/v1/zfsPools/structured/fetch",
+            "paths": {
+                "BASE": "/v1/zfsPools/fetch", "BASE_ARRAY": "/v1/zfsPools/all/fetch",
+                "SINGLE": "/v1/zfsPools/structured/fetch", "ARRAY": "/v1/zfsPools/all/structured/fetch"
+            },
             "type": "FETCH_STRUCTURED",
             "base": {
-                "type": "SINGLE",
                 "table": "zfspools",
                 "authorField": "author",
-                "structure": "zfsPool"
+                "structure": "zfs-pool"
             }
-        },
-        {
-            "path": "/v1/zfsPools/all/structured/fetch",
-            "type": "FETCH_STRUCTURED",
-            "base": {
-                "type": "ARRAY",
-                "table": "zfspools",
-                "authorField": "author",
-                "disableIdField": true,
-                "structure": "zfsPool"
-            }
-        },
-        {
-            "path": "/v1/zfsPartitions/fetch",
-            "type": "FETCH",
-            "table": "zfspartitions",
-            "authorField": "author"
         },
         {
             "path": "/v1/zfsPartitions/all/fetch",
             "type": "FETCH_MULTIPLE",
+            "singlePath": "/v1/zfsPartitions/fetch",
             "table": "zfspartitions",
-            "authorField": "author",
-            "disableIdField": true
-        },
-        {
-            "path": "/v1/containers/fetch",
-            "type": "FETCH",
-            "table": "containers",
             "authorField": "author"
-        },
-        {
-            "path": "/v1/containers/all/fetch",
-            "type": "FETCH_MULTIPLE",
-            "table": "containers",
-            "authorField": "author",
-            "disableIdField": true
         },
         {
             "path": "/v1/containers/structured/fetch",
+            "paths": {
+                "BASE": "/v1/containers/fetch", "BASE_ARRAY": "/v1/containers/all/fetch",
+                "SINGLE": "/v1/containers/structured/fetch", "ARRAY": "/v1/containers/all/structured/fetch"
+            },
             "type": "FETCH_STRUCTURED",
             "base": {
-                "type": "SINGLE",
                 "table": "containers",
                 "authorField": "author",
                 "structure": "container"
             }
-        },
-        {
-            "path": "/v1/containers/all/structured/fetch",
-            "type": "FETCH_STRUCTURED",
-            "base": {
-                "type": "ARRAY",
-                "table": "containers",
-                "authorField": "author",
-                "disableIdField": true,
-                "structure": "container"
-            }
-        },
-        {
-            "path": "/v1/containerProjects/fetch",
-            "type": "FETCH",
-            "table": "containerprojects",
-            "authorField": "author"
-        },
-        {
-            "path": "/v1/containerProjects/all/fetch",
-            "type": "FETCH_MULTIPLE",
-            "table": "containerprojects",
-            "authorField": "author",
-            "disableIdField": true
         },
         {
             "path": "/v1/containerProjects/structured/fetch",
+            "paths": {
+                "BASE": "/v1/containerProjects/fetch", "BASE_ARRAY": "/v1/containerProjects/all/fetch",
+                "SINGLE": "/v1/containerProjects/structured/fetch", "ARRAY": "/v1/containerProjects/all/structured/fetch"
+            },
             "type": "FETCH_STRUCTURED",
             "base": {
-                "type": "SINGLE",
                 "table": "containerprojects",
                 "authorField": "author",
-                "structure": "containerProject"
-            }
-        },
-        {
-            "path": "/v1/containerProjects/all/structured/fetch",
-            "type": "FETCH_STRUCTURED",
-            "base": {
-                "type": "ARRAY",
-                "table": "containerprojects",
-                "authorField": "author",
-                "disableIdField": true,
-                "structure": "containerProject"
+                "structure": "container-project"
             }
         },
         {
             "path": "/v1/databases/create",
-            "type": "DATABASE_CREATE"
+            "type": "CREATE",
+            "table": "databases",
+            "schema": "DATABASE_CREATE",
+            "defaults": { "credentials": false },
+            "prerequisites": { "server": "servers" }
         },
         {
             "path": "/v1/databases/edit",
-            "type": "DATABASE_EDIT"
+            "type": "EDIT",
+            "table": "databases",
+            "schema": "DATABASE_EDIT",
+            "prerequisites": { "server": "servers" }
         },
+        { "path": "/v1/databases/delete", "type": "DATABASE_DELETE" },
         {
-            "path": "/v1/databases/delete",
-            "type": "DATABASE_DELETE"
-        },
-        {
-            "path": "/v1/databases/fetch",
-            "type": "FETCH",
+            "path": "/v1/databases/all/fetch",
+            "type": "FETCH_MULTIPLE",
+            "singlePath": "/v1/databases/fetch",
             "table": "databases",
             "authorField": "author"
         },
         {
-            "path": "/v1/databases/all/fetch",
-            "type": "FETCH_MULTIPLE",
-            "table": "databases",
-            "authorField": "author",
-            "disableIdField": true
-        },
-        {
             "path": "/v1/smbInstances/create",
-            "type": "SMB_INSTANCE_CREATE"
+            "type": "CREATE",
+            "table": "smbinstances",
+            "schema": "SMB_INSTANCE_CREATE"
         },
         {
             "path": "/v1/smbInstances/edit",
-            "type": "SMB_INSTANCE_EDIT"
+            "type": "EDIT",
+            "table": "smbinstances",
+            "schema": "SMB_INSTANCE_EDIT",
+            "prerequisites": { "server": "servers" }
         },
-        {
-            "path": "/v1/smbInstances/delete",
-            "type": "SMB_INSTANCE_DELETE"
-        },
+        { "path": "/v1/smbInstances/delete", "type": "SMB_INSTANCE_DELETE" },
         {
             "path": "/v1/smbInstances/fetch",
             "type": "FETCH",
@@ -358,16 +214,18 @@
         },
         {
             "path": "/v1/smbShares/create",
-            "type": "SMB_SHARE_CREATE"
+            "type": "CREATE",
+            "table": "smbshares",
+            "schema": "SMB_SHARE_CREATE",
+            "prerequisites": { "parent": "smbinstances", "users": "smbusers", "admins": "smbusers" }
         },
         {
             "path": "/v1/smbShares/edit",
-            "type": "SMB_SHARE_EDIT"
+            "type": "EDIT",
+            "table": "smbshares",
+            "schema": "SMB_SHARE_EDIT"
         },
-        {
-            "path": "/v1/smbShares/delete",
-            "type": "SMB_SHARE_DELETE"
-        },
+        { "path": "/v1/smbShares/delete", "type": "SMB_SHARE_DELETE" },
         {
             "path": "/v1/smbShares/fetch",
             "type": "FETCH",
@@ -376,11 +234,16 @@
         },
         {
             "path": "/v1/smbUsers/create",
-            "type": "SMB_USER_CREATE"
+            "type": "CREATE",
+            "table": "smbusers",
+            "schema": "SMB_USER_CREATE",
+            "prerequisites": { "parent": "smbinstances" }
         },
         {
             "path": "/v1/smbUsers/edit",
-            "type": "SMB_USER_EDIT"
+            "type": "EDIT",
+            "table": "smbusers",
+            "schema": "SMB_USER_EDIT"
         },
         {
             "path": "/v1/smbUsers/delete",
@@ -394,68 +257,66 @@
             "table": "smbusers",
             "authorField": "author"
         },
+        { "path": "/v1/nfsInstances/delete", "type": "NFS_INSTANCE_DELETE" },
+        {
+            "path": "/v1/nfsInstances/fetch",
+            "type": "FETCH",
+            "table": "nfsinstances",
+            "authorField": "author"
+        },
+        { "path": "/v1/nfsExports/delete", "type": "NFS_EXPORT_DELETE" },
+        {
+            "path": "/v1/nfsExports/fetch",
+            "type": "FETCH",
+            "table": "nfsexports",
+            "authorField": "author"
+        },
+        {
+            "path": "/v1/nfsMachines/delete",
+            "type": "DELETE",
+            "table": "nfsmachines",
+            "authorField": "author"
+        },
+        {
+            "path": "/v1/nfsMachines/fetch",
+            "type": "FETCH",
+            "table": "nfsmachines",
+            "authorField": "author"
+        },
         {
             "path": "/v1/uptimeEndpoints/create",
-            "type": "UPTIME_ENDPOINT_CREATE"
+            "type": "CREATE",
+            "table": "uptimeendpoints",
+            "schema": "UPTIME_ENDPOINT_CREATE",
+            "defaults": { "interval": 10 }
         },
         {
             "path": "/v1/uptimeEndpoints/edit",
-            "type": "UPTIME_ENDPOINT_EDIT"
-        },
-        {
-            "path": "/v1/uptimeEndpoints/delete",
-            "type": "UPTIME_ENDPOINT_DELETE"
-        },
-        {
-            "path": "/v1/uptimeEndpoints/fetch",
-            "type": "FETCH",
+            "type": "EDIT",
             "table": "uptimeendpoints",
-            "authorField": "author"
+            "schema": "UPTIME_ENDPOINT_EDIT"
         },
-        {
-            "path": "/v1/uptimeEndpoints/all/fetch",
-            "type": "FETCH_MULTIPLE",
-            "table": "uptimeendpoints",
-            "authorField": "author",
-            "disableIdField": true
-        },
+        { "path": "/v1/uptimeEndpoints/delete", "type": "UPTIME_ENDPOINT_DELETE" },
         {
             "path": "/v1/uptimeEndpoints/structured/fetch",
+            "paths": {
+                "BASE": "/v1/uptimeEndpoints/fetch", "BASE_ARRAY": "/v1/uptimeEndpoints/all/fetch",
+                "SINGLE": "/v1/uptimeEndpoints/structured/fetch", "ARRAY": "/v1/uptimeEndpoints/all/structured/fetch"
+            },
             "type": "FETCH_STRUCTURED",
             "base": {
-                "type": "SINGLE",
                 "table": "uptimeendpoints",
                 "authorField": "author",
-                "structure": "uptimeEndpoint"
+                "structure": "uptime-endpoint"
             }
         },
-        {
-            "path": "/v1/uptimeEndpoints/all/structured/fetch",
-            "type": "FETCH_STRUCTURED",
-            "base": {
-                "type": "ARRAY",
-                "table": "uptimeendpoints",
-                "authorField": "author",
-                "disableIdField": true,
-                "structure": "uptimeEndpoint"
-            }
-        },
-        {
-            "path": "/v1/tasks/delete",
-            "type": "TASK_DELETE"
-        },
-        {
-            "path": "/v1/tasks/fetch",
-            "type": "FETCH",
-            "table": "tasks",
-            "authorField": "author"
-        },
+        { "path": "/v1/tasks/delete", "type": "TASK_DELETE" },
         {
             "path": "/v1/tasks/all/fetch",
             "type": "FETCH_MULTIPLE",
+            "singlePath": "/v1/tasks/fetch",
             "table": "tasks",
             "authorField": "author",
-            "disableIdField": true,
             "sort": { "field": "end", "order": "DESC" },
             "limit": 20
         },
@@ -471,14 +332,14 @@
             "root": "/usr/src/sleepy/data/user"
         },
         {
-            "path": "/v1/server/daemon/tokens/fetch",
+            "path": "/v1/servers/daemon/tokens/fetch",
             "type": "FETCH_MULTIPLE",
             "table": "daemontokens",
             "idField": "server",
             "authorField": "author"
         },
         {
-            "path": "/v1/server/daemon/tokens/create",
+            "path": "/v1/servers/daemon/tokens/create",
             "type": "DAEMON_TOKEN_CREATE"
         },
         {

@@ -4,12 +4,14 @@
         "config": {
             "type": "SINGLE",
             "table": "serverconfigs",
+            "idField": "id",
             "baseIdField": "config",
             "authorField": "author"
         },
         "network": {
             "type": "SINGLE",
             "table": "networks",
+            "idField": "id",
             "baseIdField": "network",
             "authorField": "author"
         },
@@ -30,13 +32,13 @@
             "structure": "disk",
             "sort": { "field": "name" }
         },
-        "zfsPools": {
+        "zfs": {
             "type": "ARRAY",
             "table": "zfspools",
             "idField": "server",
             "baseIdField": "id",
             "authorField": "author",
-            "structure": "zfsPool",
+            "structure": "zfs-pool",
             "sort": { "field": "name" }
         },
         "containers": {
@@ -70,12 +72,13 @@
             "idField": "server",
             "baseIdField": "id",
             "authorField": "author",
-            "structure": "smbInstance",
+            "structure": "smb-instance",
             "sort": { "field": "name" }
         },
         "public": {
             "type": "SINGLE",
             "table": "publicserverlistings",
+            "idField": "id",
             "baseIdField": "id",
             "authorField": "author"
         }

@@ -1,5 +1,5 @@
 {
-    "id": "containerProject",
+    "id": "container-project",
     "structure": {
         "containers": {
             "type": "ARRAY",

@@ -35,7 +35,7 @@ class RouteDelete extends APIRoute {
                 }
 
                 const options: DatabaseDeleteOptions = { source: this.options.table, selectors: selectors };
-                await feature.database.delete(options);
+                feature.database.delete(options);
 
                 rep.code(200);
                 rep.send();

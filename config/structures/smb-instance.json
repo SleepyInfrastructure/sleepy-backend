@@ -1,5 +1,5 @@
 {
-    "id": "smbInstance",
+    "id": "smb-instance",
     "structure": {
         "shares": {
             "type": "ARRAY",

@@ -54,8 +54,8 @@ class DatabaseMySQL extends Database {
             return this.deserialize<T>(options, items[0][0]);
         } catch(e) {
             console.error("Error trying to fetch an item:");
+            console.log(options);
             console.error(e);
-            console.error(options);
             throw e;
         }
     }
@@ -80,8 +80,8 @@ class DatabaseMySQL extends Database {
             return items[0].map((item: T) => this.deserialize<T>(options, item));
         } catch(e) {
             console.error("Error trying to fetch items:");
+            console.log(options);
             console.error(e);
-            console.error(options);
             throw e;
         }
     }
@@ -96,8 +96,8 @@ class DatabaseMySQL extends Database {
             await this.connection.execute(`INSERT INTO \`${options.destination}\` (${this.itemToKeys(item)}) VALUES (${this.itemToValuesWithQuestions(item)})`, values);
         } catch(e) {
             console.error("Error trying to add an item:");
+            console.log(options);
             console.error(e);
-            console.error(options);
             throw e;
         }
     }
@@ -112,8 +112,8 @@ class DatabaseMySQL extends Database {
             await this.connection.execute(`UPDATE \`${options.destination}\` SET ${this.itemToKeysWithQuestions(item)} ${this.selectorsToSyntax(options.selectors)}`, values);
         } catch(e) {
             console.error("Error trying to edit an item:");
+            console.log(options);
             console.error(e);
-            console.error(options);
             throw e;
         }
     }
@@ -128,8 +128,8 @@ class DatabaseMySQL extends Database {
             return items[0].affectedRows;
         } catch(e) {
             console.error("Error trying to delete an item:");
+            console.log(options);
             console.error(e);
-            console.error(options);
             throw e;
         }
     }
@@ -186,6 +186,9 @@ class DatabaseMySQL extends Database {
                 switch(fieldOptions.modifier) {
                     case types.DatabaseMySQLFieldModifier.ARRAY:
                         newItem[field] = stringToArray(newItem[field]);
+                        break;
+                    case types.DatabaseMySQLFieldModifier.BOOLEAN:
+                        newItem[field] = newItem[field] === 1;
                         break;
                 }
 

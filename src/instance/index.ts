@@ -1,20 +1,18 @@
 /* Types */
-import { APIStructureOptions, FeatureType, InstanceOptions, StateDescriptor, Status } from "../ts/backend/base";
-import { DatabaseType } from "../database/types";
-
+import { APIStructureOptions, FeatureType, InstanceOptions, StateDescriptor, Status } from "ts/backend/base";
+import { DatabaseType } from "database/types";
 /* Node Imports */
 import { workerData } from "worker_threads";
 import { bold, green, red, yellow, gray } from "nanocolors";
 import { readdirSync, readFileSync } from "fs";
-
 /* Local Imports */
-import Feature from "../feature";
-import FeatureStatic from "../feature/built-in/static";
-import FeatureAPI from "../feature/built-in/api";
-import FeatureDaemon from "../feature/custom/daemon";
-import FeatureCron from "../feature/custom/cron";
-import Database from "../database";
-import DatabaseMySQL from "../database/addons/mysql";
+import Feature from "feature";
+import FeatureStatic from "feature/built-in/static";
+import FeatureAPI from "feature/built-in/api";
+import FeatureDaemon from "feature/custom/daemon";
+import FeatureCron from "feature/custom/cron";
+import Database from "database";
+import DatabaseMySQL from "database/addons/mysql";
 
 class Instance {
     id: string;
