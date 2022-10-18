@@ -321,6 +321,14 @@
             "limit": 20
         },
         {
+            "path": "/v1/alerts/all/fetch",
+            "type": "FETCH_MULTIPLE",
+            "singlePath": "/v1/alerts/fetch",
+            "table": "alerts",
+            "authorField": "author",
+            "limit": 20
+        },
+        {
             "path": "/v1/user/files/fetch",
             "type": "FETCH",
             "table": "userfiles",

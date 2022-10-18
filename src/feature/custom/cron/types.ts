@@ -18,6 +18,7 @@ export enum CronUpdateType {
     RESOURCES = "RESOURCES",
     STATISTICS = "STATISTICS",
     UPTIME_ENDPOINTS = "UPTIME_ENDPOINTS",
+    ALERTS = "ALERTS",
 };
 
 export enum CronUpdateResourcesType {

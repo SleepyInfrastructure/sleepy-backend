@@ -15,7 +15,7 @@ export async function processEndpointUptime(database: Database, endpoint: Uptime
             lookup(endpoint.host, async(e, address) => {
                 if(e !== null) {
                     console.error(e);
-                    resolve(-1);
+                    resolve(null);
                     return;
                 }
                 try {
@@ -23,7 +23,7 @@ export async function processEndpointUptime(database: Database, endpoint: Uptime
                     resolve(res.alive === true && res.avg !== undefined ? res.avg : -1);
                 } catch(e) {
                     console.error(e);
-                    resolve(-1);
+                    resolve(null);
                 }
             });
         });
@@ -40,7 +40,7 @@ export async function processEndpointUptime(database: Database, endpoint: Uptime
                     req.destroy();
                 });
                 req.on("error", () =>{
-                    resolve(-1);
+                    resolve(null);
                     req.destroy();
                 });
                 req.write("");
@@ -51,13 +51,13 @@ export async function processEndpointUptime(database: Database, endpoint: Uptime
                     req.destroy();
                 });
                 req.on("error", () => {
-                    resolve(-1);
+                    resolve(null);
                     req.destroy();
                 });
                 req.write("");
                 req.end();
             } else {
-                resolve(-1);
+                resolve(null);
             }
         });
     }

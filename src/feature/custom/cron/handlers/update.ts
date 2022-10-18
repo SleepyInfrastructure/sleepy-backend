@@ -7,6 +7,7 @@ import { processStatisticUpdates } from "./statistics";
 /* Local Imports */
 import Database from "database";
 import FeatureDaemon from "feature/custom/daemon";
+import { processAlertUpdates } from "./alert";
 
 export default async function processUpdate(feature: FeatureDaemon, database: Database, update: CronUpdate) {
     switch(update.type) {
@@ -27,6 +28,10 @@ export default async function processUpdate(feature: FeatureDaemon, database: Da
             for(const endpoint of endpoints) {
                 processEndpointUptime(database, endpoint);
             }
+            break;
+
+        case CronUpdateType.ALERTS:
+            processAlertUpdates(feature, database, update);
             break;
     }
 }

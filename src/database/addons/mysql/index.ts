@@ -45,10 +45,11 @@ class DatabaseMySQL extends Database {
             if (this.connection === undefined) {
                 return null;
             }
-            let query = `SELECT * FROM \`${options.source}\` ${this.selectorsToSyntax(options.selectors)} LIMIT 1`;
+            let query = `SELECT * FROM \`${options.source}\` ${this.selectorsToSyntax(options.selectors)}`;
             if(options.sort !== undefined) {
                 query += ` ORDER BY ${options.sort.field} ${options.sort.order ?? "ASC"}`;
             }
+            query += " LIMIT 1";
 
             const items: [any, FieldPacket[]] = await this.connection.execute(query, this.selectorsToData(options.selectors));
             return this.deserialize<T>(options, items[0][0]);
