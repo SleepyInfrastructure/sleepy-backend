@@ -1,50 +1,57 @@
 services:
-  foxxy-mysql:
-    container_name: foxxy-mysql
+  miracle-mysql:
+    container_name: miracle-mysql
     image: mariadb:latest
     restart: "always"
     expose:
       - "3306"
     networks:
-      - foxxy-backend
+      - miracle-backend
     volumes:
-      - foxxy-mysql:/var/lib/mysql
+      - miracle-mysql:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: "${FOXXY_mysql_PASSWORD}"
-      MYSQL_DATABASE: "foxxy-db"
+      MYSQL_ROOT_PASSWORD: "${MIRACLE_MYSQL_PASSWORD}"
+      MYSQL_DATABASE: "miracle-db"
       MYSQL_ROOT_HOST: "%"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "--silent"]
-      timeout: 5s
-      retries: 10
+      timeout: 2s
+      retries: 30
     command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
-  foxxy-backend:
-    container_name: foxxy-backend
-    image: foxxy-backend:latest
+  miracle-ssh:
+    container_name: miracle-ssh
+    image: miracle-ssh:latest
     restart: "always"
     ports:
-      - "8081:8081"
-      - "8082:8082"
+      - "8888:8888"
+    build:
+      context: .docker/images/miracle-ssh
+      dockerfile: Dockerfile
+  miracle-backend:
+    container_name: miracle-backend
+    image: miracle-backend:latest
+    restart: "always"
+    ports:
+      - "9001:9001"
+      - "9002:9002"
+      - "454:454"
+      - "455:455"
     networks:
-      - foxxy-backend
+      - miracle-backend
     volumes:
-      - ./configs:/usr/src/app/configs
+      - ./config:/usr/src/app/config
     environment:
-      FOXXY_mysql_PASSWORD: "${FOXXY_mysql_PASSWORD}"
+      MIRACLE_MYSQL_PASSWORD: "${MIRACLE_MYSQL_PASSWORD}"
     depends_on:
-      foxxy-mysql:
-        condition: service_healthy
-      foxxy-redis:
+      miracle-mysql:
         condition: service_healthy
     build: 
       context: ./
-      dockerfile: .docker/images/foxxy-backend/Dockerfile
+      dockerfile: .docker/images/miracle-backend/Dockerfile
     tty: yes
 volumes:
-  foxxy-mysql:
-    external: true
-  foxxy-redis:
+  slemiracleepy-mysql:
     external: true
 networks:
-  foxxy-backend:
-    name: foxxy-backend
+  miracle-backend:
+    name: miracle-backend
