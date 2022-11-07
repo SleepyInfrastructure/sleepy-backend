@@ -1,9 +1,8 @@
 /* Types */
-import { FeatureOptions, FeatureType } from "ts/backend/base";
+import { FeatureOptions } from "feature/types";
 
 /* Options */
 export type FeatureCronOptions = FeatureOptions & {
-    type: FeatureType.CRON;
     intervals: CronInterval[];
 };
 

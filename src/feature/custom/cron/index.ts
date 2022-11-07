@@ -1,6 +1,6 @@
 /* Types */
 import { Status } from "ts/backend/base";
-import { DatabaseType } from "database/types";
+import { BuiltinDatabaseType } from "database/built-in";
 import { CronInterval, FeatureCronOptions } from "./types";
 /* Node Imports */
 import * as cron from "node-cron";
@@ -22,7 +22,7 @@ class FeatureCron extends Feature {
     }
 
     async start(): Promise<void> {
-        const database = this.parent.getDatabase(DatabaseType.MYSQL);
+        const database = this.parent.getDatabase(BuiltinDatabaseType.MYSQL);
         if (database === undefined) {
             this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
             return;

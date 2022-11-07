@@ -1,5 +1,5 @@
 /* Types */
-import { FeatureServerOptions } from "ts/backend/base";
+import { FeatureServerOptions } from "feature/types";
 /* Node Imports */
 import { readFileSync } from "fs";
 import * as fastify from "fastify";
@@ -13,19 +13,20 @@ import { Http2Server, Http2ServerRequest, Http2ServerResponse } from "http2";
 import { RouteGenericInterface } from "fastify/types/route";
 import { ContentTypeParserDoneFunction } from "fastify/types/content-type-parser";
 
-export type FoxxyFastifyRequest<T extends RouteGenericInterface> = fastify.FastifyRequest<T, Http2Server>;
-export type FoxxyFastifyReply = fastify.FastifyReply<Http2Server>;
-export type FoxxyFastifyInstance = fastify.FastifyInstance<Http2Server, Http2ServerRequest, Http2ServerResponse, fastify.FastifyBaseLogger, TypeBoxTypeProvider>;
-export type FoxxyFastifyPlainInstance = fastify.FastifyInstance;
-export type FoxxyFastifyAnyInstance = FoxxyFastifyInstance | FoxxyFastifyPlainInstance;
+export type MiracleFastifyRequest<T extends RouteGenericInterface> = fastify.FastifyRequest<T, Http2Server>;
+export type MiracleFastifyReply = fastify.FastifyReply<Http2Server>;
+export type MiracleFastifyInstance = fastify.FastifyInstance<Http2Server, Http2ServerRequest, Http2ServerResponse, fastify.FastifyBaseLogger, TypeBoxTypeProvider>;
+export type MiracleFastifyPlainInstance = fastify.FastifyInstance;
+export type MiracleFastifyAnyInstance = MiracleFastifyInstance | MiracleFastifyPlainInstance;
 
-export function createFastifyInstance(options: FeatureServerOptions): FoxxyFastifyInstance | Error {
-    const instance: FoxxyFastifyInstance = fastify.fastify({
+export function createFastifyInstance(options: FeatureServerOptions): MiracleFastifyInstance | Error {
+    const instance: MiracleFastifyInstance = fastify.fastify({
         http2: true,
         https: {
             cert: readFileSync(`config/https/${options.https}/fullchain.pem`),
             key: readFileSync(`config/https/${options.https}/privkey.pem`),
-            allowHTTP1: true
+            allowHTTP1: true,
+            origins: options.cors?.origins
         },
     }).withTypeProvider<TypeBoxTypeProvider>();
     instance.addContentTypeParser("application/json", { parseAs: "string" }, jsonParser);
@@ -38,8 +39,8 @@ export function createFastifyInstance(options: FeatureServerOptions): FoxxyFasti
 
     return instance;
 };
-export function createFastifyPlainInstance(options: FeatureServerOptions, websocket: boolean): FoxxyFastifyPlainInstance | Error {
-    const instance: FoxxyFastifyPlainInstance = fastify.fastify({
+export function createFastifyPlainInstance(options: FeatureServerOptions, websocket: boolean): MiracleFastifyPlainInstance | Error {
+    const instance: MiracleFastifyPlainInstance = fastify.fastify({
         https: {
             cert: readFileSync(`config/https/${options.https}/fullchain.pem`),
             key: readFileSync(`config/https/${options.https}/privkey.pem`)
@@ -56,7 +57,7 @@ export function createFastifyPlainInstance(options: FeatureServerOptions, websoc
     return instance;
 }
 
-function jsonParser(req: FoxxyFastifyRequest<RouteGenericInterface>, body: string, done: ContentTypeParserDoneFunction) {
+function jsonParser(req: MiracleFastifyRequest<RouteGenericInterface>, body: string, done: ContentTypeParserDoneFunction) {
     try {
         const json = JSON.parse(body.toString());
         done(null, json);
@@ -66,7 +67,7 @@ function jsonParser(req: FoxxyFastifyRequest<RouteGenericInterface>, body: strin
     }
 }
 
-export async function startFastifyInstance(instance: FoxxyFastifyAnyInstance, options: FeatureServerOptions): Promise<null> {
+export async function startFastifyInstance(instance: MiracleFastifyAnyInstance, options: FeatureServerOptions): Promise<null> {
     return await new Promise((resolve, reject) => {
         if (instance === undefined) {
             reject(new Error("Instance failed to start!"));

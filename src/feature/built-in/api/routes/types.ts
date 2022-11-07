@@ -1,7 +1,7 @@
 /* Types */
 import { BuiltinRouteType } from "./built-in";
 import { CustomRouteType } from "./custom";
-import { FoxxyFastifyRequest } from "util/fastify";
+import { MiracleFastifyRequest } from "util/fastify";
 /* Node Imports */
 import { z } from "zod";
 
@@ -10,19 +10,14 @@ export type RouteOptions = {
     type: BuiltinRouteType | CustomRouteType;
 };
 
-export type Session = {
-    id: string;
-    user: string;
-};
-
 export const IDSchema = z.object({
     id: z.string().min(32).max(32)
 });
 export type IDSchemaType = z.infer<typeof IDSchema>;
 
-export type RequestWithSchema<T> = FoxxyFastifyRequest<{
+export type RequestWithSchema<T> = MiracleFastifyRequest<{
     Body: T;
 }>;
-export type RequestWithSchemaQuery<T> = FoxxyFastifyRequest<{
+export type RequestWithSchemaQuery<T> = MiracleFastifyRequest<{
     Querystring: T;
 }>;

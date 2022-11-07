@@ -3,6 +3,7 @@ import { DatabaseDeleteOptions, DatabaseSelectorValue } from "database/types";
 import { RouteDeleteOptions } from "./index";
 import * as schemas from "./schemas";
 import { RequestWithSchemaQuery } from "feature/built-in/api/routes/types";
+import { Session } from "ts/backend/base";
 /* Local Imports */
 import APIRoute from "feature/built-in/api/routes";
 import FeatureAPI from "feature/built-in/api";

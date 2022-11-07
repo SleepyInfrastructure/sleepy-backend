@@ -3,6 +3,7 @@ import { RouteAuthCreateOptions } from "feature/built-in/api/routes/built-in";
 import { DatabaseFetchOptions } from "database/types";
 import * as schemas from "./schemas";
 import { RequestWithSchema } from "feature/built-in/api/routes/types";
+import { User } from "ts/backend/base";
 /* Node Imports */
 import { hashSync } from "bcrypt";
 import { randomBytes } from "crypto";

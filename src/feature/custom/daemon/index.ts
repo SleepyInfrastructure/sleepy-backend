@@ -2,13 +2,13 @@
 import Feature from "../..";
 import Instance from "instance";
 import { Status } from "ts/backend/base";
-import { DatabaseType } from "database/types";
+import { BuiltinDatabaseType } from "database/built-in";
 import { Client, Connection, FeatureDaemonOptions } from "./types";
 /* Node Imports */
 import * as fastify from "fastify";
 import { SocketStream } from "@fastify/websocket";
 /* Local Imports */
-import { createFastifyPlainInstance, FoxxyFastifyPlainInstance, startFastifyInstance } from "util/fastify";
+import { createFastifyPlainInstance, MiracleFastifyPlainInstance, startFastifyInstance } from "util/fastify";
 import { handleWebsocket } from "./ws";
 import Database from "database";
 import FeatureDaemonAddon, { FeatureDaemonAddonType } from "./addons/addon";
@@ -16,7 +16,7 @@ import addons from "./addons";
 
 class FeatureDaemon extends Feature {
     options: FeatureDaemonOptions;
-    instance: FoxxyFastifyPlainInstance;
+    instance: MiracleFastifyPlainInstance;
     database: Database;
     connections: Connection[];
     addons: Map<FeatureDaemonAddonType, FeatureDaemonAddon>;
@@ -24,7 +24,7 @@ class FeatureDaemon extends Feature {
     constructor(parent: Instance, options: FeatureDaemonOptions) {
         super(parent, options);
         this.options = options;
-        this.instance = null as unknown as FoxxyFastifyPlainInstance;
+        this.instance = null as unknown as MiracleFastifyPlainInstance;
         this.database = null as unknown as Database;
         this.connections = [];
         this.addons = new Map();
@@ -33,7 +33,7 @@ class FeatureDaemon extends Feature {
             this.addons.set(addon.name, addon);
         }
 
-        const database = this.parent.getDatabase(DatabaseType.MYSQL);
+        const database = this.parent.getDatabase(BuiltinDatabaseType.MYSQL);
         if (database === undefined) {
             this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
             return;

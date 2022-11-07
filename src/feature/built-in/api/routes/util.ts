@@ -1,13 +1,13 @@
 /* Types */
-import { Session } from "./types";
-import { FoxxyFastifyReply, FoxxyFastifyRequest } from "util/fastify";
+import { Session } from "ts/backend/base";
+import { MiracleFastifyReply, MiracleFastifyRequest } from "util/fastify";
 /* Node Imports */
-import { boolean, z } from "zod";
+import { z } from "zod";
 /* Local Imports */
 import Database from "database";
 import { RouteGenericInterface } from "fastify/types/route";
 
-export function validateSchema(schema: z.Schema, data: any, rep: FoxxyFastifyReply): boolean {
+export function validateSchema(schema: z.Schema, data: any, rep: MiracleFastifyReply): boolean {
     const result = schema.safeParse(data);
     if(!result.success) {
         rep.code(400);
@@ -17,14 +17,14 @@ export function validateSchema(schema: z.Schema, data: any, rep: FoxxyFastifyRep
 
     return true;
 }
-export function validateSchemaBody(schema: z.Schema, req: FoxxyFastifyRequest<RouteGenericInterface>, rep: FoxxyFastifyReply): boolean {
+export function validateSchemaBody(schema: z.Schema, req: MiracleFastifyRequest<RouteGenericInterface>, rep: MiracleFastifyReply): boolean {
     return validateSchema(schema, req.body, rep);
 }
-export function validateSchemaQuery(schema: z.Schema, req: FoxxyFastifyRequest<RouteGenericInterface>, rep: FoxxyFastifyReply): boolean {
+export function validateSchemaQuery(schema: z.Schema, req: MiracleFastifyRequest<RouteGenericInterface>, rep: MiracleFastifyReply): boolean {
     return validateSchema(schema, req.query, rep);
 }
 
-export async function getSession(database: Database, req: FoxxyFastifyRequest<RouteGenericInterface>, rep: FoxxyFastifyReply): Promise<Session | null> {
+export async function getSession(database: Database, req: MiracleFastifyRequest<RouteGenericInterface>, rep: MiracleFastifyReply): Promise<Session | null> {
     if(req.cookies.Token === undefined) {
         rep.code(403); rep.send();
         return null;
@@ -38,7 +38,7 @@ export async function getSession(database: Database, req: FoxxyFastifyRequest<Ro
     return session;
 }
 
-export async function checkPrerequisites(database: Database, session: Session, prerequisites: Record<string, string>, body: any, rep: FoxxyFastifyReply): Promise<boolean> {
+export async function checkPrerequisites(database: Database, session: Session, prerequisites: Record<string, string>, body: any, rep: MiracleFastifyReply): Promise<boolean> {
     const promises: Promise<{ key: string, result: boolean }>[] = [];
     for(const key in prerequisites) {
         const ids: string[] = [body[key]].flat();

@@ -26,7 +26,7 @@ class RoutePushSend extends APIRoute {
                 if(!validateSchemaBody(schemas.PushSendSchema, req, rep)) {
                     return;
                 }
-                if(req.body.adminKey !== process.env.FOXXY_ADMIN_KEY) { rep.code(403); rep.send(); return; }
+                if(req.body.adminKey !== process.env.MIRACLE_ADMIN_KEY) { rep.code(403); rep.send(); return; }
 
                 /* Fetch eligble users */
                 const selectors = { "pushEnabled": "1" };
@@ -34,8 +34,8 @@ class RoutePushSend extends APIRoute {
                 const users = await feature.database.fetchMultiple<any>(options);
 
                 /* Send push notification */
-                const publicKey = process.env.FOXXY_PUSH_PUBLIC_KEY;
-                const privateKey = process.env.FOXXY_PUSH_PRIVATE_KEY;
+                const publicKey = process.env.MIRACLE_PUSH_PUBLIC_KEY;
+                const privateKey = process.env.MIRACLE_PUSH_PRIVATE_KEY;
                 if(publicKey === undefined || privateKey === undefined) { return; }
 
                 const notificationPayload = req.body.message;

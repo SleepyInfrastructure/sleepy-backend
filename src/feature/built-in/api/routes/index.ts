@@ -4,7 +4,7 @@ import { RouteOptions } from "./types";
 /* Local Imports */
 import FeatureAPI from "feature/built-in/api";
 
-abstract class APIRoute {
+export default abstract class APIRoute {
     path: string;
     state: StateDescriptor;
     options: RouteOptions;
@@ -17,5 +17,3 @@ abstract class APIRoute {
 
     abstract hook(feature: FeatureAPI): void | Promise<void>;
 }
-
-export default APIRoute;

@@ -1,4 +1,4 @@
-import { RouteFetchStructuredItemImportedOptions, RouteFetchStructuredItemOptions } from "../../feature/built-in/api/routes/built-in";
+import { RouteFetchStructuredItemImportedOptions, RouteFetchStructuredItemOptions } from "feature/built-in/api/routes/built-in";
 
 /* Root Options */
 export type RootOptions = {
@@ -9,31 +9,8 @@ export type RootOptions = {
 export type InstanceOptions = {
     id: string;
     name: string;
-    features: any[];
-    databases: any[];
-};
-
-/* Features */
-export enum FeatureType {
-    STATIC = "STATIC",
-    API = "API",
-    DAEMON = "DAEMON",
-    CRON = "CRON",
-}
-
-export type FeatureOptions = {
-    id: string;
-    name: string;
-    type: FeatureType;
-};
-
-export type FeatureServerOptions = FeatureOptions & {
-    port: number;
-    https: string;
-    cors?: {
-        origins: string[];
-    };
-    rateLimit?: boolean;
+    features: string[];
+    databases: string[];
 };
 
 /* API Structures */
@@ -60,3 +37,16 @@ export enum Status {
     SUCCESS = "SUCCESS",
     ERROR = "ERROR",
 }
+
+/* Structures */
+export type Session = {
+    id: string;
+    user: string;
+};
+
+export type User = {
+    id: string;
+    username: string;
+    password?: string;
+    timestamp: number;
+};

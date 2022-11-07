@@ -1,17 +1,16 @@
 /* Types */
-import { APIStructure, APIStructureImported, APIStructureImportedDetails, Status } from "ts/backend/base";
+import { APIStructure, APIStructureImported, APIStructureImportedDetails, Session, Status } from "ts/backend/base";
 import { BuiltinRouteType, RouteFetchStructuredOptions } from "./index";
 import * as schemas from "./schemas";
-import { RequestWithSchemaQuery } from "feature/built-in/api/routes/types";
+import { IDSchema, IDSchemaType, RequestWithSchemaQuery } from "feature/built-in/api/routes/types";
 /* Local Imports */
 import APIRoute from "feature/built-in/api/routes";
 import FeatureAPI from "feature/built-in/api";
 import Database from "database";
 import { getSession, validateSchemaQuery } from "feature/built-in/api/routes/util";
-import { FoxxyFastifyReply } from "util/fastify";
+import { MiracleFastifyReply } from "util/fastify";
 import RouteFetch from "./fetch";
 import RouteFetchMultiple from "./fetch_multiple";
-import { IDSchema, IDSchemaType } from "ts/common/zod/base";
 
 class RouteFetchStructured extends APIRoute {
     options: RouteFetchStructuredOptions;
@@ -119,7 +118,7 @@ class RouteFetchStructured extends APIRoute {
         }
     }
 
-    async fetchBase(feature: FeatureAPI, baseType: "SINGLE" | "ARRAY", req: RequestWithSchemaQuery<IDSchemaType | schemas.FetchStructuredArraySchemaType>, rep: FoxxyFastifyReply): Promise<{ base: any, session: Session | null }> {
+    async fetchBase(feature: FeatureAPI, baseType: "SINGLE" | "ARRAY", req: RequestWithSchemaQuery<IDSchemaType | schemas.FetchStructuredArraySchemaType>, rep: MiracleFastifyReply): Promise<{ base: any, session: Session | null }> {
         /* Validate schemas */
         const needsId = baseType === "SINGLE" || this.details.needsQueryId;
         if(!validateSchemaQuery(needsId ? IDSchema : schemas.FetchStructuredArraySchema, req, rep)) {
@@ -127,7 +126,7 @@ class RouteFetchStructured extends APIRoute {
         }
         
         /* If needed fetch session */
-        let session: any
+        let session: any;
         if(this.details.hasAuthorField) {
             session = await getSession(feature.database, req, rep);
             if(session === null) {

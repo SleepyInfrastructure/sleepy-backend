@@ -4,7 +4,7 @@ import * as types from "database/types";
 /* Local Imports */
 import Instance from "instance";
 
-abstract class Database {
+export default abstract class Database {
     parent: Instance;
     id: string;
     name: string;
@@ -26,5 +26,3 @@ abstract class Database {
     abstract edit(options: types.DatabaseEditOptions): Promise<void>;
     abstract delete(options: types.DatabaseDeleteOptions): Promise<number>;
 }
-
-export default Database;

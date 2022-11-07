@@ -5,7 +5,7 @@
     
     "host": "sleepy-mysql",
     "user": "root",
-    "passwordEnv": "SLEEPY_MYSQL_PASSWORD",
+    "passwordEnv": "MIRACLE_MYSQL_PASSWORD",
     "database": "sleepy-db",
     "structure": {
         "containers": {

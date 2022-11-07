@@ -9,16 +9,16 @@ import { RouteGenericInterface } from "fastify/types/route";
 /* Local Imports */
 import Feature from "feature";
 import Instance from "instance";
-import { createFastifyInstance, FoxxyFastifyInstance, FoxxyFastifyReply, FoxxyFastifyRequest, startFastifyInstance } from "util/fastify";
+import { createFastifyInstance, MiracleFastifyInstance, MiracleFastifyReply, MiracleFastifyRequest, startFastifyInstance } from "util/fastify";
 
 class FeatureStatic extends Feature {
     options: FeatureStaticOptions;
-    instance: FoxxyFastifyInstance;
+    instance: MiracleFastifyInstance;
 
     constructor(parent: Instance, options: FeatureStaticOptions) {
         super(parent, options);
         this.options = options;
-        this.instance = null as unknown as FoxxyFastifyInstance;
+        this.instance = null as unknown as MiracleFastifyInstance;
     }
 
     async start(): Promise<void> {
@@ -39,7 +39,7 @@ class FeatureStatic extends Feature {
         });
         if(this.options.roots !== undefined) {
             for(const root of this.options.roots) {
-                this.instance.get(root, (req: FoxxyFastifyRequest<RouteGenericInterface>, rep: FoxxyFastifyReply) => {
+                this.instance.get(root, (req: MiracleFastifyRequest<RouteGenericInterface>, rep: MiracleFastifyReply) => {
                     const stream = createReadStream(join(this.options.root, "index.html"));
                     rep.type("text/html").send(stream);
                 });

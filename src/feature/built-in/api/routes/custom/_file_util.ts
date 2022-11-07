@@ -2,7 +2,7 @@
 import Database from "database";
 import { DaemonFileType } from "feature/custom/daemon/types";
 import { RouteDaemonFileUploadOptions } from ".";
-import { FoxxyFastifyReply, FoxxyFastifyRequest } from "util/fastify";
+import { MiracleFastifyReply, MiracleFastifyRequest } from "util/fastify";
 
 /* Node Imports */
 import { randomBytes } from "crypto";
@@ -18,7 +18,7 @@ const pump = util.promisify(pipeline);
 /* Local Imports */
 import { pad } from "util/general";
 
-export async function processFile(database: Database, options: RouteDaemonFileUploadOptions, server: Server, req: FoxxyFastifyRequest<RouteGenericInterface>, rep: FoxxyFastifyReply): Promise<Error | null> {
+export async function processFile(database: Database, options: RouteDaemonFileUploadOptions, server: Server, req: MiracleFastifyRequest<RouteGenericInterface>, rep: MiracleFastifyReply): Promise<Error | null> {
     /* Get files */
     const data = await req.file();
     if(data === undefined) {
@@ -43,7 +43,7 @@ const taskToFileType: Record<TaskType, DaemonFileType> = {
     "BACKUP_DATABASE_SCHEMA": DaemonFileType.BACKUP_DATABASE,
     "REQUEST_CONTAINER_LOG": DaemonFileType.CONTAINER_LOG
 };
-export async function processFileTask(database: Database, options: RouteDaemonFileUploadOptions, server: Server, data: MultipartFile, fileData: any, rep: FoxxyFastifyReply): Promise<Error | null> {
+export async function processFileTask(database: Database, options: RouteDaemonFileUploadOptions, server: Server, data: MultipartFile, fileData: any, rep: MiracleFastifyReply): Promise<Error | null> {
     /* Get task */
     const task = await database.fetch<Task>({ source: "tasks", selectors: { id: fileData.task } });
     if(task === null) {

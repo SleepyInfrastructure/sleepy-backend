@@ -3,6 +3,7 @@ import { RouteCreateOptions } from ".";
 import { DatabaseUnserializedItemValue } from "database/types";
 import { RequestWithSchema } from "feature/built-in/api/routes/types";
 import schemas from "ts/common/zod";
+import { Session } from "ts/backend/base";
 /* Node Imports */
 import { randomBytes } from "crypto";
 import { z } from "zod";

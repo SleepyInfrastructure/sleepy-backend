@@ -1,10 +1,8 @@
 /* Types */
-import { FeatureServerOptions, FeatureType } from "ts/backend/base";
+import { FeatureServerOptions } from "feature/types";
 
 /* Options */
 export type FeatureStaticOptions = FeatureServerOptions & {
-    type: FeatureType.STATIC;
-
     root: string;
     roots?: string[];
 };

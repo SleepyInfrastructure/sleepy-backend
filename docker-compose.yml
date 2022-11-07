@@ -4,13 +4,13 @@ services:
     image: mariadb:latest
     restart: "always"
     ports:
-      - "3308:3306"
+      - "3306:3306"
     networks:
       - sleepy-backend
     volumes:
       - sleepy-mysql:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: "${SLEEPY_MYSQL_PASSWORD}"
+      MYSQL_ROOT_PASSWORD: "${MIRACLE_MYSQL_PASSWORD}"
       MYSQL_DATABASE: "sleepy-db"
       MYSQL_ROOT_HOST: "%"
     healthcheck:
@@ -18,15 +18,22 @@ services:
       timeout: 2s
       retries: 30
     command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
-  sleepy-ssh:
-    container_name: sleepy-ssh
-    image: sleepy-ssh:latest
+  sleepy-redis:
+    container_name: sleepy-redis
+    image: redis:alpine
     restart: "always"
     ports:
-      - "8888:8888"
-    build:
-      context: .docker/images/sleepy-ssh
-      dockerfile: Dockerfile
+      - "6379:6379"
+    networks:
+      - sleepy-backend
+    volumes:
+      - .docker/volumes/miracle-redis:/usr/local/etc/redis
+      - sleepy-redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli" ,"ping"]
+      timeout: 2s
+      retries: 30
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf", "--requirepass", "$MIRACLE_REDIS_PASSWORD"]
   sleepy-backend:
     container_name: sleepy-backend
     image: sleepy-backend:latest
@@ -38,21 +45,40 @@ services:
       - "455:455"
     networks:
       - sleepy-backend
+      - cute-foxgirls-internal
     volumes:
       - ./config:/usr/src/app/config
       - ${SLEEPY_DATA_PATH}:/usr/src/sleepy
     environment:
-      SLEEPY_MYSQL_PASSWORD: "${SLEEPY_MYSQL_PASSWORD}"
+      MIRACLE_MYSQL_PASSWORD: "${MIRACLE_MYSQL_PASSWORD}"
+      MIRACLE_REDIS_PASSWORD: "${MIRACLE_REDIS_PASSWORD}"
     depends_on:
       sleepy-mysql:
         condition: service_healthy
     build: 
       context: ./
-      dockerfile: .docker/images/sleepy-backend/Dockerfile
+      dockerfile: .docker/images/miracle-backend/Dockerfile
     tty: yes
+  sleepy-ssh:
+    container_name: sleepy-ssh
+    image: sleepy-ssh:latest
+    restart: "always"
+    ports:
+      - "8888:8888"
+    networks:
+      - sleepy-backend
+      - cute-foxgirls-internal
+    build:
+      context: .docker/images/sleepy-ssh
+      dockerfile: Dockerfile
 volumes:
   sleepy-mysql:
+    external: true
+  sleepy-redis:
     external: true
 networks:
   sleepy-backend:
     name: sleepy-backend
+  cute-foxgirls-internal:
+    name: cute-foxgirls-internal
+    external: true

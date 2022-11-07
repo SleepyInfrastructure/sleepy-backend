@@ -1,18 +1,16 @@
 /* Types */
-import { APIStructureOptions, FeatureType, InstanceOptions, StateDescriptor, Status } from "ts/backend/base";
-import { DatabaseType } from "database/types";
+import { APIStructureOptions, InstanceOptions, StateDescriptor, Status } from "ts/backend/base";
 /* Node Imports */
 import { workerData } from "worker_threads";
 import { bold, green, red, yellow, gray } from "nanocolors";
-import { readdirSync, readFileSync } from "fs";
+import { existsSync, readdirSync, readFileSync } from "fs";
 /* Local Imports */
 import Feature from "feature";
-import FeatureStatic from "feature/built-in/static";
-import FeatureAPI from "feature/built-in/api";
-import FeatureDaemon from "feature/custom/daemon";
-import FeatureCron from "feature/custom/cron";
+import { FeatureOptions } from "feature/types";
 import Database from "database";
-import DatabaseMySQL from "database/addons/mysql";
+import BuiltinDatabases, { BuiltinDatabaseType } from "database/built-in";
+import BuiltinFeatures, { BuiltinFeatureType } from "feature/built-in";
+import CustomFeatures, { CustomFeatureType } from "feature/custom";
 
 class Instance {
     id: string;
@@ -37,49 +35,42 @@ class Instance {
         for (const id of this.options.databases) {
             const options = JSON.parse(readFileSync(`config/databases/${id}/options.json`, "utf-8"));
             let database: Database | undefined;
-            switch (options.type) {
-                case DatabaseType.MYSQL:
-                    database = new DatabaseMySQL(this, options);
-                    break;
+            const builtinType = Object.values(BuiltinDatabaseType).find(e => e === (options.type as BuiltinDatabaseType));
+            if(builtinType !== undefined) {
+                database = BuiltinDatabases[builtinType](this, options);
+            } else {
+                this.state = { status: Status.ERROR, message: `${options.type} is not a valid database type` };
+                return;
             }
-
-            if (database === undefined) {
-                continue;
-            }
+            
             this.databaseContainer.set(database.id, database);
         }
 
         for (const id of this.options.features) {
-            const options = JSON.parse(readFileSync(`config/features/${id}/options.json`, "utf-8"));
+            const options: FeatureOptions = JSON.parse(readFileSync(`config/features/${id}/options.json`, "utf-8"));
             let feature: Feature | undefined;
-            switch (options.type) {
-                case FeatureType.STATIC:
-                    feature = new FeatureStatic(this, options);
-                    break;
-
-                case FeatureType.API:
-                    feature = new FeatureAPI(this, options);
-                    break;
-
-                case FeatureType.DAEMON:
-                    feature = new FeatureDaemon(this, options);
-                    break;
-
-                case FeatureType.CRON:
-                    feature = new FeatureCron(this, options);
-                    break;
+            const builtinType = Object.values(BuiltinFeatureType).find(e => e === (options.type as BuiltinFeatureType));
+            if(builtinType !== undefined) {
+                feature = BuiltinFeatures[builtinType](this, options);
+            } else {
+                const customType = Object.values(CustomFeatureType).find(e => e === (options.type as CustomFeatureType));
+                if(customType !== undefined) {
+                    feature = CustomFeatures[customType](this, options);
+                } else {
+                    this.state = { status: Status.ERROR, message: `${options.type} is not a valid feature type` };
+                    return;
+                }
             }
 
-            if (feature === undefined) {
-                continue;
-            }
             this.featureContainer.set(feature.id, feature);
         }
 
-        const structurePaths = readdirSync("config/structures");
-        for (const structurePath of structurePaths) {
-            const options = JSON.parse(readFileSync(`config/structures/${structurePath}`, "utf-8"));
-            this.structureContainer.set(options.id, options);
+        if(existsSync("config/structures")) {
+            const structurePaths = readdirSync("config/structures");
+            for (const structurePath of structurePaths) {
+                const options = JSON.parse(readFileSync(`config/structures/${structurePath}`, "utf-8"));
+                this.structureContainer.set(options.id, options);
+            }
         }
     }
 
@@ -123,7 +114,7 @@ class Instance {
         console.log(`[  ${red("ERROR")}  ] Instance ${bold(yellow(this.options.name))} failed to start!`);
     }
 
-    getDatabase(type: DatabaseType): Database | undefined {
+    getDatabase(type: BuiltinDatabaseType): Database | undefined {
         return Array.from(this.databaseContainer.values()).find((e) => e.type === type);
     }
 }

@@ -1,28 +1,28 @@
 /* Types */
 import { Status } from "ts/backend/base";
+import { BuiltinDatabaseType } from "database/built-in";
 import { FeatureAPIOptions } from "./types";
-import { DatabaseType } from "database/types";
 /* Node Imports */
 import { bold, green, yellow } from "nanocolors";
 /* Local Imports */
 import Feature from "feature";
 import Instance from "instance";
 import APIRoute from "./routes";
-import { createFastifyInstance, FoxxyFastifyInstance, startFastifyInstance } from "util/fastify";
+import { createFastifyInstance, MiracleFastifyInstance, startFastifyInstance } from "util/fastify";
 import BuiltinRoutes, { BuiltinRouteType } from "./routes/built-in";
 import CustomRoutes, { CustomRouteType } from "./routes/custom";
 import Database from "database";
 
 class FeatureAPI extends Feature {
     options: FeatureAPIOptions;
-    instance: FoxxyFastifyInstance;
+    instance: MiracleFastifyInstance;
     routeContainer: Map<string, APIRoute>;
     database: Database;
 
     constructor(parent: Instance, options: FeatureAPIOptions) {
         super(parent, options);
         this.options = options;
-        this.instance = null as unknown as FoxxyFastifyInstance;
+        this.instance = null as unknown as MiracleFastifyInstance;
         this.routeContainer = new Map();
         this.database = null as unknown as Database;
     }
@@ -34,7 +34,7 @@ class FeatureAPI extends Feature {
             return;
         }
         this.instance = instance;
-        const database = this.parent.getDatabase(DatabaseType.MYSQL);
+        const database = this.parent.getDatabase(BuiltinDatabaseType.MYSQL);
         if (database === undefined) {
             this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
             return;
