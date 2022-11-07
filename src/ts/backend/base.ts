@@ -13,29 +13,6 @@ export type InstanceOptions = {
     databases: string[];
 };
 
-/* Features */
-export enum FeatureType {
-    STATIC = "STATIC",
-    API = "API",
-    DAEMON = "DAEMON",
-    CRON = "CRON",
-}
-
-export type FeatureOptions = {
-    id: string;
-    name: string;
-    type: FeatureType;
-};
-
-export type FeatureServerOptions = FeatureOptions & {
-    port: number;
-    https: string;
-    cors?: {
-        origins: string[];
-    };
-    rateLimit?: boolean;
-};
-
 /* API Structures */
 export type APIStructure = Record<string, RouteFetchStructuredItemOptions>;
 export type APIStructureImported = Record<string, RouteFetchStructuredItemImportedOptions>;

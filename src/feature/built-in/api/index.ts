@@ -1,7 +1,7 @@
 /* Types */
 import { Status } from "ts/backend/base";
+import { BuiltinDatabaseType } from "database/built-in";
 import { FeatureAPIOptions } from "./types";
-import { DatabaseType } from "database/types";
 /* Node Imports */
 import { bold, green, yellow } from "nanocolors";
 /* Local Imports */
@@ -33,7 +33,7 @@ class FeatureAPI extends Feature {
             return;
         }
         this.instance = instance;
-        const database = this.parent.getDatabase(DatabaseType.MYSQL);
+        const database = this.parent.getDatabase(BuiltinDatabaseType.MYSQL);
         if (database === undefined) {
             this.state = { status: Status.ERROR, message: "NO_DATABASE_FOUND" };
             return;

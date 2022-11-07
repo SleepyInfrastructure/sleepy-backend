@@ -1,10 +1,8 @@
 /* Types */
-import { FeatureServerOptions, FeatureType } from "ts/backend/base";
+import { FeatureServerOptions } from "feature/types";
 import { RouteOptions } from "./routes/types";
 
 /* Options */
 export type FeatureAPIOptions = FeatureServerOptions & {
-    type: FeatureType.API;
-
     routes: RouteOptions[];
 };

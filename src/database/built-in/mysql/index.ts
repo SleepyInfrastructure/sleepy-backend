@@ -1,20 +1,23 @@
 /* Types */
 import { Status } from "ts/backend/base";
-import * as types from "database/types";
+import * as baseTypes from "database/types";
+import * as types from "./types";
 /* Node Imports */
 import { createConnection, Connection, FieldPacket } from "mysql2/promise";
 /* Local Imports */
-import { stringToArray } from "util/general";
 import Database from "database";
 import Instance from "instance";
+import { stringToArray } from "util/general";
+import { serializeDatabaseItemValue } from "../util";
 
 class DatabaseMySQL extends Database {
     options: types.DatabaseMySQLOptions;
-    connection: void | Connection | undefined;
+    connection: Connection;
 
     constructor(parent: Instance, options: types.DatabaseMySQLOptions) {
         super(parent, options);
         this.options = options;
+        this.connection = null as unknown as Connection;
     }
 
     async start(): Promise<void> {
@@ -30,21 +33,20 @@ class DatabaseMySQL extends Database {
 
         this.connection = await createConnection({
             host: this.options.host,
+            port: this.options.port,
             user: this.options.user,
             password: password,
             database: this.options.database,
             charset: "utf8mb4",
         }).catch((e) => {
             this.state = { status: Status.ERROR, message: e.message };
+            return null as unknown as Connection;
         });
         setInterval(() => { this.fetch({ source: "users", selectors: { id: "0" } }); }, 1000 * 60 * 5);
     }
 
-    async fetch<T>(options: types.DatabaseFetchOptions): Promise<T | null> {
+    async fetch<T>(options: baseTypes.DatabaseFetchOptions): Promise<T | null> {
         try {
-            if (this.connection === undefined) {
-                return null;
-            }
             let query = `SELECT * FROM \`${options.source}\` ${this.selectorsToSyntax(options.selectors)}`;
             if(options.sort !== undefined) {
                 query += ` ORDER BY ${options.sort.field} ${options.sort.order ?? "ASC"}`;
@@ -61,7 +63,7 @@ class DatabaseMySQL extends Database {
         }
     }
 
-    async fetchMultiple<T>(options: types.DatabaseFetchMultipleOptions): Promise<T[]> {
+    async fetchMultiple<T>(options: baseTypes.DatabaseFetchMultipleOptions): Promise<T[]> {
         try {
             if (this.connection === undefined) {
                 return [];
@@ -87,7 +89,7 @@ class DatabaseMySQL extends Database {
         }
     }
 
-    async add(options: types.DatabaseAddOptions): Promise<void> {
+    async add(options: baseTypes.DatabaseAddOptions): Promise<void> {
         try {
             if (this.connection === undefined) {
                 return;
@@ -103,7 +105,7 @@ class DatabaseMySQL extends Database {
         }
     }
 
-    async edit(options: types.DatabaseEditOptions): Promise<void> {
+    async edit(options: baseTypes.DatabaseEditOptions): Promise<void> {
         try {
             if (this.connection === undefined) {
                 return;
@@ -119,7 +121,7 @@ class DatabaseMySQL extends Database {
         }
     }
 
-    async delete(options: types.DatabaseDeleteOptions): Promise<number> {
+    async delete(options: baseTypes.DatabaseDeleteOptions): Promise<number> {
         try {
             if (this.connection === undefined) {
                 return -1;
@@ -135,45 +137,36 @@ class DatabaseMySQL extends Database {
         }
     }
 
-    selectorsToSyntax(selectors: Record<string, types.DatabaseSelectorValue>): string {
+    selectorsToSyntax(selectors: Record<string, baseTypes.DatabaseSelectorValue>): string {
         const list = Object.keys(selectors);
         if (list.length > 0) {
-            return `WHERE ${list.map((e) => `\`${e}\` ${(typeof(selectors[e]) !== "object" ? "=" : (selectors[e] as types.DatabaseFetchSelector).comparison)} ?`).join(" AND ")}`;
+            return `WHERE ${list.map((e) => `\`${e}\` ${(typeof(selectors[e]) !== "object" ? "=" : (selectors[e] as baseTypes.DatabaseFetchSelector).comparison)} ?`).join(" AND ")}`;
         }
 
         return "";
     }
 
-    selectorsToData(selectors: Record<string, types.DatabaseSelectorValue>): string[] {
+    selectorsToData(selectors: Record<string, baseTypes.DatabaseSelectorValue>): string[] {
         return Object.values(selectors).map(e => typeof(e) !== "object" ? e.toString() : e.value.toString());
     }
 
-    itemToKeys(item: Record<string, types.DatabaseItemValue>): string {
+    itemToKeys(item: Record<string, baseTypes.DatabaseItemValue>): string {
         return Object.keys(item).map(e => `\`${e}\``).join(", ");
     }
 
-    itemToKeysWithQuestions(item: Record<string, types.DatabaseItemValue>): string {
+    itemToKeysWithQuestions(item: Record<string, baseTypes.DatabaseItemValue>): string {
         return Object.keys(item).map(e => `\`${e}\` = ?`).join(", ");
     }
 
-    itemToValues(item: Record<string, types.DatabaseItemValue>): (string | null)[] {
-        return Object.values(item).map(e => {
-            if(e === null) { return e; }
-            switch(typeof(e)) {
-                case "boolean":
-                    return e ? "1" : "0";
-
-                default:
-                    return e.toString();
-            }
-        });
+    itemToValues(item: Record<string, baseTypes.DatabaseItemValue>): (string | null)[] {
+        return Object.values(item).map(e => serializeDatabaseItemValue(e));
     }
 
-    itemToValuesWithQuestions(item: Record<string, types.DatabaseItemValue>): string {
+    itemToValuesWithQuestions(item: Record<string, baseTypes.DatabaseItemValue>): string {
         return Object.values(item).map(() => "?").join(", ");
     }
 
-    deserialize<T>(options: types.DatabaseFetchOptions, item: any): T | null {
+    deserialize<T>(options: baseTypes.DatabaseFetchOptions, item: any): T | null {
         if(item === undefined) {
             return null;
         }
@@ -203,7 +196,7 @@ class DatabaseMySQL extends Database {
         return newItem;
     }
 
-    serialize(table: string, item: Record<string, types.DatabaseUnserializedItemValue>): Record<string, types.DatabaseItemValue> {
+    serialize(table: string, item: Record<string, baseTypes.DatabaseUnserializedItemValue>): Record<string, baseTypes.DatabaseItemValue> {
         const newItem: any = item;
         if(this.options.structure !== undefined && this.options.structure[table] !== undefined) {
             const fields = Object.keys(this.options.structure[table]).filter(e => newItem[e] !== undefined);

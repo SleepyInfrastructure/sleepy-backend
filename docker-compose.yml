@@ -3,8 +3,8 @@ services:
     container_name: miracle-mysql
     image: mariadb:latest
     restart: "always"
-    expose:
-      - "3306"
+    ports:
+      - "3306:3306"
     networks:
       - miracle-backend
     volumes:
@@ -18,30 +18,36 @@ services:
       timeout: 2s
       retries: 30
     command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
-  miracle-ssh:
-    container_name: miracle-ssh
-    image: miracle-ssh:latest
+  miracle-redis:
+    container_name: miracle-redis
+    image: redis:alpine
     restart: "always"
     ports:
-      - "8888:8888"
-    build:
-      context: .docker/images/miracle-ssh
-      dockerfile: Dockerfile
+      - "6379:6379"
+    networks:
+      - miracle-backend
+    volumes:
+      - .docker/volumes/miracle-redis:/usr/local/etc/redis
+      - miracle-redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli" ,"ping"]
+      timeout: 2s
+      retries: 30
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf", "--requirepass", "$MIRACLE_REDIS_PASSWORD"]
   miracle-backend:
     container_name: miracle-backend
     image: miracle-backend:latest
     restart: "always"
     ports:
-      - "9001:9001"
-      - "9002:9002"
-      - "454:454"
-      - "455:455"
+      - "8000:8000"
+      - "8001:8001"
     networks:
       - miracle-backend
     volumes:
       - ./config:/usr/src/app/config
     environment:
       MIRACLE_MYSQL_PASSWORD: "${MIRACLE_MYSQL_PASSWORD}"
+      MIRACLE_REDIS_PASSWORD: "${MIRACLE_REDIS_PASSWORD}"
     depends_on:
       miracle-mysql:
         condition: service_healthy
@@ -50,7 +56,9 @@ services:
       dockerfile: .docker/images/miracle-backend/Dockerfile
     tty: yes
 volumes:
-  slemiracleepy-mysql:
+  miracle-mysql:
+    external: true
+  miracle-redis:
     external: true
 networks:
   miracle-backend:

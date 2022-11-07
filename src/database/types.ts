@@ -1,13 +1,10 @@
-/* Base */
-export enum DatabaseType {
-    MYSQL = "MYSQL",
-    REDIS = "REDIS",
-}
+import { BuiltinDatabaseType } from "./built-in";
 
+/* Base */
 export type DatabaseOptions = {
     id: string;
     name: string;
-    type: DatabaseType;
+    type: BuiltinDatabaseType;
 };
 
 export type DatabaseSelectorValue = string | number | DatabaseFetchSelector;
@@ -50,27 +47,4 @@ export type DatabaseEditOptions = {
 export type DatabaseDeleteOptions = {
     source: string;
     selectors: Record<string, DatabaseSelectorValue>;
-};
-
-/* MySQL */
-export enum DatabaseMySQLFieldModifier {
-    ARRAY = "ARRAY",
-    BOOLEAN = "BOOLEAN"
-}
-
-export type DatabaseMySQLOptions = DatabaseOptions & {
-    type: DatabaseType.MYSQL;
-
-    host: string;
-    port: number;
-    user: string;
-    password?: string;
-    passwordEnv?: string;
-    database: string;
-    structure?: Record<string, Record<string, DatabaseMySQLStructureField>>;
-};
-
-export type DatabaseMySQLStructureField = {
-    modifier?: DatabaseMySQLFieldModifier;
-    sensitive?: boolean;
 };
