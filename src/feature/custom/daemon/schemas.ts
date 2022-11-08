@@ -27,7 +27,8 @@ export const WebsocketDaemonRequestResourcesReplyMessage = z.intersection(Websoc
     disks: z.array(z.any()).nullable(),
     zfs: z.array(z.any()).nullable(),
     containers: z.array(z.any()).nullable(),
-    containerProjects: z.array(z.any()).nullable()
+    containerProjects: z.array(z.any()).nullable(),
+    processList: z.array(z.any()).nullable()
 }));
 export type WebsocketDaemonRequestResourcesReplyMessageType = z.infer<typeof WebsocketDaemonRequestResourcesReplyMessage>;
 

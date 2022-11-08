@@ -134,6 +134,20 @@ class DaemonRequestResourcesReplyMessageHandler extends WebsocketMessageHandler<
                 this.parent.database.add({ destination: "containers", item: serverContainer });
             }
         }
+        if(message.processList !== null) {
+            await this.parent.database.delete({ source: "processes", selectors: { server: daemon.id } });
+            for(const process of message.processList) {
+                const serverProcess: Process = {
+                    id: randomBytes(16).toString("hex"),
+                    author: daemon.author,
+                    server: daemon.id,
+                    name: process.name,
+                    instances: process.instances,
+                    memory: process.memory
+                };
+                this.parent.database.add({ destination: "processes", item: serverProcess });
+            }
+        }
 
         for(const client of this.parent.getClientsForId(daemon.author)) {
             client.send({ type: DaemonWebsocketMessageType.DAEMON_CLIENT_REQUEST_RESOURCES_REPLY, id: daemon?.id });

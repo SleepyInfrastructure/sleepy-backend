@@ -23,7 +23,8 @@ export enum CronUpdateType {
 export enum CronUpdateResourcesType {
     GENERAL = "GENERAL",
     CONTAINERS = "CONTAINERS",
-    DISKS = "DISKS"
+    DISKS = "DISKS",
+    PROCESS_LIST = "PROCESS_LIST"
 };
 
 export type CronUpdate = {

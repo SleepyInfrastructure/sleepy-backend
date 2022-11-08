@@ -31,7 +31,7 @@
 		},
 		{
 			"time": "*/1 * * * *",
-			"updates": [{ "type": "RESOURCES", "resources": ["CONTAINERS"] }, { "type": "ALERTS" }],
+			"updates": [{ "type": "RESOURCES", "resources": ["CONTAINERS", "PROCESS_LIST"] }, { "type": "ALERTS" }],
 			"cleans": []
 		},
 		{
