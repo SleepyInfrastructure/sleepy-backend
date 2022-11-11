@@ -1,5 +1,6 @@
 .docker
 .husky
 .vscode
+config
 build
 node_modules

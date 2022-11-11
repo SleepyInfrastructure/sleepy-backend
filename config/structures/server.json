@@ -81,6 +81,14 @@
             "idField": "id",
             "baseIdField": "id",
             "authorField": "author"
+        },
+        "processes": {
+            "type": "ARRAY",
+            "table": "processes",
+            "idField": "server",
+            "baseIdField": "id",
+            "authorField": "author",
+            "sort": { "field": "memory", "order": "DESC" }
         }
     }
 }

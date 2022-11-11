@@ -1,10 +1,10 @@
 import { RouteOptions } from "../types";
 import APIRoute from "feature/built-in/api/routes";
+import FeatureAPI from "feature/built-in/api";
 import RouteDaemonTokenCreate from "./daemon_token_create";
 import RouteDaemonFileUpload from "./daemon_file_upload";
 import RouteServerCreate from "./server_create";
 import RouteServerEdit from "./server_edit";
-import FeatureAPI from "feature/built-in/api";
 import RouteUserFileAccess from "./user_file_access";
 import RouteServerDelete from "./server_delete";
 import RouteUptimeEndpointDelete from "./uptime_endpoint_delete";
