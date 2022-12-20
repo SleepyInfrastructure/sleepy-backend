@@ -25,8 +25,7 @@ export function createFastifyInstance(options: FeatureServerOptions): MiracleFas
         https: {
             cert: readFileSync(`config/https/${options.https}/fullchain.pem`),
             key: readFileSync(`config/https/${options.https}/privkey.pem`),
-            allowHTTP1: true,
-            origins: options.cors?.origins
+            allowHTTP1: true
         },
     }).withTypeProvider<TypeBoxTypeProvider>();
     instance.addContentTypeParser("application/json", { parseAs: "string" }, jsonParser);

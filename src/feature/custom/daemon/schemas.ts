@@ -71,5 +71,11 @@ export const WebsocketDaemonContainerLogMessageMessage = z.intersection(Websocke
 })));
 export type WebsocketDaemonContainerLogMessageMessageType = z.infer<typeof WebsocketDaemonContainerLogMessageMessage>;
 
+export const WebsocketDaemonClientContainerActionMessage = z.intersection(WebsocketMessage, z.intersection(IDSchema, z.object({
+    project: z.boolean(),
+    action: z.enum(["START", "STOP", "BUILD", "REMOVE", "RESTART", "REBUILD"])
+})));
+export type WebsocketDaemonClientContainerActionMessageType = z.infer<typeof WebsocketDaemonClientContainerActionMessage>;
+
 export const WebsocketDaemonClientBuildSmbConfigMessage = z.intersection(WebsocketMessage, IDSchema);
 export type WebsocketDaemonClientBuildSmbConfigMessageType = z.infer<typeof WebsocketDaemonClientBuildSmbConfigMessage>;
