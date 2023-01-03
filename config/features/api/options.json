@@ -360,6 +360,82 @@
             "path": "/v1/daemon/file/upload",
             "type": "DAEMON_FILE_UPLOAD",
             "root": "/usr/src/sleepy/data/user"
+        },
+        { "path": "/v1/nginxInstances/delete", "type": "NGINX_INSTANCE_DELETE" },
+        {
+            "path": "/v1/nginxInstances/create",
+            "type": "CREATE",
+            "table": "nginxinstances",
+            "schema": "NGINX_INSTANCE_CREATE"
+        },
+        {
+            "path": "/v1/nginxInstances/edit",
+            "type": "EDIT",
+            "table": "nginxinstances",
+            "schema": "NGINX_INSTANCE_EDIT"
+        },
+        {
+            "path": "/v1/nginxInstances/structured/fetch",
+            "paths": {
+                "BASE": "/v1/nginxInstances/fetch", "BASE_ARRAY": "/v1/nginxInstances/all/fetch",
+                "SINGLE": "/v1/nginxInstances/structured/fetch", "ARRAY": "/v1/nginxInstances/all/structured/fetch"
+            },
+            "type": "FETCH_STRUCTURED",
+            "base": {
+                "table": "nginxinstances",
+                "authorField": "author",
+                "structure": "nginx-instance"
+            }
+        },
+        { "path": "/v1/nginxServers/delete", "type": "NGINX_SERVER_DELETE" },
+        {
+            "path": "/v1/nginxServers/create",
+            "type": "CREATE",
+            "table": "nginxservers",
+            "schema": "NGINX_SERVER_CREATE"
+        },
+        {
+            "path": "/v1/nginxServers/edit",
+            "type": "EDIT",
+            "table": "nginxservers",
+            "schema": "NGINX_SERVER_EDIT"
+        },
+        {
+            "path": "/v1/nginxServers/structured/fetch",
+            "paths": {
+                "BASE": "/v1/nginxServers/fetch", "BASE_ARRAY": "/v1/nginxServers/all/fetch",
+                "SINGLE": "/v1/nginxServers/structured/fetch", "ARRAY": "/v1/nginxServers/all/structured/fetch"
+            },
+            "type": "FETCH_STRUCTURED",
+            "base": {
+                "table": "nginxservers",
+                "authorField": "author",
+                "structure": "nginx-server"
+            }
+        },
+        {
+            "path": "/v1/nginxLocations/delete",
+            "type": "DELETE",
+            "table": "nginxlocations",
+            "authorField": "author"
+        },
+        {
+            "path": "/v1/nginxLocations/create",
+            "type": "CREATE",
+            "table": "nginxlocations",
+            "schema": "NGINX_LOCATION_CREATE"
+        },
+        {
+            "path": "/v1/nginxLocations/edit",
+            "type": "EDIT",
+            "table": "nginxlocations",
+            "schema": "NGINX_LOCATION_EDIT"
+        },
+        {
+            "path": "/v1/nginxLocations/fetch",
+            "type": "FETCH",
+            "table": "nginxlocations",
+            "authorField": "author"
         }
     ]
 }

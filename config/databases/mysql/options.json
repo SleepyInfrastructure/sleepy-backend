@@ -19,6 +19,14 @@
         "disks": {
             "ssd": { "modifier": "BOOLEAN" }
         },
+        "nginxinstances": {
+            "networks": { "modifier": "ARRAY" }
+        },
+        "nginxservers": {
+            "origins": { "modifier": "ARRAY" },
+            "httpRedirect": { "modifier": "BOOLEAN" },
+            "http2": { "modifier": "BOOLEAN" }
+        },
         "publicserverlistings": {
             "statistics": { "modifier": "BOOLEAN" }
         },

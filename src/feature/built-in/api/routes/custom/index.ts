@@ -13,6 +13,8 @@ import RouteUserDelete from "./user_delete";
 import RouteTaskDelete from "./task_delete";
 import RouteSMBInstanceDelete from "./smb_instance_delete";
 import RouteSMBShareDelete from "./smb_share_delete";
+import RouteNginxInstanceDelete from "./nginx_instance_delete";
+import RouteNginxServerDelete from "./nginx_server_delete";
 import RouteServerPublicFetchStructured from "./server_public_fetch_structured";
 
 export enum CustomRouteType {
@@ -26,6 +28,8 @@ export enum CustomRouteType {
     DATABASE_DELETE = "DATABASE_DELETE",
     SMB_INSTANCE_DELETE = "SMB_INSTANCE_DELETE",
     SMB_SHARE_DELETE = "SMB_SHARE_DELETE",
+    NGINX_INSTANCE_DELETE = "NGINX_INSTANCE_DELETE",
+    NGINX_SERVER_DELETE = "NGINX_SERVER_DELETE",
     NFS_INSTANCE_DELETE = "NFS_INSTANCE_DELETE",
     NFS_EXPORT_DELETE = "NFS_EXPORT_DELETE",
     TASK_DELETE = "TASK_DELETE",
@@ -51,6 +55,8 @@ const routes: Record<CustomRouteType, (feature: FeatureAPI, options: RouteOption
     [CustomRouteType.DATABASE_DELETE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteDatabaseDelete(feature, options);},
     [CustomRouteType.SMB_INSTANCE_DELETE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteSMBInstanceDelete(feature, options);},
     [CustomRouteType.SMB_SHARE_DELETE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteSMBShareDelete(feature, options);},
+    [CustomRouteType.NGINX_INSTANCE_DELETE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteNginxInstanceDelete(feature, options);},
+    [CustomRouteType.NGINX_SERVER_DELETE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteNginxServerDelete(feature, options);},
     [CustomRouteType.NFS_INSTANCE_DELETE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteSMBInstanceDelete(feature, options);},
     [CustomRouteType.NFS_EXPORT_DELETE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteSMBShareDelete(feature, options);},
     [CustomRouteType.TASK_DELETE]: (feature: FeatureAPI, options: RouteOptions) => {return new RouteTaskDelete(feature, options);},

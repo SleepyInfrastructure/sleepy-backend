@@ -1,0 +1,14 @@
+{
+    "id": "nginx-instance",
+    "structure": {
+        "servers": {
+            "type": "ARRAY",
+            "table": "nginxservers",
+            "idField": "parent",
+            "baseIdField": "id",
+            "authorField": "author",
+            "structure": "nginx-server",
+            "sort": { "field": "name" }
+        }
+    }
+}

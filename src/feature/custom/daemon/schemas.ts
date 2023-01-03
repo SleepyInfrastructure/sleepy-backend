@@ -79,3 +79,6 @@ export type WebsocketDaemonClientContainerActionMessageType = z.infer<typeof Web
 
 export const WebsocketDaemonClientBuildSmbConfigMessage = z.intersection(WebsocketMessage, IDSchema);
 export type WebsocketDaemonClientBuildSmbConfigMessageType = z.infer<typeof WebsocketDaemonClientBuildSmbConfigMessage>;
+
+export const WebsocketDaemonClientBuildNginxConfigMessage = z.intersection(WebsocketMessage, IDSchema);
+export type WebsocketDaemonClientBuildNginxConfigMessageType = z.infer<typeof WebsocketDaemonClientBuildNginxConfigMessage>;

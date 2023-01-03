@@ -65,6 +65,35 @@ export async function deleteSmbShare(database: Database, id: string, author: str
     return true;
 }
 
+export async function deleteNginxInstance(database: Database, id: string, author: string): Promise<boolean> {
+    /* Delete instance */
+    const instance = await database.delete({ source: "nginxinstances", selectors: { id: id, author: author } });
+    if(instance < 1) {
+        return false;
+    }
+
+    /* Delete related objects */
+    const servers = await database.fetchMultiple<NginxServer>({ source: "nginxservers", selectors: { parent: id, author: author } });
+    for(const server of servers) {
+        deleteNginxServer(database, server.id, author);
+    }
+
+    return true;
+}
+
+export async function deleteNginxServer(database: Database, id: string, author: string): Promise<boolean> {
+    /* Delete server */
+    const server = await database.delete({ source: "nginxservers", selectors: { id: id, author: author } });
+    if(server < 1) {
+        return false;
+    }
+
+    /* Delete related objects */
+    database.delete({ source: "nginxlocations", selectors: { parent: id, author: author } });
+
+    return true;
+}
+
 export async function deleteUptimeEndpoint(database: Database, id: string, author: string): Promise<boolean> {
     /* Delete server */
     const endpoint = await database.delete({ source: "uptimeendpoints", selectors: { id: id, author: author } });

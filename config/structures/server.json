@@ -75,6 +75,15 @@
             "structure": "smb-instance",
             "sort": { "field": "name" }
         },
+        "nginx": {
+            "type": "ARRAY",
+            "table": "nginxinstances",
+            "idField": "server",
+            "baseIdField": "id",
+            "authorField": "author",
+            "structure": "nginx-instance",
+            "sort": { "field": "name" }
+        },
         "public": {
             "type": "SINGLE",
             "table": "publicserverlistings",

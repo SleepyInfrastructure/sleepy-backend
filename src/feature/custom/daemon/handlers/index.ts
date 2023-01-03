@@ -1,5 +1,6 @@
 import DaemonsMessageHandler from "./daemons";
 import DaemonAuthMessageHandler from "./daemon_auth";
+import DaemonClientBuildNginxConfigMessageHandler from "./daemon_client_build_nginx_config";
 import DaemonClientBuildSmbConfigMessageHandler from "./daemon_client_build_smb_config";
 import DaemonClientConnectContainerLogMessageHandler from "./daemon_client_connect_container_log";
 import DaemonClientRequestContainerActionMessageHandler from "./daemon_client_request_container_action";
@@ -13,6 +14,7 @@ import DaemonTaskProgressMessageHandler from "./daemon_task_progress";
 
 export default [
     DaemonAuthMessageHandler,
+    DaemonClientBuildNginxConfigMessageHandler,
     DaemonClientBuildSmbConfigMessageHandler,
     DaemonClientConnectContainerLogMessageHandler,
     DaemonClientRequestContainerActionMessageHandler,
