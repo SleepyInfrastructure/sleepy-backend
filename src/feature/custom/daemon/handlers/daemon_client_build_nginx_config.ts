@@ -140,11 +140,8 @@ class DaemonClientBuildNginxConfigMessageHandler extends WebsocketMessageHandler
 
             // Fill in networks
             instanceConfig.push("    networks:");
-            const networks = [
-                `sleepy-nginx-${instance.name}-network`
-            ];
-            instanceNetworks.push(...networks);
-            for(const network of networks) {
+            instanceNetworks.push(...instance.networks);
+            for(const network of instance.networks) {
                 instanceConfig.push(`      - ${network}`);
             }
 
