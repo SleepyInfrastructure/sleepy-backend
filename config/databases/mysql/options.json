@@ -27,6 +27,9 @@
             "httpRedirect": { "modifier": "BOOLEAN" },
             "http2": { "modifier": "BOOLEAN" }
         },
+        "nginxlocations": {
+            "cors": { "modifier": "BOOLEAN" }
+        },
         "publicserverlistings": {
             "statistics": { "modifier": "BOOLEAN" }
         },

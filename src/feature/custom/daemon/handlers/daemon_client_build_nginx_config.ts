@@ -55,10 +55,14 @@ class DaemonClientBuildNginxConfigMessageHandler extends WebsocketMessageHandler
     createLocation(server: NginxServer, location: NginxLocation) {
         const l = [
             `    location /${location.path} {`,
-            `        expires ${location.type === "STATIC" ? `$return_expires_${server.id}` : "off"};`,
-            `        add_header Access-Control-Allow-Origin $return_origin_${server.id};`,
-            "        add_header Access-Control-Allow-Credentials true;"
+            `        expires ${location.type === "STATIC" ? `$return_expires_${server.id}` : "off"};`
         ];
+        if(location.cors) {
+            l.push(...[
+                `        add_header Access-Control-Allow-Origin $return_origin_${server.id};`,
+                "        add_header Access-Control-Allow-Credentials true;"
+            ]);
+        }
         if(location.type === "WS") {
             l.push(...[
                 "        proxy_set_header Upgrade $http_upgrade;",
@@ -76,7 +80,7 @@ class DaemonClientBuildNginxConfigMessageHandler extends WebsocketMessageHandler
     }
 
     createServer(server: NginxServer, locations: NginxLocation[]) {
-        return [
+        const s = [
             "server {",
             `    listen 443 ${server.http2 ? "ssl http2" : "ssl"};`,
             `    server_name ${server.domain};`,
@@ -85,6 +89,8 @@ class DaemonClientBuildNginxConfigMessageHandler extends WebsocketMessageHandler
             ...locations.map(location => this.createLocation(server, location)).flat(),
             "}"
         ];
+
+        return s;
     }
 
     createReturnExpires(server: NginxServer) {
