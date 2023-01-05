@@ -80,8 +80,8 @@ class DaemonClientBuildNginxConfigMessageHandler extends WebsocketMessageHandler
             "server {",
             `    listen 443 ${server.http2 ? "ssl http2" : "ssl"};`,
             `    server_name ${server.domain};`,
-            `    ssl_certificate /etc/letsencrypt/live/${server.domain}/fullchain.pem;`,
-            `    ssl_certificate_key /etc/letsencrypt/live/${server.domain}/privkey.pem;`,
+            `    ssl_certificate /etc/letsencrypt/live/${server.ssl}/fullchain.pem;`,
+            `    ssl_certificate_key /etc/letsencrypt/live/${server.ssl}/privkey.pem;`,
             ...locations.map(location => this.createLocation(server, location)).flat(),
             "}"
         ];
