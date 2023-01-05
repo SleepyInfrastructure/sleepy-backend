@@ -73,6 +73,46 @@
             "limit": 12
         },
         {
+            "path": "/v1/disks/statistics/hour/fetch",
+            "type": "FETCH_MULTIPLE",
+            "table": "diskstatistics",
+            "idField": "parent",
+            "authorField": "author",
+            "select": { "type": "MINUTE" },
+            "sort": { "field": "timestamp", "order": "DESC" },
+            "limit": 60
+        },
+        {
+            "path": "/v1/disks/statistics/day/fetch",
+            "type": "FETCH_MULTIPLE",
+            "table": "diskstatistics",
+            "idField": "parent",
+            "authorField": "author",
+            "select": { "type": "HOUR" },
+            "sort": { "field": "timestamp", "order": "DESC" },
+            "limit": 24
+        },
+        {
+            "path": "/v1/disks/statistics/month/fetch",
+            "type": "FETCH_MULTIPLE",
+            "table": "diskstatistics",
+            "idField": "parent",
+            "authorField": "author",
+            "select": { "type": "DAY" },
+            "sort": { "field": "timestamp", "order": "DESC" },
+            "limit": 30
+        },
+        {
+            "path": "/v1/disks/statistics/year/fetch",
+            "type": "FETCH_MULTIPLE",
+            "table": "diskstatistics",
+            "idField": "parent",
+            "authorField": "author",
+            "select": { "type": "MONTH" },
+            "sort": { "field": "timestamp", "order": "DESC" },
+            "limit": 12
+        },
+        {
             "path": "/v1/serverconfigs/fetch",
             "type": "FETCH",
             "table": "serverconfigs",
