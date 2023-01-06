@@ -66,7 +66,8 @@ class DaemonRequestResourcesReplyMessageHandler extends WebsocketMessageHandler<
                         type: partition.type,
                         size: partition.size,
                         used: partition.used,
-                        mountpoint: partition.mountpoint
+                        mountpoint: partition.mountpoint,
+                        flags: partition.flags
                     };
                     this.parent.database.add({ destination: "partitions", item: serverPartition });
                 }
