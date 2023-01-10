@@ -20,6 +20,9 @@
 		"/create-smb-user/:id", "/edit-smb-user/:id",
 		"/create-nfs-instance/:id", "/edit-nfs-instance/:id", "/nfs-instance/:id",
 		"/create-nfs-export/:id", "/edit-nfs-export/:id",
-		"/create-nfs-machine/:id", "/edit-nfs-machine/:id"
+		"/create-nfs-machine/:id", "/edit-nfs-machine/:id",
+		"/create-nginx-instance/:id", "/edit-nginx-instance/:id", "/nginx-instance/:id",
+		"/create-nginx-server/:id", "/edit-nginx-server/:id",
+		"/create-nginx-location/:id", "/edit-nginx-location/:id"
 	]
 }
