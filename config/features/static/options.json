@@ -14,7 +14,7 @@
 		"/create-network", "/edit-network/:id", "/network/:id", 
 		"/container/:id", "/container-project/:id",
 		"/create-database", "/edit-database/:id", "/database/:id", 
-		"/create-uptime-endpoint", "/edit-uptime-endpoint",
+		"/create-uptime-endpoint", "/edit-uptime-endpoint", "/uptime-endpoint/:id",
 		"/create-smb-instance/:id", "/edit-smb-instance/:id", "/smb-instance/:id",
 		"/create-smb-share/:id", "/edit-smb-share/:id",
 		"/create-smb-user/:id", "/edit-smb-user/:id",

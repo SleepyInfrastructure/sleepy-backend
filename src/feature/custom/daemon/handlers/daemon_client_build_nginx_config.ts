@@ -96,7 +96,7 @@ class DaemonClientBuildNginxConfigMessageHandler extends WebsocketMessageHandler
     createReturnExpires(server: NginxServer) {
         return [
             `    map $sent_http_content_type $return_expires_${server.id} {`,
-            "        default 7d;",
+            `        default ${server.expires};`,
             "    }"
         ];
     }
