@@ -9,7 +9,7 @@
 	"root": "/usr/src/sleepy/static",
 	"roots": [
 		"/", "/public-dashboards", "/login", "/register", "/tasks", "/tokens", "/settings",
-		"/overview",
+		"/overview", "/servers", "/uptime-endpoints",
 		"/create-server", "/edit-server/:id", "/server/:id", "/server/:id/map", "/installing-daemon/:id",
 		"/create-network", "/edit-network/:id", "/network/:id", 
 		"/container/:id", "/container-project/:id",
